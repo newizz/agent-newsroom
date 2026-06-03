@@ -1,7 +1,7 @@
 {
   "currentRun": null,
   "currentSlug": null,
-  "lastUpdate": "2026-06-03T09:44:31Z",
+  "lastUpdate": "2026-06-03T09:57:40Z",
   "agents": [
     {
       "id": "intake",
@@ -24,8 +24,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "busy",
-      "task": "Rebuilding cat-life-stories with animated overview reel"
+      "status": "idle",
+      "task": ""
     },
     {
       "id": "reporter",

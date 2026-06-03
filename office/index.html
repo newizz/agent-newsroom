@@ -836,9 +836,24 @@
       }
     }
   }
+  let __lastDataUpdate = null;
+  function fmtRelative(ts) {
+    if (!ts) return '—';
+    const diff = Date.now() - ts.getTime();
+    if (diff < 0)       return 'just now';
+    if (diff < 5000)    return 'just now';
+    if (diff < 60000)   return Math.floor(diff/1000) + 's ago';
+    if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+    return Math.floor(diff/3600000) + 'h ago';
+  }
+  // Tick every second so the relative time visibly counts up (even between polls)
+  setInterval(() => {
+    document.getElementById('lastUpdate').textContent = fmtRelative(__lastDataUpdate);
+  }, 1000);
+
   function applyStatusData(data) {
-    document.getElementById('lastUpdate').textContent =
-      data.lastUpdate ? new Date(data.lastUpdate).toLocaleTimeString() : '—';
+    __lastDataUpdate = data.lastUpdate ? new Date(data.lastUpdate) : null;
+    document.getElementById('lastUpdate').textContent = fmtRelative(__lastDataUpdate);
     const bar = document.getElementById('currentRunBar');
     if (data.currentSlug) {
       bar.style.display = 'block';
