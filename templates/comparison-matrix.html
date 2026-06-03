@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE: comparison-matrix
+  PURPOSE:  "X vs Y" / "Best Z for ..." / "Should I choose A or B"
+  PLACEHOLDERS:
+    {{TITLE}}, {{SUBTITLE}}, {{SLUG}}, {{DATE}}
+    {{OPTIONS_JSON}} — JSON array:
+      [
+        { "name": "Option A", "tagline": "...", "pros": ["..."], "cons": ["..."], "scores": { "Speed": 8, "Cost": 5, ... } },
+        ...
+      ]
+      All options must use the same `scores` keys (criteria). Score range 0-10.
+    {{CONTENT_NARRATIVE}}  — analytical text
+    {{CONTENT_RECOMMENDATION}} — final recommendation paragraph
+    {{SOURCES_HTML}}
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}} — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .row-hover:hover { background: #1c1c20 !important; }
+  }
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .row-hover:hover { background: #f4f4f5; }
+  .score-bar { height: 6px; background: #f4f4f5; border-radius: 999px; overflow: hidden; }
+  .score-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s ease; }
+  @media (prefers-color-scheme: dark) {
+    .score-bar { background: #27272a; }
+  }
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="border-b border-soft">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">{{SLUG}} · {{DATE}}</div>
+  </div>
+</header>
+
+<section class="max-w-6xl mx-auto px-6 pt-16 pb-8 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Comparison</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">{{TITLE}}</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">{{SUBTITLE}}</p>
+</section>
+
+<!-- Option cards -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div id="optionCards" class="grid md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</section>
+
+<!-- Radar chart -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="surface rounded-xl p-6">
+    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="radar" class="w-5 h-5 accent"></i> At a glance
+    </h2>
+    <div class="h-96"><canvas id="radar"></canvas></div>
+  </div>
+</section>
+
+<!-- Detail table -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="table" class="w-5 h-5 accent"></i> Criterion-by-criterion
+  </h2>
+  <div class="surface rounded-xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead><tr id="tableHead" class="border-b border-soft text-left muted"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Narrative -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="message-square" class="w-5 h-5 accent"></i> Analysis
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content">{{CONTENT_NARRATIVE}}</div>
+</section>
+
+<!-- Recommendation -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="check-circle-2" class="w-5 h-5 accent"></i> Recommendation
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content border-l-4" style="border-left-color: var(--accent);">
+    {{CONTENT_RECOMMENDATION}}
+  </div>
+</section>
+
+<!-- Sources -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm">{{SOURCES_HTML}}</div>
+</section>
+
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on {{DATE}}</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<style>
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  th, td { padding: 0.75rem 1rem; }
+  tbody tr { border-top: 1px solid #e4e4e7; }
+  @media (prefers-color-scheme: dark) {
+    tbody tr { border-top-color: #27272a; }
+  }
+</style>
+
+<script>
+  lucide.createIcons();
+
+  const options = {{OPTIONS_JSON}};
+  const palette = ['#6366F1', '#10B981', '#F59E0B', '#EC4899', '#06B6D4', '#8B5CF6'];
+
+  // Render option cards
+  const cardWrap = document.getElementById('optionCards');
+  options.forEach((opt, i) => {
+    const color = palette[i % palette.length];
+    const div = document.createElement('div');
+    div.className = 'surface rounded-xl p-6';
+    div.innerHTML = `
+      <div class="flex items-center gap-2 mb-2">
+        <div style="width:10px;height:10px;background:${color};border-radius:999px"></div>
+        <h3 class="font-semibold text-lg">${opt.name}</h3>
+      </div>
+      <p class="muted text-sm mb-4">${opt.tagline || ''}</p>
+      <div class="text-xs muted font-medium mb-1">Pros</div>
+      <ul class="text-sm mb-3 list-disc pl-5 space-y-1">${(opt.pros||[]).map(p=>`<li>${p}</li>`).join('')}</ul>
+      <div class="text-xs muted font-medium mb-1">Cons</div>
+      <ul class="text-sm list-disc pl-5 space-y-1">${(opt.cons||[]).map(c=>`<li>${c}</li>`).join('')}</ul>
+    `;
+    cardWrap.appendChild(div);
+  });
+
+  // Criteria for table & radar
+  const criteria = Object.keys(options[0]?.scores || {});
+
+  // Radar chart
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const tickColor = isDark ? '#a1a1aa' : '#71717a';
+  const gridColor = isDark ? '#27272a' : '#e4e4e7';
+  new Chart(document.getElementById('radar'), {
+    type: 'radar',
+    data: {
+      labels: criteria,
+      datasets: options.map((opt, i) => ({
+        label: opt.name,
+        data: criteria.map(c => opt.scores[c] ?? 0),
+        borderColor: palette[i % palette.length],
+        backgroundColor: palette[i % palette.length] + '33',
+        pointBackgroundColor: palette[i % palette.length],
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          beginAtZero: true, max: 10,
+          grid: { color: gridColor },
+          angleLines: { color: gridColor },
+          pointLabels: { color: tickColor, font: { family: 'Inter', size: 12 } },
+          ticks: { display: false }
+        }
+      },
+      plugins: { legend: { position: 'top', labels: { color: tickColor, font: { family: 'Inter' } } } }
+    }
+  });
+
+  // Table
+  const thead = document.getElementById('tableHead');
+  thead.innerHTML = `<th class="font-medium">Criterion</th>` + options.map(o => `<th class="font-medium">${o.name}</th>`).join('');
+  const tbody = document.getElementById('tableBody');
+  criteria.forEach(c => {
+    const max = Math.max(...options.map(o => o.scores[c] ?? 0));
+    tbody.innerHTML += `<tr class="row-hover transition">
+      <td class="muted">${c}</td>
+      ${options.map(o => {
+        const v = o.scores[c] ?? 0;
+        const isMax = v === max && v > 0;
+        return `<td>
+          <div class="flex items-center gap-2">
+            <div class="score-bar w-24"><div class="score-fill" style="width:${v*10}%"></div></div>
+            <span class="${isMax ? 'accent font-semibold' : ''}">${v}</span>
+          </div>
+        </td>`;
+      }).join('')}
+    </tr>`;
+  });
+</script>
+</body>
+</html>

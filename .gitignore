@@ -1,0 +1,21 @@
+# Claude Code local
+.claude/local/
+.claude/cache/
+.claude/conversations/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Temp
+*.tmp
+*.log
+node_modules/
+.env
+.env.local

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Large Language Models Work — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .card { background: #131316 !important; border-color: #27272a !important; }
+    dd { color: #a1a1aa !important; }
+    code { background: #1c1c20 !important; }
+  }
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .step { counter-increment: step; display: flex; align-items: flex-start; margin-bottom: 1.25rem; }
+  .step::before {
+    content: counter(step);
+    flex-shrink: 0;
+    display: inline-flex;
+    width: 28px; height: 28px;
+    align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 8px; font-weight: 600; font-size: 13px;
+    margin-right: 12px;
+  }
+  .steps { counter-reset: step; }
+  .card { padding: 1.5rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  dl { display: grid; gap: 1em; }
+  dt { font-weight: 600; }
+  dd { margin-left: 0; color: #71717a; line-height: 1.6; }
+  code { background: var(--accent-soft); color: var(--accent); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: ui-monospace, monospace; }
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.7; }
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  sup a { font-size: 0.7em; padding: 0 2px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="border-b border-soft">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      agent-newsroom
+    </a>
+    <div class="text-xs muted">llm-explained · 2026-06-03</div>
+  </div>
+</header>
+
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-12 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Concept Explainer</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">How Large Language Models Work</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+    An LLM is, at heart, a very large statistical next-token predictor. The "magic" is six mechanisms — tokens, embeddings, attention, training, sampling, and context — combined at massive scale.
+  </p>
+</section>
+
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-4 flex flex-wrap gap-1">
+    <a href="#overview" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Overview</a>
+    <a href="#how" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">How it works</a>
+    <a href="#examples" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Examples</a>
+    <a href="#glossary" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Glossary</a>
+    <a href="#sources" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Sources</a>
+  </div>
+</nav>
+
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> Overview
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content">
+    <p>Before 2017, language models were RNNs and LSTMs — networks that processed text left-to-right with a hidden state that struggled to remember things from far back in the sequence. The <strong>Transformer architecture</strong><sup><a href="#s1">[1]</a></sup> threw all that out and replaced it with <strong>self-attention</strong>, which lets every word interact with every other word in parallel.</p>
+    <p>That parallelism is what made today's models possible. RNNs couldn't be efficiently trained on huge datasets; Transformers can. Scaled-up Transformers became GPT, BERT, Claude, Gemini, and every modern LLM.</p>
+    <p>Underneath all the polish, an LLM does one thing: <strong>given some text, predict the most likely next chunk of text</strong>. Everything you experience — chat, summarisation, code generation, reasoning — emerges from that single trick applied billions of times across trillions of training examples.</p>
+  </div>
+</section>
+
+<section id="how" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="cog" class="w-5 h-5 accent"></i> How it works
+  </h2>
+  <div class="surface rounded-xl p-8 steps">
+
+    <div class="step">
+      <div>
+        <h3 class="font-semibold mb-1">Tokenize — chop text into pieces</h3>
+        <p class="muted leading-relaxed">A tokenizer breaks your prompt into integer IDs from a fixed vocabulary of ~100,000 tokens. Common words become one token; rare words split into pieces. Rough rule: <code>1 token ≈ 4 characters</code> in English<sup><a href="#s4">[4]</a></sup>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div>
+        <h3 class="font-semibold mb-1">Embed — turn IDs into meaning vectors</h3>
+        <p class="muted leading-relaxed">Each token ID is looked up in a giant table and replaced with a vector of ~4,000–12,000 numbers. Similar meanings end up close together in this space. Famously: <code>king − man + woman ≈ queen</code><sup><a href="#s2">[2]</a></sup>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div>
+        <h3 class="font-semibold mb-1">Attend — every token looks at every other</h3>
+        <p class="muted leading-relaxed">For each token, the model computes a <strong>Query</strong>, <strong>Key</strong>, and <strong>Value</strong>. The Query is matched against every other token's Key to decide how much attention to pay — then those attention weights mix the Values to update the representation<sup><a href="#s1">[1]</a></sup>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div>
+        <h3 class="font-semibold mb-1">Stack — repeat this dozens of times</h3>
+        <p class="muted leading-relaxed">Frontier models stack 80–120 layers of attention + feed-forward blocks. Lower layers learn grammar; higher layers learn facts, intent, and style — without anyone explicitly programming those rules<sup><a href="#s3">[3]</a></sup>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div>
+        <h3 class="font-semibold mb-1">Predict — produce a probability for every next token</h3>
+        <p class="muted leading-relaxed">The final layer projects to a 100,000-wide vector — one logit per vocabulary token. Softmax turns those logits into a probability distribution. The model now "thinks" every possible next word with a probability.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div>
+        <h3 class="font-semibold mb-1">Sample — pick one token, then loop</h3>
+        <p class="muted leading-relaxed">A sampler picks one token from the distribution (greedy, temperature, or top-p). The new token is appended and the whole process runs again to produce the next one. Token by token, sentences and pages emerge.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> Worked examples
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div class="card">
+      <div class="text-xs font-medium accent mb-2">EXAMPLE 1</div>
+      <h3 class="font-semibold mb-3">Tokenizing "extraordinary"</h3>
+      <p class="muted text-sm leading-relaxed mb-3">A rare word like <code>extraordinary</code> doesn't get its own token. The BPE tokenizer splits it into common pieces:</p>
+      <div class="font-mono text-sm bg-zinc-100 dark:bg-zinc-900 p-3 rounded">
+        "extraordinary" → ["extra", "ordinary"]<br>
+        → [11814, 19929]
+      </div>
+      <p class="muted text-xs mt-3">Two tokens for one "word" — and the model sees the link to other "ordinary" contexts it has learned.</p>
+    </div>
+
+    <div class="card">
+      <div class="text-xs font-medium accent mb-2">EXAMPLE 2</div>
+      <h3 class="font-semibold mb-3">Predicting "The cat sat on the ___"</h3>
+      <p class="muted text-sm leading-relaxed mb-3">After tokenization, embedding, and 100 layers of attention, the final probabilities for the next token look something like:</p>
+      <div class="font-mono text-sm space-y-1">
+        <div class="flex items-center gap-2"><div class="w-32"> mat</div><div class="bg-accent rounded h-2" style="width:41%"></div><div>41%</div></div>
+        <div class="flex items-center gap-2"><div class="w-32"> floor</div><div class="bg-accent rounded h-2" style="width:18%"></div><div>18%</div></div>
+        <div class="flex items-center gap-2"><div class="w-32"> chair</div><div class="bg-accent rounded h-2" style="width:9%"></div><div>9%</div></div>
+        <div class="flex items-center gap-2"><div class="w-32"> couch</div><div class="bg-accent rounded h-2" style="width:6%"></div><div>6%</div></div>
+        <div class="flex items-center gap-2 muted text-xs"><div class="w-32">... ~99,996 more</div></div>
+      </div>
+      <p class="muted text-xs mt-3">Greedy sampling picks <code> mat</code>. Higher temperature might pick <code> floor</code> instead.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> Key terms
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <dl>
+      <div><dt>Token</dt><dd>A sub-word piece of text; the atomic unit the model operates on. Roughly 4 characters of English.</dd></div>
+      <div><dt>Embedding</dt><dd>A learned vector representation of a token. Similar meanings → similar vectors.</dd></div>
+      <div><dt>Attention</dt><dd>The mechanism that lets each token "look at" every other token to update its representation based on context.</dd></div>
+      <div><dt>Parameter</dt><dd>A single trainable number in the model. Frontier models have 10¹¹–10¹² of them (100B–1T).</dd></div>
+      <div><dt>Inference</dt><dd>Running the trained model to produce output. Contrast with <em>training</em>, which updates the parameters.</dd></div>
+      <div><dt>Temperature</dt><dd>A knob (0 to ~2) that controls how random sampling is. 0 = always pick the most likely token; higher = more creative / variable.</dd></div>
+      <div><dt>Context window</dt><dd>The maximum number of tokens the model can attend to at once. Costs scale as O(n²), which is why long context is engineering-intensive.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm">
+    <ol class="space-y-3 list-decimal pl-5">
+      <li id="s1"><strong>Attention Is All You Need</strong> — Vaswani et al., arXiv (2017). <a href="https://arxiv.org/abs/1706.03762" target="_blank">arxiv.org/abs/1706.03762</a></li>
+      <li id="s2"><strong>The Illustrated Transformer</strong> — Jay Alammar (2018). <a href="https://jalammar.github.io/illustrated-transformer/" target="_blank">jalammar.github.io</a></li>
+      <li id="s3"><strong>Language Models are Few-Shot Learners</strong> — Brown et al., arXiv (2020). <a href="https://arxiv.org/abs/2005.14165" target="_blank">arxiv.org/abs/2005.14165</a></li>
+      <li id="s4"><strong>Tiktoken — OpenAI tokenizer</strong> (2023). <a href="https://github.com/openai/tiktoken" target="_blank">github.com/openai/tiktoken</a></li>
+      <li id="s5"><strong>Anthropic Claude model card</strong> (2026). <a href="https://docs.claude.com/en/docs/about-claude/models" target="_blank">docs.claude.com</a></li>
+    </ol>
+  </div>
+</section>
+
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-03</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE: timeline
+  PURPOSE:  "History of X" / "Evolution of Y" / "How X changed over time"
+  PLACEHOLDERS:
+    {{TITLE}}, {{SUBTITLE}}, {{SLUG}}, {{DATE}}
+    {{MILESTONES_JSON}} — JSON array, chronological:
+      [
+        { "year": "1969", "title": "ARPANET goes live", "body": "...", "tag": "Origin", "tagColor": "indigo" },
+        { "year": "1989", "title": "...", "body": "...", "tag": "Standard", "tagColor": "emerald" },
+        ...
+      ]
+      tagColor options: indigo | emerald | amber | rose | sky | violet
+    {{CONTENT_INTRO}}  — opening narrative
+    {{CONTENT_OUTLOOK}} — future / outlook narrative
+    {{SOURCES_HTML}}
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}} — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .timeline-line { background: #27272a !important; }
+  }
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .timeline { position: relative; padding-left: 2.5rem; }
+  .timeline-line { position: absolute; left: 0.875rem; top: 0; bottom: 0; width: 2px; background: #e4e4e7; }
+  .milestone { position: relative; margin-bottom: 2rem; }
+  .milestone:last-child { margin-bottom: 0; }
+  .milestone-dot {
+    position: absolute; left: -2rem; top: 0.5rem;
+    width: 14px; height: 14px; border-radius: 999px;
+    background: var(--accent); box-shadow: 0 0 0 4px #fafafa, 0 0 0 5px var(--accent);
+    transition: transform .2s ease;
+  }
+  @media (prefers-color-scheme: dark) {
+    .milestone-dot { box-shadow: 0 0 0 4px #0a0a0b, 0 0 0 5px var(--accent); }
+  }
+  .milestone:hover .milestone-dot { transform: scale(1.3); }
+  .tag-indigo { background: #6366F11A; color: #6366F1; }
+  .tag-emerald { background: #10B9811A; color: #10B981; }
+  .tag-amber { background: #F59E0B1A; color: #B45309; }
+  .tag-rose { background: #F43F5E1A; color: #E11D48; }
+  .tag-sky { background: #0EA5E91A; color: #0284C7; }
+  .tag-violet { background: #8B5CF61A; color: #7C3AED; }
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="border-b border-soft">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">{{SLUG}} · {{DATE}}</div>
+  </div>
+</header>
+
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-8 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Timeline</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">{{TITLE}}</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">{{SUBTITLE}}</p>
+</section>
+
+<!-- Intro -->
+<section class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="surface rounded-xl p-8 prose-content">{{CONTENT_INTRO}}</div>
+</section>
+
+<!-- Filter -->
+<section class="max-w-5xl mx-auto px-6 mb-6">
+  <div class="flex flex-wrap gap-2 items-center">
+    <span class="text-sm muted mr-2">Filter:</span>
+    <div id="filterChips" class="flex flex-wrap gap-2"></div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section class="max-w-5xl mx-auto px-6 mb-16">
+  <div class="surface rounded-xl p-8">
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <div id="milestones"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Outlook -->
+<section class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="telescope" class="w-5 h-5 accent"></i> Outlook
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content">{{CONTENT_OUTLOOK}}</div>
+</section>
+
+<!-- Sources -->
+<section class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm">{{SOURCES_HTML}}</div>
+</section>
+
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on {{DATE}}</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<style>
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+</style>
+
+<script>
+  lucide.createIcons();
+
+  const milestones = {{MILESTONES_JSON}};
+  const wrap = document.getElementById('milestones');
+  const allTags = [...new Set(milestones.map(m => m.tag).filter(Boolean))];
+
+  function render(activeTag = 'all') {
+    wrap.innerHTML = '';
+    milestones
+      .filter(m => activeTag === 'all' || m.tag === activeTag)
+      .forEach(m => {
+        const colorClass = `tag-${m.tagColor || 'indigo'}`;
+        wrap.innerHTML += `
+          <div class="milestone">
+            <div class="milestone-dot"></div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="font-mono text-sm muted">${m.year}</div>
+              ${m.tag ? `<span class="${colorClass} text-xs px-2 py-0.5 rounded-md font-medium">${m.tag}</span>` : ''}
+            </div>
+            <h3 class="font-semibold text-lg mb-2">${m.title}</h3>
+            <p class="muted leading-relaxed">${m.body}</p>
+          </div>
+        `;
+      });
+  }
+
+  const chipsWrap = document.getElementById('filterChips');
+  function renderChips(active) {
+    chipsWrap.innerHTML = '';
+    ['all', ...allTags].forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = `text-xs px-3 py-1.5 rounded-md transition ${t === active ? 'bg-accent text-white' : 'surface hover:bg-accent-soft'}`;
+      if (t === active) btn.style.background = 'var(--accent)';
+      btn.textContent = t === 'all' ? 'All' : t;
+      btn.onclick = () => { renderChips(t); render(t); };
+      chipsWrap.appendChild(btn);
+    });
+  }
+  renderChips('all');
+  render('all');
+</script>
+</body>
+</html>

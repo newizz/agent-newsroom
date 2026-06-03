@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>agent-newsroom · Virtual Office</title>
+<meta name="description" content="A 4-agent virtual newsroom that turns any topic into a deep-research interactive dashboard.">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --accent: #6366F1;
+    --accent-soft: #6366F11A;
+    --bubble-busy: #ff8a3d;
+    --bubble-idle: #5db5e6;
+    --bubble-online: #6dd97c;
+    --bubble-offline: #8a8a8a;
+  }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    input, textarea { background: #131316 !important; border-color: #27272a !important; color: #e4e4e7 !important; }
+  }
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Pixel scene ─────────────────────────────────────────────── */
+  .neon-frame {
+    background: linear-gradient(135deg, #06b6d4 0%, #6366f1 50%, #a855f7 100%);
+    padding: 4px;
+    border-radius: 14px;
+    box-shadow:
+      0 0 24px rgba(6, 182, 212, 0.35),
+      0 0 48px rgba(168, 85, 247, 0.25),
+      0 8px 32px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+  .neon-frame::before {
+    content: ''; position: absolute; inset: -2px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #06b6d4 0%, #6366f1 50%, #a855f7 100%);
+    filter: blur(14px); opacity: .35; z-index: -1;
+  }
+  .office-scene {
+    position: relative;
+    background: #2a1c10;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 800 / 500;
+  }
+  .office-title {
+    position: absolute; top: 10px; left: 0; right: 0;
+    text-align: center;
+    color: #f5e6d3;
+    font-family: 'Courier New', monospace;
+    font-size: clamp(11px, 1.6vw, 17px);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-shadow: 2px 2px 0 #1a0e05, 0 0 12px rgba(99, 102, 241, 0.35);
+    z-index: 5;
+    pointer-events: none;
+  }
+  .office-svg { width: 100%; height: 100%; display: block; }
+
+  /* SVG character offline dimming */
+  .char[data-status="offline"] { opacity: 0.45; }
+
+  /* Overlay layer — bubble (above head) and name (below feet) positioned independently */
+  .overlay-layer { position: absolute; inset: 0; pointer-events: none; }
+  .bubble-ov, .name-ov {
+    position: absolute;
+    transform: translateX(-50%);
+    transition: top .04s linear, left .04s linear;
+    white-space: nowrap;
+  }
+  .bubble-ov {
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-family: 'Courier New', ui-monospace, monospace;
+    font-size: clamp(10px, 1.1vw, 12px);
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.25);
+    letter-spacing: 0.03em;
+  }
+  .bubble-ov::after {
+    content: '';
+    position: absolute;
+    bottom: -3px; left: 50%;
+    width: 7px; height: 7px;
+    background: inherit;
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .bubble-ov[data-status="busy"]    { background: var(--bubble-busy);   }
+  .bubble-ov[data-status="idle"]    { background: var(--bubble-idle);   }
+  .bubble-ov[data-status="online"]  { background: var(--bubble-online); }
+  .bubble-ov[data-status="offline"] { background: var(--bubble-offline); opacity: 0.7; }
+  .bubble-ov[data-status="busy"] { animation: bubBob 1.2s ease-in-out infinite; }
+  @keyframes bubBob {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50%      { transform: translateX(-50%) translateY(-3px); }
+  }
+  .name-ov {
+    background: rgba(0,0,0,0.65);
+    color: #ffffff;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: clamp(9px, 0.95vw, 11px);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.03em;
+    backdrop-filter: blur(2px);
+  }
+  .name-ov .role { opacity: 0.5; font-weight: 400; margin-left: 4px; }
+
+  /* Legs + walking animation */
+  .char .leg, .char .foot { transition: opacity .15s ease; }
+  /* hide legs when sitting — they'd be under the desk anyway */
+  .char[data-state="sitting"] .leg, .char[data-state="sitting"] .foot { opacity: 0; }
+  /* walking step animation: legs alternate up/down */
+  .char[data-state="walking"] .leg-l, .char[data-state="walking"] .foot-l {
+    animation: step 0.32s ease-in-out infinite alternate;
+  }
+  .char[data-state="walking"] .leg-r, .char[data-state="walking"] .foot-r {
+    animation: step 0.32s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes step {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-3px); }
+  }
+
+  /* Live indicator */
+  .live-chip {
+    position: absolute; top: 12px; right: 14px;
+    background: rgba(0,0,0,0.55);
+    color: #d1d5db;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-family: ui-monospace, monospace;
+    backdrop-filter: blur(4px);
+    z-index: 5;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .live-chip .pulse { width: 6px; height: 6px; border-radius: 999px; background: #6dd97c; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.4 } }
+
+  .current-run {
+    position: absolute; bottom: 10px; left: 0; right: 0;
+    text-align: center;
+    color: #d1d5db;
+    font-family: ui-monospace, monospace;
+    font-size: 11px;
+    z-index: 5;
+    pointer-events: none;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .current-run .slug { color: #a78bfa; }
+
+  /* Form bits */
+  .filter-btn { color: #71717a; border: 1px solid transparent; padding: 6px 12px; border-radius: 6px; transition: all .2s ease; }
+  .filter-btn:hover { color: var(--accent); }
+  .filter-btn.active { background: var(--accent-soft); color: var(--accent); }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(120%);
+    background: #18181b; color: #fff;
+    padding: 0.75rem 1.25rem; border-radius: 0.5rem;
+    font-size: 0.875rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transition: transform .3s ease;
+    z-index: 100;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Header -->
+<header class="border-b border-soft sticky top-0 backdrop-blur-md bg-white/70 dark:bg-black/40 z-50">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-accent flex items-center justify-center text-white font-bold text-sm">aN</div>
+      <div>
+        <div class="font-semibold tracking-tight">agent-newsroom</div>
+        <div class="text-xs muted">Virtual Office</div>
+      </div>
+    </div>
+    <nav class="flex items-center gap-4 text-sm">
+      <a href="#submit" class="muted hover:text-current transition">Submit topic</a>
+      <a href="#runs" class="muted hover:text-current transition">Past runs</a>
+      <a href="https://github.com/newizz/agent-newsroom" class="muted hover:text-current transition flex items-center gap-1">
+        <i data-lucide="github" class="w-4 h-4"></i> GitHub
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-6xl mx-auto px-6 pt-12 pb-6 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Live</span>
+    <span>4-agent research pipeline</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-3 max-w-3xl">
+    A virtual newsroom of <span class="accent">four AI agents</span>.
+  </h1>
+  <p class="text-base md:text-lg muted max-w-2xl leading-relaxed">
+    Drop in a topic. Watch the agents intake, research, build, and report — and get back a published interactive dashboard.
+  </p>
+</section>
+
+<!-- ── Pixel office scene ──────────────────────────────────────── -->
+<section class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="neon-frame">
+    <div class="office-scene" id="officeScene">
+
+      <div class="office-title">agent-newsroom Virtual Office 🏢</div>
+      <div class="live-chip"><span class="pulse"></span> LIVE · <span id="lastUpdate">—</span></div>
+
+      <svg class="office-svg" id="officeSvg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="floorWood" x="0" y="0" width="80" height="22" patternUnits="userSpaceOnUse">
+            <rect width="80" height="22" fill="#8b5a2b"/>
+            <rect width="80" height="2" y="0" fill="#6b3e1a"/>
+            <rect width="80" height="1" y="21" fill="#6b3e1a"/>
+            <rect width="2" height="22" x="0"  fill="#6b3e1a"/>
+            <rect width="2" height="22" x="38" fill="#6b3e1a"/>
+            <rect width="1" height="22" x="20" fill="#a06d36" opacity=".4"/>
+            <rect width="1" height="22" x="60" fill="#a06d36" opacity=".4"/>
+          </pattern>
+          <pattern id="floorStagger" x="0" y="0" width="160" height="44" patternUnits="userSpaceOnUse">
+            <rect width="2" height="22" x="78" y="22" fill="#6b3e1a"/>
+            <rect width="2" height="22" x="158" y="22" fill="#6b3e1a"/>
+          </pattern>
+          <pattern id="wallWood" x="0" y="0" width="800" height="14" patternUnits="userSpaceOnUse">
+            <rect width="800" height="14" fill="#3d2818"/>
+            <rect width="800" height="1" y="13" fill="#2a1c10"/>
+          </pattern>
+
+          <!-- Reusable character template. Uses CSS custom properties for colours so <use> + shadow-DOM still inherits per-agent palette -->
+          <g id="char-body">
+            <!-- Shirt -->
+            <rect x="-22" y="0"   width="44" height="24" fill="var(--shirt)"/>
+            <rect x="-26" y="4"   width="52" height="18" fill="var(--shirt)"/>
+            <rect x="-26" y="4"   width="52" height="2"  fill="var(--shirt-hi)"/>
+            <!-- Arms -->
+            <rect x="-26" y="-10" width="7"  height="14" fill="var(--shirt)"/>
+            <rect x="19"  y="-10" width="7"  height="14" fill="var(--shirt)"/>
+            <rect x="-26" y="-16" width="7"  height="7"  fill="#f4c290"/>
+            <rect x="19"  y="-16" width="7"  height="7"  fill="#f4c290"/>
+            <!-- Neck -->
+            <rect x="-6"  y="-2"  width="12" height="6"  fill="#f4c290"/>
+            <!-- Head (skin) -->
+            <rect x="-14" y="-22" width="28" height="22" fill="#f4c290"/>
+            <rect x="-16" y="-20" width="3"  height="18" fill="#f4c290"/>
+            <rect x="13"  y="-20" width="3"  height="18" fill="#f4c290"/>
+            <!-- Hair -->
+            <rect x="-14" y="-22" width="28" height="14" fill="var(--hair)"/>
+            <rect x="-16" y="-20" width="3"  height="12" fill="var(--hair)"/>
+            <rect x="13"  y="-20" width="3"  height="12" fill="var(--hair)"/>
+            <rect x="-12" y="-24" width="24" height="2"  fill="var(--hair)"/>
+            <rect x="-10" y="-26" width="20" height="2"  fill="var(--hair-tip)"/>
+          </g>
+        </defs>
+
+        <!-- Back wall -->
+        <rect x="0" y="0" width="800" height="110" fill="url(#wallWood)"/>
+        <rect x="0" y="106" width="800" height="4" fill="#1a0e05"/>
+
+        <!-- Floor -->
+        <rect x="0" y="110" width="800" height="390" fill="url(#floorWood)"/>
+        <rect x="0" y="110" width="800" height="390" fill="url(#floorStagger)"/>
+
+        <!-- ── Back-wall furniture ─────────────────────────────── -->
+        <!-- Coffee maker -->
+        <g transform="translate(490,40)">
+          <rect x="-22" y="0"  width="44" height="46" fill="#1f1f24"/>
+          <rect x="-22" y="0"  width="44" height="6"  fill="#2c2c33"/>
+          <rect x="-18" y="10" width="36" height="14" fill="#0f0f12"/>
+          <rect x="-14" y="14" width="28" height="8"  fill="#ff6b6b"/>
+          <rect x="-2"  y="14" width="4"  height="8"  fill="#5d2828"/>
+          <rect x="-14" y="28" width="28" height="14" fill="#2c2c33"/>
+          <rect x="-14" y="32" width="28" height="2"  fill="#0f0f12"/>
+          <rect x="-10" y="36" width="20" height="4"  fill="#7a5230"/>
+          <rect x="-12" y="40" width="24" height="4"  fill="#0f0f12"/>
+        </g>
+        <!-- Printer -->
+        <g transform="translate(560,46)">
+          <rect x="-26" y="0"  width="52" height="40" fill="#cfcfd1"/>
+          <rect x="-26" y="0"  width="52" height="6"  fill="#a8a8aa"/>
+          <rect x="-22" y="10" width="44" height="6"  fill="#1f1f24"/>
+          <rect x="-22" y="22" width="44" height="14" fill="#e6e6e8"/>
+          <rect x="-18" y="26" width="36" height="10" fill="#ffffff"/>
+          <rect x="-26" y="36" width="52" height="4"  fill="#a8a8aa"/>
+        </g>
+        <!-- Filing cabinet -->
+        <g transform="translate(640,40)">
+          <rect x="-26" y="0"  width="52" height="60" fill="#7a7a7e"/>
+          <rect x="-26" y="0"  width="52" height="4"  fill="#6a6a6e"/>
+          <rect x="-22" y="8"  width="44" height="14" fill="#9a9a9e"/>
+          <rect x="-22" y="26" width="44" height="14" fill="#9a9a9e"/>
+          <rect x="-22" y="44" width="44" height="14" fill="#9a9a9e"/>
+          <rect x="-4"  y="13" width="8"  height="3"  fill="#3a3a3e"/>
+          <rect x="-4"  y="31" width="8"  height="3"  fill="#3a3a3e"/>
+          <rect x="-4"  y="49" width="8"  height="3"  fill="#3a3a3e"/>
+        </g>
+        <!-- Water cooler -->
+        <g transform="translate(720,32)">
+          <rect x="-18" y="0"  width="36" height="26" fill="#bfe9f5"/>
+          <rect x="-18" y="0"  width="36" height="4"  fill="#9cd0df"/>
+          <rect x="-14" y="6"  width="28" height="18" fill="#a0d8e8" opacity=".5"/>
+          <rect x="-10" y="10" width="20" height="6"  fill="#dff3f9"/>
+          <rect x="-20" y="26" width="40" height="34" fill="#dadbe0"/>
+          <rect x="-20" y="26" width="40" height="4"  fill="#b7b8bd"/>
+          <rect x="-8"  y="42" width="6"  height="6"  fill="#3a3a3e"/>
+          <rect x="2"   y="42" width="6"  height="6"  fill="#5db5e6"/>
+        </g>
+
+        <!-- ── Side decoration desks ───────────────────────────── -->
+        <g transform="translate(50,290)">
+          <rect x="-10" y="-30" width="56" height="20" fill="#1f1f24"/>
+          <rect x="-8"  y="-28" width="52" height="16" fill="#2a4a7f"/>
+          <rect x="14"  y="-10" width="8"  height="6"  fill="#1f1f24"/>
+          <rect x="-10" y="-4"  width="56" height="38" fill="#8b6f47"/>
+          <rect x="-10" y="-4"  width="56" height="3"  fill="#a98662"/>
+          <rect x="-10" y="31"  width="56" height="3"  fill="#6b4f32"/>
+        </g>
+        <g transform="translate(750,290) scale(-1,1)">
+          <rect x="-10" y="-30" width="56" height="20" fill="#1f1f24"/>
+          <rect x="-8"  y="-28" width="52" height="16" fill="#2a4a7f"/>
+          <rect x="14"  y="-10" width="8"  height="6"  fill="#1f1f24"/>
+          <rect x="-10" y="-4"  width="56" height="38" fill="#8b6f47"/>
+          <rect x="-10" y="-4"  width="56" height="3"  fill="#a98662"/>
+          <rect x="-10" y="31"  width="56" height="3"  fill="#6b4f32"/>
+        </g>
+
+        <!-- ── Plants (4 corners) ──────────────────────────────── -->
+        <g transform="translate(40,160)">
+          <rect x="-14" y="0"  width="28" height="20" fill="#a55a2a"/>
+          <rect x="-14" y="0"  width="28" height="3"  fill="#7a3f1a"/>
+          <path d="M 0,-30 Q -18,-10 -12,2 L 12,2 Q 18,-10 0,-30 Z" fill="#2d8659"/>
+          <path d="M -4,-26 Q -14,-14 -8,0  L 0,0  Q  -2,-12 -4,-26 Z" fill="#1f6b44"/>
+          <path d="M  4,-26 Q  14,-14  8,0  L 0,0  Q   2,-12  4,-26 Z" fill="#1f6b44"/>
+          <ellipse cx="-4" cy="-20" rx="3" ry="6" fill="#3aa269"/>
+          <ellipse cx="4"  cy="-22" rx="3" ry="6" fill="#3aa269"/>
+        </g>
+        <g transform="translate(40,420)">
+          <rect x="-14" y="0"  width="28" height="20" fill="#a55a2a"/>
+          <rect x="-14" y="0"  width="28" height="3"  fill="#7a3f1a"/>
+          <path d="M 0,-30 Q -18,-10 -12,2 L 12,2 Q 18,-10 0,-30 Z" fill="#2d8659"/>
+          <path d="M -4,-26 Q -14,-14 -8,0  L 0,0  Q  -2,-12 -4,-26 Z" fill="#1f6b44"/>
+          <path d="M  4,-26 Q  14,-14  8,0  L 0,0  Q   2,-12  4,-26 Z" fill="#1f6b44"/>
+          <ellipse cx="-4" cy="-20" rx="3" ry="6" fill="#3aa269"/>
+          <ellipse cx="4"  cy="-22" rx="3" ry="6" fill="#3aa269"/>
+        </g>
+        <g transform="translate(760,160)">
+          <rect x="-14" y="0"  width="28" height="20" fill="#a55a2a"/>
+          <rect x="-14" y="0"  width="28" height="3"  fill="#7a3f1a"/>
+          <path d="M 0,-30 Q -18,-10 -12,2 L 12,2 Q 18,-10 0,-30 Z" fill="#2d8659"/>
+          <path d="M -4,-26 Q -14,-14 -8,0  L 0,0  Q  -2,-12 -4,-26 Z" fill="#1f6b44"/>
+          <path d="M  4,-26 Q  14,-14  8,0  L 0,0  Q   2,-12  4,-26 Z" fill="#1f6b44"/>
+        </g>
+        <g transform="translate(760,420)">
+          <rect x="-14" y="0"  width="28" height="20" fill="#a55a2a"/>
+          <rect x="-14" y="0"  width="28" height="3"  fill="#7a3f1a"/>
+          <path d="M 0,-30 Q -18,-10 -12,2 L 12,2 Q 18,-10 0,-30 Z" fill="#2d8659"/>
+          <path d="M -4,-26 Q -14,-14 -8,0  L 0,0  Q  -2,-12 -4,-26 Z" fill="#1f6b44"/>
+          <path d="M  4,-26 Q  14,-14  8,0  L 0,0  Q   2,-12  4,-26 Z" fill="#1f6b44"/>
+        </g>
+
+        <!-- ── Desks (fixed — characters can leave and return) ─── -->
+        <g transform="translate(280,150)" id="desk-intake">
+          <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
+          <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
+          <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
+          <rect x="-30" y="-2" width="60" height="22" fill="#1a1a1f"/>
+          <rect x="-28" y="0"  width="56" height="16" fill="#2c2c33"/>
+          <rect x="-4"  y="14" width="8"  height="6"  fill="#1a1a1f"/>
+          <rect x="36" y="22" width="14" height="14" fill="#c0392b"/>
+          <rect x="36" y="22" width="14" height="3"  fill="#8a2820"/>
+          <rect x="-50" y="20" width="10" height="16" fill="#3b3b40"/>
+          <rect x="-50" y="20" width="10" height="3"  fill="#2a2a2e"/>
+        </g>
+        <g transform="translate(460,150)" id="desk-researcher">
+          <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
+          <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
+          <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
+          <rect x="-30" y="-2" width="60" height="22" fill="#1a1a1f"/>
+          <rect x="-28" y="0"  width="56" height="16" fill="#2c2c33"/>
+          <rect x="-4"  y="14" width="8"  height="6"  fill="#1a1a1f"/>
+          <rect x="34" y="20" width="6"  height="18" fill="#3b82f6"/>
+          <rect x="40" y="22" width="6"  height="16" fill="#10b981"/>
+          <rect x="46" y="18" width="6"  height="20" fill="#f59e0b"/>
+          <rect x="-46" y="28" width="10" height="8"  fill="#a55a2a"/>
+          <path d="M -41,28 Q -50,18 -44,10 L -38,10 Q -32,18 -41,28 Z" fill="#2d8659"/>
+        </g>
+        <g transform="translate(280,340)" id="desk-builder">
+          <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
+          <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
+          <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
+          <rect x="-30" y="-2" width="60" height="22" fill="#1a1a1f"/>
+          <rect x="-28" y="0"  width="56" height="16" fill="#2c2c33"/>
+          <rect x="-4"  y="14" width="8"  height="6"  fill="#1a1a1f"/>
+          <rect x="34"  y="20" width="14" height="14" fill="#dadbe0"/>
+          <rect x="34"  y="20" width="14" height="3"  fill="#b7b8bd"/>
+          <rect x="48"  y="24" width="3"  height="6"  fill="#dadbe0"/>
+          <rect x="36"  y="23" width="10" height="6"  fill="#5a3a1a"/>
+        </g>
+        <g transform="translate(460,340)" id="desk-reporter">
+          <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
+          <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
+          <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
+          <rect x="-30" y="-2" width="60" height="22" fill="#1a1a1f"/>
+          <rect x="-28" y="0"  width="56" height="16" fill="#2c2c33"/>
+          <rect x="-4"  y="14" width="8"  height="6"  fill="#1a1a1f"/>
+          <rect x="34" y="24" width="20" height="4"  fill="#10b981"/>
+          <rect x="34" y="28" width="20" height="4"  fill="#0ea5e9"/>
+          <rect x="34" y="32" width="20" height="4"  fill="#f43f5e"/>
+        </g>
+
+        <!-- ── Static chairs at home desks (stay put when character walks away) -->
+        <g class="static-chair" transform="translate(280,220)">
+          <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
+          <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
+        </g>
+        <g class="static-chair" transform="translate(460,220)">
+          <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
+          <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
+        </g>
+        <g class="static-chair" transform="translate(280,410)">
+          <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
+          <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
+        </g>
+        <g class="static-chair" transform="translate(460,410)">
+          <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
+          <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
+        </g>
+
+        <!-- ── Characters (moveable groups — JS controls transform) -->
+        <!-- Legs/feet are direct children so CSS animations work (they cannot animate inside <use>) -->
+        <g id="char-intake" class="char" data-agent="intake" data-status="offline" transform="translate(280,220)">
+          <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <use href="#char-body"/>
+        </g>
+        <g id="char-researcher" class="char" data-agent="researcher" data-status="offline" transform="translate(460,220)">
+          <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <use href="#char-body"/>
+        </g>
+        <g id="char-builder" class="char" data-agent="builder" data-status="offline" transform="translate(280,410)">
+          <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <use href="#char-body"/>
+        </g>
+        <g id="char-reporter" class="char" data-agent="reporter" data-status="offline" transform="translate(460,410)">
+          <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <use href="#char-body"/>
+        </g>
+
+      </svg>
+
+      <!-- Overlay: bubble above head + name tag below feet (positioned independently) -->
+      <div class="overlay-layer" id="overlayLayer">
+        <div class="bubble-ov" id="bub-intake"     data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-researcher" data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-builder"    data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-reporter"   data-status="offline">offline</div>
+        <div class="name-ov" id="name-intake">Iris<span class="role">· intake</span></div>
+        <div class="name-ov" id="name-researcher">Ravi<span class="role">· research</span></div>
+        <div class="name-ov" id="name-builder">Bram<span class="role">· builder</span></div>
+        <div class="name-ov" id="name-reporter">Rosa<span class="role">· reporter</span></div>
+      </div>
+
+      <div class="current-run" id="currentRunBar" style="display:none">
+        Now running: <span class="slug" id="currentSlug">—</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Submit topic -->
+<section id="submit" class="max-w-6xl mx-auto px-6 mb-16">
+  <div class="grid md:grid-cols-3 gap-6">
+    <div class="md:col-span-1">
+      <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2">
+        <i data-lucide="send" class="w-5 h-5 accent"></i> Submit a topic
+      </h2>
+      <p class="muted text-sm leading-relaxed">
+        Type a topic, click <strong>Copy command</strong>, then paste into a Claude Code session running in the repo. The newsroom starts immediately.
+      </p>
+    </div>
+    <div class="md:col-span-2 surface rounded-xl p-6">
+      <label class="text-xs font-medium muted">Topic</label>
+      <textarea id="topicInput" rows="3" placeholder="e.g. Explain how stablecoins maintain their peg, with worked examples"
+        class="mt-2 w-full px-4 py-3 rounded-lg border border-soft bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition resize-none"></textarea>
+      <div class="flex items-center justify-between mt-3 flex-wrap gap-3">
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-medium muted mr-1">Mode:</label>
+          <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="auto" checked class="accent-indigo-500"> Auto-preview</label>
+          <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="approve" class="accent-indigo-500"> Approve before deploy</label>
+        </div>
+        <button id="copyBtn" class="bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition flex items-center gap-2">
+          <i data-lucide="copy" class="w-4 h-4"></i> Copy command
+        </button>
+      </div>
+      <details class="mt-4 text-xs muted">
+        <summary class="cursor-pointer hover:text-current">What gets copied?</summary>
+        <pre id="commandPreview" class="mt-2 p-3 bg-zinc-100 dark:bg-zinc-900 rounded-md overflow-x-auto whitespace-pre-wrap text-xs"></pre>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- Past runs -->
+<section id="runs" class="max-w-6xl mx-auto px-6 mb-16">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-2xl font-semibold flex items-center gap-2">
+      <i data-lucide="folder-clock" class="w-5 h-5 accent"></i> Past runs
+    </h2>
+    <div class="flex gap-2 text-xs">
+      <button class="filter-btn" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="published">Published</button>
+      <button class="filter-btn" data-filter="preview">Preview</button>
+    </div>
+  </div>
+  <div id="runsList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  <div id="emptyState" class="surface rounded-xl p-12 text-center muted hidden">
+    <i data-lucide="folder-open" class="w-8 h-8 mx-auto mb-2 muted"></i>
+    <p>No dashboards yet. Submit your first topic above.</p>
+  </div>
+</section>
+
+<footer class="border-t border-soft py-8">
+  <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>
+      A 4-agent virtual newsroom · <a href="https://github.com/newizz/agent-newsroom">github.com/newizz/agent-newsroom</a>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="https://docs.claude.com/en/docs/claude-code" class="hover:text-current transition">Built with Claude Code</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" class="toast">✓ Command copied — paste into Claude Code</div>
+
+<!-- Character palette — CSS variables inherit through SVG <use> shadow DOM -->
+<style>
+  /* Iris — intake — orange hair + indigo shirt */
+  [data-agent="intake"]     { --shirt: #6366f1; --shirt-hi: #7c7ff5; --hair: #d97757; --hair-tip: #c25f3f; }
+  /* Ravi — researcher — black hair + violet shirt */
+  [data-agent="researcher"] { --shirt: #8b5cf6; --shirt-hi: #a78bfa; --hair: #1a1a1a; --hair-tip: #1a1a1a; }
+  /* Bram — builder — blue hair + sky shirt */
+  [data-agent="builder"]    { --shirt: #0ea5e9; --shirt-hi: #38bdf8; --hair: #3b82f6; --hair-tip: #2563eb; }
+  /* Rosa — reporter — green hair + rose shirt */
+  [data-agent="reporter"]   { --shirt: #f43f5e; --shirt-hi: #fb7185; --hair: #10b981; --hair-tip: #059669; }
+</style>
+
+<script>
+  lucide.createIcons();
+
+  // ══════════════════════════════════════════════════════════════
+  //  Character system: positions, movement, status → activity
+  // ══════════════════════════════════════════════════════════════
+
+  // SVG viewBox is 800 × 500. All coords below are in that space.
+  const HOMES = {
+    intake:     { x: 280, y: 220 },
+    researcher: { x: 460, y: 220 },
+    builder:    { x: 280, y: 410 },
+    reporter:   { x: 460, y: 410 }
+  };
+
+  // Activity points (where to stand) — in front of back-wall items + middle floor
+  const ACTIVITIES = {
+    coffee:   { x: 490, y: 160, label: 'getting coffee ☕' },
+    printer:  { x: 560, y: 160, label: 'at printer 🖨️' },
+    cabinet:  { x: 640, y: 160, label: 'filing 🗂️' },
+    cooler:   { x: 720, y: 160, label: 'water break 💧' },
+    meeting:  { x: 370, y: 280, label: 'standup 🗣️' },
+    plant_tl: { x:  70, y: 180, label: 'watering plants 🪴' },
+    plant_bl: { x:  70, y: 400, label: 'watering plants 🪴' },
+    side_l:   { x:  90, y: 290, label: 'side desk 💻' },
+    side_r:   { x: 720, y: 290, label: 'side desk 💻' }
+  };
+
+  // Animation state
+  const STATE = {};
+  Object.keys(HOMES).forEach(id => {
+    STATE[id] = {
+      pos:    { ...HOMES[id] },
+      target: { ...HOMES[id] },
+      state:  'sitting',           // sitting | walking | standing
+      status: 'offline',           // bubble status
+      activity: null,              // current activity (for label)
+      arriveAt: 0,                 // ms — when current standing/sitting ends
+      typingPhase: 0,              // counter for typing wiggle
+      walkPhase: 0                 // counter for walking bob
+    };
+  });
+
+  // ─ helpers ─
+  function randomActivity() {
+    const keys = Object.keys(ACTIVITIES);
+    return ACTIVITIES[keys[Math.floor(Math.random() * keys.length)]];
+  }
+
+  function goTo(id, target) {
+    STATE[id].target = { x: target.x, y: target.y };
+    STATE[id].state = 'walking';
+  }
+
+  function goHome(id) {
+    goTo(id, HOMES[id]);
+  }
+
+  function setStatus(id, status) {
+    const s = STATE[id];
+    const changed = s.status !== status;
+    s.status = status;
+
+    // Update bubble immediately
+    const bub = document.getElementById('bub-' + id);
+    if (bub) {
+      bub.dataset.status = status;
+      bub.textContent = status;
+    }
+
+    // Update SVG opacity for offline
+    const ch = document.getElementById('char-' + id);
+    if (ch) ch.dataset.status = status;
+
+    if (!changed) return;
+
+    // Status → activity mapping
+    if (status === 'busy' || status === 'online' || status === 'offline') {
+      // Sit at home desk
+      goHome(id);
+      s.activity = null;
+    } else if (status === 'idle') {
+      // Start wandering
+      scheduleWander(id);
+    }
+  }
+
+  function scheduleWander(id) {
+    const s = STATE[id];
+    if (s.status !== 'idle') return; // status changed mid-flight
+    const act = randomActivity();
+    s.activity = act;
+    goTo(id, act);
+    s.arriveAt = 0; // will be set on arrival
+  }
+
+  // ─ main animation loop ─
+  function tick() {
+    const now = performance.now();
+    Object.keys(STATE).forEach(id => {
+      const s = STATE[id];
+
+      if (s.state === 'walking') {
+        const dx = s.target.x - s.pos.x;
+        const dy = s.target.y - s.pos.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist < 1.5) {
+          s.pos.x = s.target.x;
+          s.pos.y = s.target.y;
+          // Decide what to do on arrival
+          if (s.target.x === HOMES[id].x && s.target.y === HOMES[id].y) {
+            s.state = 'sitting';
+          } else {
+            s.state = 'standing';
+            s.arriveAt = now + 2500 + Math.random() * 2500;  // stand for 2.5-5s
+          }
+        } else {
+          const speed = 1.3;
+          s.pos.x += (dx / dist) * speed;
+          s.pos.y += (dy / dist) * speed;
+          s.walkPhase += 0.25;
+        }
+      } else if (s.state === 'standing') {
+        if (now >= s.arriveAt) {
+          if (s.status === 'idle') {
+            // Walk home briefly, then wander again
+            goHome(id);
+            // After arriving home, if still idle, wander again
+            const after = setInterval(() => {
+              if (s.state === 'sitting') {
+                clearInterval(after);
+                if (s.status === 'idle') {
+                  setTimeout(() => scheduleWander(id), 1500 + Math.random() * 2000);
+                }
+              }
+            }, 200);
+          } else {
+            goHome(id);
+          }
+        }
+      } else if (s.state === 'sitting') {
+        if (s.status === 'busy') s.typingPhase += 0.4;
+      }
+
+      // Apply transform with subtle bob/wiggle
+      const ch = document.getElementById('char-' + id);
+      if (ch) {
+        let xo = 0, yo = 0;
+        if (s.state === 'walking') {
+          yo = Math.sin(s.walkPhase) * 1.5;
+        }
+        ch.setAttribute('transform', `translate(${s.pos.x + xo}, ${s.pos.y + yo})`);
+        ch.dataset.state = s.state;
+
+        // Typing hand wiggle when busy and sitting
+        if (s.status === 'busy' && s.state === 'sitting') {
+          const handsGrp = ch.querySelector('use');
+          // can't easily transform inside <use>, so we apply a class on the char
+          ch.classList.add('typing');
+        } else {
+          ch.classList.remove('typing');
+        }
+      }
+
+      // Update overlay position
+      updateOverlayPos(id, s.pos, s.activity, s.state);
+    });
+
+    requestAnimationFrame(tick);
+  }
+
+  function updateOverlayPos(id, pos, activity, state) {
+    const bub = document.getElementById('bub-' + id);
+    const nm  = document.getElementById('name-' + id);
+    if (!bub || !nm) return;
+
+    const leftPct = (pos.x / 800) * 100;
+    // Bubble sits above head (head top is at pos.y - 26)
+    const bubTopPct  = ((pos.y - 40) / 500) * 100;
+    // Name sits below feet (feet end ~ pos.y + 36)
+    const nameTopPct = ((pos.y + 42) / 500) * 100;
+
+    bub.style.left = leftPct + '%';
+    bub.style.top  = bubTopPct + '%';
+    nm.style.left  = leftPct + '%';
+    nm.style.top   = nameTopPct + '%';
+
+    // Bubble text: prefer activity label while standing, "walking…" while walking, else status
+    const s = STATE[id];
+    if (state === 'standing' && activity) {
+      bub.textContent = activity.label;
+    } else if (state === 'walking') {
+      bub.textContent = 'walking…';
+    } else {
+      bub.textContent = s.status;
+    }
+  }
+
+  // Initial overlay placement
+  Object.keys(HOMES).forEach(id => updateOverlayPos(id, HOMES[id], null, 'sitting'));
+
+  requestAnimationFrame(tick);
+
+  // ══════════════════════════════════════════════════════════════
+  //  Status polling (from status.json) + demo cycle
+  // ══════════════════════════════════════════════════════════════
+  const STATUS_URL = 'status.json';
+  const POLL_MS = 2000;
+
+  async function pollStatus() {
+    try {
+      const r = await fetch(STATUS_URL + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return;
+      const data = await r.json();
+      applyStatusData(data);
+      window.__realStatusSeen = true;
+    } catch (e) {}
+  }
+  function applyStatusData(data) {
+    document.getElementById('lastUpdate').textContent =
+      data.lastUpdate ? new Date(data.lastUpdate).toLocaleTimeString() : '—';
+    const bar = document.getElementById('currentRunBar');
+    if (data.currentSlug) {
+      bar.style.display = 'block';
+      document.getElementById('currentSlug').textContent = data.currentSlug;
+    } else {
+      bar.style.display = 'none';
+    }
+    (data.agents || []).forEach(a => setStatus(a.id, a.status));
+  }
+  pollStatus();
+  setInterval(pollStatus, POLL_MS);
+
+  // Demo cycle — only runs if no real status seen yet
+  const DEMO_CYCLE = ['busy', 'idle', 'online', 'idle', 'busy', 'online'];
+  let demoTick = 0;
+  function demoStep() {
+    if (window.__realStatusSeen) return;
+    const agents = ['intake', 'researcher', 'builder', 'reporter'];
+    agents.forEach((id, i) => setStatus(id, DEMO_CYCLE[(demoTick + i) % DEMO_CYCLE.length]));
+    demoTick++;
+  }
+  // Stagger initial appearance so they don't all change at once
+  setTimeout(() => { setStatus('intake', 'busy');     }, 500);
+  setTimeout(() => { setStatus('researcher', 'idle'); }, 900);
+  setTimeout(() => { setStatus('builder', 'online');  }, 1300);
+  setTimeout(() => { setStatus('reporter', 'idle');   }, 1700);
+  setInterval(demoStep, 9000);
+
+  // ══════════════════════════════════════════════════════════════
+  //  Topic submit (clipboard)
+  // ══════════════════════════════════════════════════════════════
+  const topicInput = document.getElementById('topicInput');
+  const copyBtn = document.getElementById('copyBtn');
+  const cmdPreview = document.getElementById('commandPreview');
+
+  function buildCommand() {
+    const topic = topicInput.value.trim() || '<your topic here>';
+    const mode = document.querySelector('input[name="mode"]:checked').value;
+    const flag = mode === 'approve' ? ' (approve before deploy)' : '';
+    return `@orchestrator.md Run the newsroom on this topic${flag}:\n"${topic}"`;
+  }
+  function refreshPreview() { cmdPreview.textContent = buildCommand(); }
+  topicInput.addEventListener('input', refreshPreview);
+  document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener('change', refreshPreview));
+  refreshPreview();
+  copyBtn.addEventListener('click', async () => {
+    const cmd = buildCommand();
+    try {
+      await navigator.clipboard.writeText(cmd);
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    } catch (e) {
+      alert('Could not copy — please copy manually:\n\n' + cmd);
+    }
+  });
+
+  // ══════════════════════════════════════════════════════════════
+  //  Past runs (manifest.json)
+  // ══════════════════════════════════════════════════════════════
+  async function loadRuns() {
+    const empty = document.getElementById('emptyState');
+    try {
+      const r = await fetch('manifest.json?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('no manifest');
+      const m = await r.json();
+      const all = [
+        ...(m.published || []).map(x => ({ ...x, kind: 'published' })),
+        ...(m.preview || []).map(x => ({ ...x, kind: 'preview' }))
+      ];
+      if (all.length === 0) { empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      window.__allRuns = all;
+      renderRuns('all');
+    } catch (e) {
+      empty.classList.remove('hidden');
+    }
+  }
+  function renderRuns(filter) {
+    const list = document.getElementById('runsList');
+    list.innerHTML = '';
+    const items = (window.__allRuns || []).filter(x => filter === 'all' || x.kind === filter);
+    if (items.length === 0) {
+      list.innerHTML = '<div class="muted text-sm col-span-full">No items in this filter.</div>';
+      return;
+    }
+    items.forEach(item => {
+      const card = document.createElement('a');
+      card.href = item.url;
+      card.className = 'surface rounded-xl p-5 hover:shadow-md transition group block';
+      card.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium ${item.kind === 'published' ? 'text-emerald-600' : 'accent'}">
+            ${item.kind === 'published' ? '● Published' : '○ Preview'}
+          </span>
+          <i data-lucide="arrow-up-right" class="w-4 h-4 muted group-hover:accent transition"></i>
+        </div>
+        <div class="font-semibold text-sm mb-1 group-hover:accent transition">${item.slug}</div>
+        <div class="text-xs muted truncate">${item.url}</div>
+      `;
+      list.appendChild(card);
+    });
+    lucide.createIcons();
+  }
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderRuns(btn.dataset.filter);
+    });
+  });
+  document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+  loadRuns();
+</script>
+
+<style>
+  /* Subtle typing wiggle for busy characters (whole char tiny bob) */
+  .char.typing {
+    animation: charType 0.5s ease-in-out infinite alternate;
+    transform-box: fill-box;
+  }
+  @keyframes charType {
+    from { /* base transform set by JS */ }
+    to   { /* applied as additional via transform-origin if needed */ }
+  }
+</style>
+</body>
+</html>

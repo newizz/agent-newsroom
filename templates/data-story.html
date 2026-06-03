@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE: data-story
+  PURPOSE:  "Analyze X" / "Trends in Y" / "Market for Z"
+  PLACEHOLDERS:
+    {{TITLE}}, {{SUBTITLE}}, {{SLUG}}, {{DATE}}
+    {{CONTENT_KPIS}}     — 3-4 KPI cards as <div class="kpi">…</div>
+    {{CONTENT_NARRATIVE_1}} — first analytical block (HTML paragraphs)
+    {{CHART_1_TITLE}}    — title for first chart
+    {{CHART_1_DATA}}     — JSON: { "labels": [...], "datasets": [{ "label": "...", "data": [...] }] }
+    {{CHART_1_TYPE}}     — "line" | "bar" | "area"
+    {{CONTENT_NARRATIVE_2}} — second analytical block
+    {{CHART_2_TITLE}}, {{CHART_2_DATA}}, {{CHART_2_TYPE}}
+    {{CONTENT_ANALYSIS}} — final analysis / takeaways
+    {{SOURCES_HTML}}     — sources <ol>
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}} — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; --accent-line: #6366F133; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+  }
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .kpi { padding: 1.25rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .kpi-value { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+  .kpi-label { font-size: 0.8rem; color: #71717a; margin-bottom: 0.25rem; }
+  .kpi-delta { font-size: 0.75rem; margin-top: 0.5rem; }
+  .kpi-delta.up { color: #059669; }
+  .kpi-delta.down { color: #dc2626; }
+  @media (prefers-color-scheme: dark) {
+    .kpi { background: #131316; border-color: #27272a; }
+  }
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="border-b border-soft">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">{{SLUG}} · {{DATE}}</div>
+  </div>
+</header>
+
+<section class="max-w-6xl mx-auto px-6 pt-16 pb-8 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Data Story</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">{{TITLE}}</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">{{SUBTITLE}}</p>
+</section>
+
+<!-- KPIs -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    {{CONTENT_KPIS}}
+  </div>
+</section>
+
+<!-- Narrative + Chart 1 -->
+<section class="max-w-6xl mx-auto px-6 mb-12 grid md:grid-cols-2 gap-6">
+  <div class="surface rounded-xl p-6">
+    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="trending-up" class="w-5 h-5 accent"></i> Context
+    </h2>
+    <div class="prose-content">{{CONTENT_NARRATIVE_1}}</div>
+  </div>
+  <div class="surface rounded-xl p-6">
+    <h3 class="text-sm font-medium muted mb-3">{{CHART_1_TITLE}}</h3>
+    <div class="h-64"><canvas id="chart1"></canvas></div>
+  </div>
+</section>
+
+<!-- Narrative + Chart 2 -->
+<section class="max-w-6xl mx-auto px-6 mb-12 grid md:grid-cols-2 gap-6">
+  <div class="surface rounded-xl p-6 md:order-2">
+    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="bar-chart-3" class="w-5 h-5 accent"></i> Deeper view
+    </h2>
+    <div class="prose-content">{{CONTENT_NARRATIVE_2}}</div>
+  </div>
+  <div class="surface rounded-xl p-6 md:order-1">
+    <h3 class="text-sm font-medium muted mb-3">{{CHART_2_TITLE}}</h3>
+    <div class="h-64"><canvas id="chart2"></canvas></div>
+  </div>
+</section>
+
+<!-- Analysis -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="sparkles" class="w-5 h-5 accent"></i> Analysis
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content">{{CONTENT_ANALYSIS}}</div>
+</section>
+
+<!-- Sources -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm">{{SOURCES_HTML}}</div>
+</section>
+
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on {{DATE}}</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<style>
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.7; }
+</style>
+
+<script>
+  lucide.createIcons();
+
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const gridColor = isDark ? '#27272a' : '#e4e4e7';
+  const tickColor = isDark ? '#a1a1aa' : '#71717a';
+
+  const baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: tickColor, font: { family: 'Inter' } } } },
+    scales: {
+      x: { grid: { color: gridColor, drawBorder: false }, ticks: { color: tickColor } },
+      y: { grid: { color: gridColor, drawBorder: false }, ticks: { color: tickColor }, beginAtZero: true }
+    }
+  };
+
+  const chart1Type = "{{CHART_1_TYPE}}";
+  const chart1Data = {{CHART_1_DATA}};
+  const chart2Type = "{{CHART_2_TYPE}}";
+  const chart2Data = {{CHART_2_DATA}};
+
+  function styleDatasets(data, type) {
+    data.datasets.forEach((ds, i) => {
+      ds.borderColor = ds.borderColor || '#6366F1';
+      ds.backgroundColor = ds.backgroundColor || (type === 'line' || type === 'area' ? 'rgba(99,102,241,0.1)' : '#6366F1');
+      ds.tension = 0.35;
+      ds.fill = type === 'area';
+      ds.pointRadius = 3;
+      ds.pointHoverRadius = 5;
+    });
+    return data;
+  }
+
+  new Chart(document.getElementById('chart1'), {
+    type: chart1Type === 'area' ? 'line' : chart1Type,
+    data: styleDatasets(chart1Data, chart1Type),
+    options: baseOpts
+  });
+  new Chart(document.getElementById('chart2'), {
+    type: chart2Type === 'area' ? 'line' : chart2Type,
+    data: styleDatasets(chart2Data, chart2Type),
+    options: baseOpts
+  });
+</script>
+</body>
+</html>

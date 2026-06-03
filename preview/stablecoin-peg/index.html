@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Stablecoins Maintain Their Peg — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .kpi { background: #131316 !important; border-color: #27272a !important; }
+  }
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .kpi { padding: 1.25rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .kpi-value { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; }
+  .kpi-label { font-size: 0.8rem; color: #71717a; margin-bottom: 0.25rem; }
+  .kpi-delta.up { color: #059669; font-size: 0.75rem; margin-top: 0.5rem; }
+  .kpi-delta.down { color: #dc2626; font-size: 0.75rem; margin-top: 0.5rem; }
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<header class="border-b border-soft">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">stablecoin-peg · 2026-06-03 · <span class="accent">preview</span></div>
+  </div>
+</header>
+
+<section class="max-w-6xl mx-auto px-6 pt-16 pb-8 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Data Story</span>
+    <span class="bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 px-2 py-1 rounded-md">Preview — illustrative figures</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">How Stablecoins Maintain Their Peg</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+    Four mechanisms — reserves, redemption, arbitrage, and algorithmic supply — keep stablecoins anchored to $1. Most of the time. Most of them.
+  </p>
+</section>
+
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="kpi">
+      <div class="kpi-label">Total stablecoin market cap</div>
+      <div class="kpi-value">$170B</div>
+      <div class="kpi-delta up">▲ illustrative</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">USDT share</div>
+      <div class="kpi-value">~65%</div>
+      <div class="kpi-delta muted">dominant for years</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Typical peg deviation</div>
+      <div class="kpi-value">±0.1%</div>
+      <div class="kpi-delta muted">in normal markets</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Largest historical depeg</div>
+      <div class="kpi-value">UST → $0</div>
+      <div class="kpi-delta down">May 2022</div>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-6 mb-12 grid md:grid-cols-2 gap-6">
+  <div class="surface rounded-xl p-6">
+    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="trending-up" class="w-5 h-5 accent"></i> Three peg models
+    </h2>
+    <div class="prose-content">
+      <p><strong>Fiat-backed</strong> (USDT, USDC) — every coin is supposedly redeemable for $1 in a bank. Peg is held by trust + arbitrage.</p>
+      <p><strong>Crypto-backed</strong> (DAI) — over-collateralised with volatile crypto. If collateral falls in value, positions are liquidated automatically.</p>
+      <p><strong>Algorithmic</strong> (UST, prior to collapse) — no real collateral; rely on supply elasticity via a paired token. Historically fragile.</p>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-6">
+    <h3 class="text-sm font-medium muted mb-3">Illustrative peg performance · 30 days</h3>
+    <div class="h-64"><canvas id="chart1"></canvas></div>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-6 mb-12 grid md:grid-cols-2 gap-6">
+  <div class="surface rounded-xl p-6 md:order-2">
+    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="bar-chart-3" class="w-5 h-5 accent"></i> Why arbitrage holds the peg
+    </h2>
+    <div class="prose-content">
+      <p>If USDC trades at <strong>$0.99</strong> on the market, an authorised participant can buy 1M USDC for $990,000, redeem them at Circle for $1,000,000 in USD, and pocket $10,000 risk-free.</p>
+      <p>That demand pushes the market price back up to $1. Arbitrage works in both directions and is the single most important reason fiat-backed coins stay close to peg in normal markets.</p>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-6 md:order-1">
+    <h3 class="text-sm font-medium muted mb-3">Hypothetical arbitrage profit · per $1M</h3>
+    <div class="h-64"><canvas id="chart2"></canvas></div>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="sparkles" class="w-5 h-5 accent"></i> Analysis
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content">
+    <p>Stablecoins don't really maintain $1 directly — they maintain a <strong>credible promise of redemption</strong>. The actual price comes from arbitrage between the on-chain market and the off-chain (or smart-contract) redemption mechanism.</p>
+    <p>This means peg stability is mostly about three things: <strong>quality of reserves</strong>, <strong>speed of redemption</strong>, and <strong>market confidence that the first two hold</strong>. When any of these breaks, the peg breaks — sometimes spectacularly, as UST demonstrated by losing all $40B of its market cap in days.</p>
+    <p>The post-2022 trend has been toward more transparent, faster-attesting reserves (monthly → daily → real-time) and away from purely algorithmic designs.</p>
+  </div>
+</section>
+
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm muted">
+    <p><em>(This is a preview dashboard — sources to be filled in by Researcher in the next iteration.)</em></p>
+  </div>
+</section>
+
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> · preview</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<script>
+  lucide.createIcons();
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const tickColor = isDark ? '#a1a1aa' : '#71717a';
+  const gridColor = isDark ? '#27272a' : '#e4e4e7';
+  const base = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { labels: { color: tickColor, font: { family: 'Inter' } } } },
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: tickColor } },
+      y: { grid: { color: gridColor }, ticks: { color: tickColor } }
+    }
+  };
+  new Chart(document.getElementById('chart1'), {
+    type: 'line',
+    data: {
+      labels: Array.from({length: 30}, (_, i) => `D${i+1}`),
+      datasets: [
+        { label: 'USDC', data: Array.from({length: 30}, () => 1 + (Math.random()-0.5)*0.002), borderColor: '#6366F1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, tension: 0.3, pointRadius: 0 },
+        { label: 'DAI',  data: Array.from({length: 30}, () => 1 + (Math.random()-0.5)*0.004), borderColor: '#10B981', backgroundColor: 'transparent', tension: 0.3, pointRadius: 0 }
+      ]
+    },
+    options: { ...base, scales: { ...base.scales, y: { ...base.scales.y, min: 0.99, max: 1.01 } } }
+  });
+  new Chart(document.getElementById('chart2'), {
+    type: 'bar',
+    data: {
+      labels: ['$0.985','$0.99','$0.995','$0.999','$1.001','$1.005'],
+      datasets: [{ label: 'Profit ($)', data: [15000, 10000, 5000, 1000, -1000, -5000], backgroundColor: '#6366F1' }]
+    },
+    options: base
+  });
+</script>
+</body>
+</html>

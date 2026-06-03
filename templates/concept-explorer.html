@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+  TEMPLATE: concept-explorer
+  PURPOSE:  "Explain X" / "What is Y" / "How does Z work"
+  PLACEHOLDERS the Builder must replace:
+    {{TITLE}}                — Dashboard title
+    {{SUBTITLE}}             — One-sentence summary (from research TL;DR)
+    {{SLUG}}                 — Run slug
+    {{DATE}}                 — ISO date
+    {{CONTENT_OVERVIEW}}     — 2-3 paragraphs of background / context (HTML allowed)
+    {{CONTENT_HOW_IT_WORKS}} — Step-by-step or mechanism explanation (HTML; <ol> or <div class="step"> blocks)
+    {{CONTENT_EXAMPLES}}     — 2-3 worked example cards (HTML <div class="card"> blocks)
+    {{CONTENT_GLOSSARY}}     — Key terms as <dl><dt>term</dt><dd>def</dd></dl>
+    {{SOURCES_HTML}}         — <ol><li>title — publisher (<a>link</a>)</li>…</ol>
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{TITLE}} — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root {
+    --accent: #6366F1;
+    --accent-soft: #6366F11A;
+  }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+  }
+  .surface { background: #ffffff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  .ring-accent { box-shadow: 0 0 0 2px var(--accent-soft); }
+  .step { counter-increment: step; }
+  .step::before {
+    content: counter(step);
+    display: inline-flex;
+    width: 28px; height: 28px;
+    align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 8px; font-weight: 600; font-size: 13px;
+    margin-right: 12px;
+  }
+  .steps { counter-reset: step; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Header -->
+<header class="border-b border-soft">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      agent-newsroom
+    </a>
+    <div class="text-xs muted">{{SLUG}} · {{DATE}}</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-12 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Concept Explainer</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">{{TITLE}}</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">{{SUBTITLE}}</p>
+</section>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-4 flex flex-wrap gap-1">
+    <a href="#overview" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Overview</a>
+    <a href="#how" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">How it works</a>
+    <a href="#examples" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Examples</a>
+    <a href="#glossary" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Glossary</a>
+    <a href="#sources" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Sources</a>
+  </div>
+</nav>
+
+<!-- Overview -->
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> Overview
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content">
+    {{CONTENT_OVERVIEW}}
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="cog" class="w-5 h-5 accent"></i> How it works
+  </h2>
+  <div class="surface rounded-xl p-8 steps">
+    {{CONTENT_HOW_IT_WORKS}}
+  </div>
+</section>
+
+<!-- Examples -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> Worked examples
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4">
+    {{CONTENT_EXAMPLES}}
+  </div>
+</section>
+
+<!-- Glossary -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> Key terms
+  </h2>
+  <div class="surface rounded-xl p-8">
+    {{CONTENT_GLOSSARY}}
+  </div>
+</section>
+
+<!-- Sources -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm">
+    {{SOURCES_HTML}}
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on {{DATE}}</div>
+    <div class="flex items-center gap-4">
+      <button onclick="window.print()" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="printer" class="w-4 h-4"></i> Print
+      </button>
+      <a href="../../" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="home" class="w-4 h-4"></i> Office
+      </a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.7; }
+  .prose-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5em 0 0.5em; }
+  dl { display: grid; gap: 1em; }
+  dt { font-weight: 600; }
+  dd { margin-left: 0; color: #71717a; line-height: 1.6; }
+  .card { padding: 1.5rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  @media (prefers-color-scheme: dark) {
+    .card { background: #131316; border-color: #27272a; }
+    dd { color: #a1a1aa; }
+  }
+  @media print {
+    nav, footer button { display: none; }
+    .surface { border: 1px solid #ccc; box-shadow: none; }
+  }
+</style>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
