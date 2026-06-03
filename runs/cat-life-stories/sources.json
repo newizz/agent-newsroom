@@ -1,0 +1,204 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "2021 AAHA/AAFP Feline Life Stage Guidelines",
+      "url": "https://www.aaha.org/resources/2021-aaha-aafp-feline-life-stage-guidelines/feline-life-stage-definitions/",
+      "publisher": "American Animal Hospital Association (AAHA)",
+      "author": "AAHA/AAFP Task Force",
+      "date": "2021-03-02",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 2,
+      "title": "Kitten Development Stages and Kitten Age Chart",
+      "url": "https://www.petmd.com/cat/care/kitten-development-understanding-kittens-major-growth-milestones",
+      "publisher": "PetMD",
+      "author": "PetMD Editorial",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 3,
+      "title": "How Long Do Cats Live? Here's What To Expect",
+      "url": "https://www.petmd.com/cat/care/how-long-do-cats-live",
+      "publisher": "PetMD",
+      "author": "PetMD Editorial",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 4,
+      "title": "Cognitive Dysfunction | Cornell University College of Veterinary Medicine",
+      "url": "https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/cognitive-dysfunction",
+      "publisher": "Cornell University College of Veterinary Medicine",
+      "author": "Cornell Feline Health Center",
+      "date": "2024",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 5,
+      "title": "AAHA and AAFP Release Updated Feline Life Stage Guidelines to the Veterinary Community",
+      "url": "https://www.aaha.org/aaha-and-aafp-release-updated-feline-life-stage-guidelines-to-the-veterinary-community/",
+      "publisher": "American Animal Hospital Association (AAHA)",
+      "author": "AAHA Communications",
+      "date": "2021-03-02",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 6,
+      "title": "Cat communication - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Cat_communication",
+      "publisher": "Wikipedia",
+      "author": "Multiple contributors",
+      "date": "2025",
+      "type": "reference",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 7,
+      "title": "Do Cats Go Through Puberty?",
+      "url": "https://cats.com/do-cats-go-through-puberty",
+      "publisher": "Cats.com",
+      "author": "Cats.com Editorial",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 8,
+      "title": "Attachment as the Catalyst for the Attribution of Complex Cognition and Emotion to Companion Cats",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11274030/",
+      "publisher": "PMC / National Institutes of Health",
+      "author": "Multiple authors",
+      "date": "2024",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 9,
+      "title": "Truth or Myth: Cats Only Meow to Humans",
+      "url": "https://www.hartz.com/truth-or-myth-cats-only-meow-to-humans/",
+      "publisher": "Hartz",
+      "author": "Hartz Editorial",
+      "date": "2023",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 10,
+      "title": "Cats, like children and dogs, develop attachments to their caregivers, study shows",
+      "url": "https://news.oregonstate.edu/news/cats-children-and-dogs-develop-attachments-their-caregivers-study-shows",
+      "publisher": "Oregon State University Newsroom",
+      "author": "Kristyn Vitale (lead researcher)",
+      "date": "2019-09-23",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 11,
+      "title": "Older Cats with Behavior Problems",
+      "url": "https://www.aspca.org/pet-care/cat-care/common-cat-behavior-issues/older-cats-behavior-problems",
+      "publisher": "ASPCA",
+      "author": "ASPCA Animal Behavior Team",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 12,
+      "title": "The Sensitive Period for Socialization in Puppies and Kittens",
+      "url": "https://www.companionanimalpsychology.com/2017/07/the-sensitive-period-for-socialization.html",
+      "publisher": "Companion Animal Psychology",
+      "author": "Zazie Todd, PhD",
+      "date": "2017-07",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 13,
+      "title": "Socialization and Fear Prevention in Kittens",
+      "url": "https://vcahospitals.com/know-your-pet/socialization-and-fear-prevention-in-kittens",
+      "publisher": "VCA Animal Hospitals",
+      "author": "VCA Editorial",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 14,
+      "title": "Hello, kitty: Cats recognize their own names, according to new Japanese research",
+      "url": "https://www.sciencedaily.com/releases/2019/04/190408101120.htm",
+      "publisher": "ScienceDaily",
+      "author": "Atsuko Saito (lead researcher, University of Tokyo)",
+      "date": "2019-04-08",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 15,
+      "title": "The felid purr: A healing mechanism?",
+      "url": "https://pubs.aip.org/asa/jasa/article/110/5_Supplement/2666/550913/The-felid-purr-A-healing-mechanism",
+      "publisher": "Journal of the Acoustical Society of America / AIP Publishing",
+      "author": "Elizabeth von Muggenthaler",
+      "date": "2001",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 16,
+      "title": "Are Cats Nocturnal?",
+      "url": "https://www.petmd.com/cat/general-health/are-cats-nocturnal",
+      "publisher": "PetMD",
+      "author": "PetMD Editorial",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 17,
+      "title": "Oldest cat ever",
+      "url": "https://www.guinnessworldrecords.com/world-records/oldest-cat-ever",
+      "publisher": "Guinness World Records",
+      "author": "Guinness World Records",
+      "date": "2010",
+      "type": "reference",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 18,
+      "title": "Social Behavior of Cats - Merck Veterinary Manual",
+      "url": "https://www.merckvetmanual.com/behavior/behavior-of-cats/social-behavior-of-cats",
+      "publisher": "Merck Veterinary Manual",
+      "author": "Merck Veterinary Manual Editorial",
+      "date": "2024",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 19,
+      "title": "Cognitive dysfunction syndrome (senility, dementia) in cats",
+      "url": "https://icatcare.org/articles/cognitive-dysfunction-syndrome-in-cats",
+      "publisher": "International Cat Care",
+      "author": "International Cat Care",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 20,
+      "title": "My Cat and Me—A Study of Cat Owner Perceptions of Their Bond and Relationship",
+      "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8228645/",
+      "publisher": "PMC / National Institutes of Health",
+      "author": "Multiple authors",
+      "date": "2021",
+      "type": "primary",
+      "accessed": "2026-06-03"
+    }
+  ]
+}

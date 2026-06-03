@@ -153,7 +153,20 @@
     display: flex; align-items: center; gap: 6px;
   }
   .live-chip .pulse { width: 6px; height: 6px; border-radius: 999px; background: #6dd97c; animation: pulse 2s ease-in-out infinite; }
+  .live-chip[data-mode="demo"] .pulse { background: #f59e0b; }
+  .live-chip[data-mode="error"] .pulse { background: #ef4444; }
   @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.4 } }
+  .error-banner {
+    position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+    background: rgba(220, 38, 38, 0.95); color: white;
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 12px; font-family: ui-monospace, monospace;
+    box-shadow: 0 4px 12px rgba(220,38,38,0.4);
+    z-index: 6; max-width: 90%; text-align: center;
+    display: none;
+  }
+  .error-banner code { background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 3px; }
+  .error-banner.show { display: block; }
 
   .current-run {
     position: absolute; bottom: 10px; left: 0; right: 0;
@@ -228,7 +241,8 @@
     <div class="office-scene" id="officeScene">
 
       <div class="office-title">agent-newsroom Virtual Office 🏢</div>
-      <div class="live-chip"><span class="pulse"></span> LIVE · <span id="lastUpdate">—</span></div>
+      <div class="live-chip" id="liveChip"><span class="pulse"></span> <span id="liveLabel">LIVE</span> · <span id="lastUpdate">—</span></div>
+      <div class="error-banner" id="errBanner">⚠️ status.json fetch failed — open via local server (<code>python3 -m http.server</code>) or wait for GitHub Pages</div>
 
       <svg class="office-svg" id="officeSvg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -644,16 +658,17 @@
     goTo(id, HOMES[id]);
   }
 
-  function setStatus(id, status) {
+  function setStatus(id, status, task) {
     const s = STATE[id];
     const changed = s.status !== status;
     s.status = status;
+    s.task = task || '';
 
     // Update bubble immediately
     const bub = document.getElementById('bub-' + id);
     if (bub) {
       bub.dataset.status = status;
-      bub.textContent = status;
+      bub.textContent = s.task || status;
     }
 
     // Update SVG opacity for offline
@@ -773,12 +788,14 @@
     nm.style.left  = leftPct + '%';
     nm.style.top   = nameTopPct + '%';
 
-    // Bubble text: prefer activity label while standing, "walking…" while walking, else status
+    // Bubble text: prefer task description (if any), else activity, else state, else status
     const s = STATE[id];
-    if (state === 'standing' && activity) {
-      bub.textContent = activity.label;
-    } else if (state === 'walking') {
+    if (state === 'walking') {
       bub.textContent = 'walking…';
+    } else if (state === 'standing' && activity) {
+      bub.textContent = activity.label;
+    } else if (s.task) {
+      bub.textContent = s.task;
     } else {
       bub.textContent = s.status;
     }
@@ -790,19 +807,34 @@
   requestAnimationFrame(tick);
 
   // ══════════════════════════════════════════════════════════════
-  //  Status polling (from status.json) + demo cycle
+  //  Status polling — local file when running on localhost,
+  //  GitHub Gist when running on github.io (Pages can't see live local file)
   // ══════════════════════════════════════════════════════════════
-  const STATUS_URL = 'status.json';
-  const POLL_MS = 2000;
+  let STATUS_URL = 'status.json';
+  let POLL_MS = 2000;
 
   async function pollStatus() {
+    const chip = document.getElementById('liveChip');
+    const lbl = document.getElementById('liveLabel');
+    const err = document.getElementById('errBanner');
     try {
       const r = await fetch(STATUS_URL + '?t=' + Date.now(), { cache: 'no-store' });
-      if (!r.ok) return;
+      if (!r.ok) throw new Error('HTTP ' + r.status);
       const data = await r.json();
       applyStatusData(data);
       window.__realStatusSeen = true;
-    } catch (e) {}
+      chip.dataset.mode = 'live';
+      lbl.textContent = 'LIVE';
+      err.classList.remove('show');
+    } catch (e) {
+      console.warn('[agent-newsroom] status.json fetch failed:', e.message);
+      if (!window.__realStatusSeen) {
+        chip.dataset.mode = 'demo';
+        lbl.textContent = 'DEMO';
+        // Only show banner if running via file:// (CORS issue)
+        if (location.protocol === 'file:') err.classList.add('show');
+      }
+    }
   }
   function applyStatusData(data) {
     document.getElementById('lastUpdate').textContent =
@@ -814,10 +846,28 @@
     } else {
       bar.style.display = 'none';
     }
-    (data.agents || []).forEach(a => setStatus(a.id, a.status));
+    (data.agents || []).forEach(a => setStatus(a.id, a.status, a.task));
   }
-  pollStatus();
-  setInterval(pollStatus, POLL_MS);
+  // On GH Pages, prefer the Gist URL (raw status.json on Pages is stale until next push)
+  (async () => {
+    if (location.hostname.endsWith('.github.io')) {
+      try {
+        const r = await fetch('gist-config.json', { cache: 'no-store' });
+        if (r.ok) {
+          const cfg = await r.json();
+          if (cfg.gistRawUrl) {
+            STATUS_URL = cfg.gistRawUrl;
+            POLL_MS = 5000;  // gist CDN cache softens this anyway; relax poll rate
+            console.log('[agent-newsroom] live status from Gist:', STATUS_URL);
+          }
+        }
+      } catch (e) {
+        console.warn('[agent-newsroom] no gist-config.json — Pages will show DEMO mode');
+      }
+    }
+    pollStatus();
+    setInterval(pollStatus, POLL_MS);
+  })();
 
   // Demo cycle — only runs if no real status seen yet
   const DEMO_CYCLE = ['busy', 'idle', 'online', 'idle', 'busy', 'online'];
@@ -828,11 +878,11 @@
     agents.forEach((id, i) => setStatus(id, DEMO_CYCLE[(demoTick + i) % DEMO_CYCLE.length]));
     demoTick++;
   }
-  // Stagger initial appearance so they don't all change at once
-  setTimeout(() => { setStatus('intake', 'busy');     }, 500);
-  setTimeout(() => { setStatus('researcher', 'idle'); }, 900);
-  setTimeout(() => { setStatus('builder', 'online');  }, 1300);
-  setTimeout(() => { setStatus('reporter', 'idle');   }, 1700);
+  // Stagger initial demo appearance — guarded by __realStatusSeen so real data wins
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('intake', 'busy');     }, 800);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('researcher', 'idle'); }, 1100);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('builder', 'online');  }, 1400);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('reporter', 'idle');   }, 1700);
   setInterval(demoStep, 9000);
 
   // ══════════════════════════════════════════════════════════════

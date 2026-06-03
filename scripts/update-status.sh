@@ -22,6 +22,14 @@ command -v jq >/dev/null 2>&1 || { echo "jq is required — install with: brew i
 
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
+# Fire-and-forget sync to Gist after every status change (silent if not configured)
+sync_to_gist() {
+  if [[ -f "$REPO_ROOT/office/gist-config.json" ]]; then
+    ( "$REPO_ROOT/scripts/sync-status-to-gist.sh" >/dev/null 2>&1 & ) || true
+  fi
+}
+trap sync_to_gist EXIT
+
 case "${1:-}" in
   --run)
     SLUG="${2:?slug required}"

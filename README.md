@@ -111,6 +111,31 @@ When you're happy with a `/preview/<slug>/` dashboard, run:
 
 This copies it to `/published/<slug>/` and pushes — that URL becomes the "official" version.
 
+## Live status on GitHub Pages
+
+Because GitHub Pages serves static files, the `office/status.json` baked into a push is stale until the next deploy. To make the Virtual Office show **live** status while you run the pipeline locally, agent-newsroom syncs `status.json` to a **public GitHub Gist** on every change.
+
+### One-time setup
+
+```bash
+brew install gh jq           # if not already installed
+gh auth login                # authenticate with GitHub
+./scripts/setup-gist.sh      # creates the gist, writes office/gist-config.json
+git add office/gist-config.json
+git commit -m "feat: live-status gist"
+git push                      # Pages picks up the gist URL
+```
+
+### How it works
+
+- **Local dev** (`localhost`, `python3 -m http.server`) → Office UI reads `office/status.json` directly (sub-second updates)
+- **On `*.github.io`** → Office UI fetches the Gist raw URL listed in `office/gist-config.json` (a few seconds CDN lag, but truly live)
+- **Hook flow**: agent activity → `update-status.sh` → `office/status.json` updated → `sync-status-to-gist.sh` called automatically → Gist updated → public visitors see it within seconds
+
+### Disabling
+
+Delete `office/gist-config.json` (and stop committing it). The sync becomes a silent no-op and Pages falls back to DEMO mode for visitors.
+
 ## Templates
 
 The Builder Agent auto-picks one of 5 templates based on the topic:

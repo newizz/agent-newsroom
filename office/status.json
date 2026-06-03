@@ -1,7 +1,7 @@
 {
   "currentRun": null,
   "currentSlug": null,
-  "lastUpdate": "2026-06-03T05:42:04Z",
+  "lastUpdate": "2026-06-03T05:53:02Z",
   "agents": [
     {
       "id": "intake",
@@ -24,15 +24,15 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "busy",
-      "task": "Building timeline dashboard for cat life"
+      "status": "idle",
+      "task": ""
     },
     {
       "id": "reporter",
       "name": "Rosa",
       "role": "Reporter",
       "emoji": "📋",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     }
   ]
