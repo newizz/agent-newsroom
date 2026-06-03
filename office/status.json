@@ -1,22 +1,22 @@
 {
   "currentRun": null,
   "currentSlug": null,
-  "lastUpdate": "2026-06-03T10:04:19Z",
+  "lastUpdate": "2026-06-03T10:22:47Z",
   "agents": [
     {
       "id": "intake",
       "name": "Iris",
       "role": "Intake Specialist",
       "emoji": "🎙️",
-      "status": "offline",
-      "task": ""
+      "status": "busy",
+      "task": "spawning subagent"
     },
     {
       "id": "researcher",
       "name": "Ravi",
       "role": "Research Analyst",
       "emoji": "🔍",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -24,8 +24,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "offline",
-      "task": ""
+      "status": "busy",
+      "task": "writing dashboard"
     },
     {
       "id": "reporter",

@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Story of Coffee — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+  body { background: #fafafa; color: #18181b; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .timeline-line { background: #27272a !important; }
+    .milestone-dot { box-shadow: 0 0 0 4px #0a0a0b, 0 0 0 5px var(--accent) !important; }
+    .reel-slide { background: #131316 !important; }
+    .nav-dot-active { background: #e4e4e7 !important; }
+    nav.side-nav { background: #0a0a0b !important; border-color: #27272a !important; }
+  }
+
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 2.5rem; }
+  .timeline-line { position: absolute; left: 0.875rem; top: 0; bottom: 0; width: 2px; background: #e4e4e7; }
+  .milestone { position: relative; margin-bottom: 2rem; }
+  .milestone:last-child { margin-bottom: 0; }
+  .milestone-dot {
+    position: absolute; left: -2rem; top: 0.5rem;
+    width: 14px; height: 14px; border-radius: 999px;
+    background: var(--accent); box-shadow: 0 0 0 4px #fafafa, 0 0 0 5px var(--accent);
+    transition: transform .2s ease;
+  }
+  .milestone:hover .milestone-dot { transform: scale(1.3); }
+
+  /* Tags */
+  .tag-indigo { background: #6366F11A; color: #6366F1; }
+  .tag-emerald { background: #10B9811A; color: #10B981; }
+  .tag-amber { background: #F59E0B1A; color: #B45309; }
+  .tag-rose { background: #F43F5E1A; color: #E11D48; }
+  .tag-sky { background: #0EA5E91A; color: #0284C7; }
+  .tag-violet { background: #8B5CF61A; color: #7C3AED; }
+
+  /* Animations - gated by prefers-reduced-motion */
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .55s ease, transform .55s ease; }
+    .scale-in  { opacity: 0; transform: scale(0.93); transition: opacity .45s ease, transform .45s ease; }
+    .anim-visible { opacity: 1 !important; transform: none !important; }
+  }
+
+  /* Hover lift */
+  .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,.13); }
+
+  /* Prose */
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+
+  /* Side nav */
+  nav.side-nav {
+    position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+    padding: 1rem 0.75rem; border-right: 1px solid #e4e4e7;
+    background: #fafafa; border-radius: 0 1rem 1rem 0;
+    display: flex; flex-direction: column; gap: 0.5rem; z-index: 100;
+  }
+  nav.side-nav a {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; color: #71717a; text-decoration: none;
+    padding: 0.35rem 0.5rem; border-radius: 0.5rem;
+    transition: all .2s ease; white-space: nowrap;
+  }
+  nav.side-nav a:hover, nav.side-nav a.active {
+    color: var(--accent); background: var(--accent-soft);
+  }
+  @media (max-width: 1200px) { nav.side-nav { display: none; } }
+
+  /* Reel */
+  .reel-slide { display: none; padding: 2rem; }
+  .reel-slide.active { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+  .reel-stat { font-size: 3.5rem; font-weight: 800; line-height: 1; min-width: 140px; }
+  @media (max-width: 600px) { .reel-stat { font-size: 2.5rem; } }
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 999px; background: #d4d4d8;
+    border: none; cursor: pointer; transition: all .2s; padding: 0;
+  }
+  .nav-dot.active { background: var(--accent); width: 24px; }
+
+  /* Stat badges */
+  .stat-badge {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 1.25rem 1.5rem; border-radius: 1rem; text-align: center;
+  }
+  .stat-badge .stat-num { font-size: 2rem; font-weight: 800; color: var(--accent); }
+  .stat-badge .stat-lbl { font-size: 0.75rem; color: #71717a; margin-top: 0.25rem; }
+
+  /* Variety cards */
+  .variety-card { flex: 1; min-width: 260px; }
+
+  /* Fact cards */
+  .fact-card { border-left: 3px solid var(--accent); padding: 1.25rem 1.5rem; border-radius: 0 0.75rem 0.75rem 0; }
+
+  /* Source list */
+  .source-item { padding: 0.75rem 0; border-bottom: 1px solid #e4e4e7; }
+  @media (prefers-color-scheme: dark) { .source-item { border-color: #27272a; } }
+  .source-item:last-child { border-bottom: none; }
+
+  /* Footnote links */
+  sup a { font-size: 0.7em; color: var(--accent); text-decoration: none; }
+  sup a:hover { text-decoration: underline; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Scroll progress bar -->
+<div id="prog" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;pointer-events:none;"></div>
+
+<!-- Side nav -->
+<nav class="side-nav" aria-label="Sections">
+  <a href="#hero"><i data-lucide="coffee" class="w-3 h-3"></i> Hero</a>
+  <a href="#overview"><i data-lucide="zap" class="w-3 h-3"></i> Reel</a>
+  <a href="#origins"><i data-lucide="map-pin" class="w-3 h-3"></i> Origins</a>
+  <a href="#timeline"><i data-lucide="clock" class="w-3 h-3"></i> Timeline</a>
+  <a href="#coffeehouses"><i data-lucide="building-2" class="w-3 h-3"></i> Coffeehouses</a>
+  <a href="#global"><i data-lucide="globe" class="w-3 h-3"></i> Global Today</a>
+  <a href="#varieties"><i data-lucide="layers" class="w-3 h-3"></i> Varieties</a>
+  <a href="#facts"><i data-lucide="sparkles" class="w-3 h-3"></i> Facts</a>
+  <a href="#sources"><i data-lucide="link" class="w-3 h-3"></i> Sources</a>
+</nav>
+
+<!-- Header -->
+<header class="border-b border-soft">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">coffee-history-and-facts &middot; 2026-06-03</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section id="hero" class="max-w-5xl mx-auto px-6 pt-16 pb-8 fade-in">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Timeline</span>
+    <span class="muted">&middot; History &amp; Culture</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">The Story of Coffee</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+    From the highland forests of Ethiopia and the prayer halls of 15th-century Yemen, to the coffeehouses that incubated the Enlightenment and the 2.25 billion cups consumed every single day — coffee is far more than a drink. It is one of history&apos;s great engines of human connection, commerce, and culture.
+  </p>
+</section>
+
+<!-- Insight Reel -->
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-10 fade-in" style="animation-delay:.15s;">
+  <div class="surface rounded-2xl overflow-hidden card-hover" id="reel" tabindex="0" style="outline:none;">
+    <div id="reelSlides" style="min-height:170px;"></div>
+    <div style="padding:0 2rem 0.5rem;">
+      <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;border-radius:999px;transition:width .1s linear;"></div>
+    </div>
+    <div id="reelDots" class="flex justify-center gap-2 pb-4"></div>
+  </div>
+</section>
+
+<!-- Origins -->
+<section id="origins" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="map-pin" class="w-5 h-5 accent"></i> Origins: Ethiopia &amp; Yemen
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content card-hover fade-up">
+    <p>
+      The coffee plant <em>Coffea arabica</em> is indigenous to the highland forests of <strong>Ethiopia</strong>, growing wild at elevations between 1,000 and 2,000 metres in the southwestern highlands. The Kaffa and Oromo peoples likely consumed coffee cherries as a food paste long before any beverage was made from them. Yet the plant that grew in Africa would only become the world-altering drink we know today in a different country entirely.
+    </p>
+    <p>
+      The earliest credible written record of coffee as a brewed beverage comes from <strong>Yemeni Sufi texts of the mid-15th century</strong>.<sup><a href="#source-2" id="ref-2a">[^2]</a></sup> Monks of the Shadhiliyya order discovered that roasting the bean and brewing it into a hot drink sustained their long nights of devotional prayer and meditation. From Yemen&apos;s port cities, the practice spread northward to Mecca by 1414, where it entered Islamic pilgrimage networks and began its journey across the known world.<sup><a href="#source-3" id="ref-3a">[^3]</a></sup>
+    </p>
+    <p>
+      The beloved <strong>Kaldi legend</strong> — the Ethiopian goat-herder who observed his flock dancing after eating red berries from a wild bush — is the most popular origin story in coffee culture. It is also, strictly speaking, folklore. The story was first committed to writing in 1671 CE by a Maronite monk named Antoine Faustus Nairon, centuries after the events it claims to describe.<sup><a href="#source-1" id="ref-1a">[^1]</a></sup> Coffee historians treat it as explanatory myth rather than documented history. The distinction matters: <strong>Ethiopia is where the plant evolved; Yemen is where the beverage was born.</strong>
+    </p>
+    <p>
+      A 2020 genetic study (Scalabrin et al., <em>Scientific Reports</em>) confirmed Yemen&apos;s central role further: the vast majority of modern <em>Coffea arabica</em> varieties trace their lineage to early Yemeni cultivated strains, meaning that the genetic foundation of the world&apos;s coffee supply was largely shaped by those 15th-century Sufi gardens.<sup><a href="#source-3" id="ref-3b">[^3]</a></sup>
+    </p>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section id="timeline" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="clock" class="w-5 h-5 accent"></i> Timeline of Coffee
+  </h2>
+  <div class="flex flex-wrap gap-2 items-center mb-6 fade-up">
+    <span class="text-sm muted mr-2">Filter by era:</span>
+    <div id="filterChips" class="flex flex-wrap gap-2"></div>
+  </div>
+  <div class="surface rounded-xl p-8 card-hover">
+    <div class="timeline">
+      <div class="timeline-line"></div>
+      <div id="milestones"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Coffeehouses -->
+<section id="coffeehouses" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="building-2" class="w-5 h-5 accent"></i> The Coffeehouse Revolution
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content card-hover fade-up">
+    <p>
+      No institution in history has punched quite so far above its weight as the coffeehouse. In the Ottoman world (<em>kahvehane</em>) and then in Europe, the coffeehouse created something radically new: a <strong>sober, egalitarian public space</strong> where men of different social classes could sit, talk, read, debate, and do business — for the price of a cup.
+    </p>
+    <p>
+      The first Ottoman coffeehouses opened in <strong>Constantinople (Istanbul) in 1554&ndash;55</strong>, established by two traders from Aleppo and Damascus during the reign of Suleiman the Magnificent.<sup><a href="#source-13" id="ref-13a">[^13]</a></sup> These establishments admitted merchants, scholars, students, and soldiers alike. They hosted chess, poetry recitals, political debate, and news exchange. So threatening did they appear to authority that <strong>Sultan Murad IV (r. 1623&ndash;40) made coffee consumption a capital offense</strong> — a ban that was largely unenforceable and ultimately failed.<sup><a href="#source-5" id="ref-5a">[^5]</a></sup>
+    </p>
+    <p>
+      In <strong>London</strong>, the first English coffeehouse opened in 1652, run by Pasqua Ros&eacute;e in St Michael&apos;s Alley. By 1700, London alone had an estimated <strong>2,000&ndash;3,000 coffeehouses</strong>. They were nicknamed <strong>&ldquo;Penny Universities&rdquo;</strong> because for the price of a penny admission and a cup, any man could join intellectual discourse of the highest order.<sup><a href="#source-5" id="ref-5b">[^5]</a></sup>
+    </p>
+    <p>
+      The institutional legacy is staggering: <strong>Lloyd&apos;s of London</strong> (global insurance market) began at Edward Lloyd&apos;s coffeehouse in 1686, where ship merchants exchanged maritime intelligence and arranged cargo insurance.<sup><a href="#source-4" id="ref-4a">[^4]</a></sup> The <strong>London Stock Exchange</strong> traces its origin to Jonathan&apos;s Coffee House around 1680, where stock prices were first publicly posted.<sup><a href="#source-4" id="ref-4b">[^4]</a></sup> <strong>Caf&eacute; Procope</strong> in Paris, opened 1686, became the salon where Voltaire, Rousseau, and Diderot refined Enlightenment philosophy. Isaac Newton was a regular at the Grecian Coffee House. Reuters news agency and Christie&apos;s auction house also trace their roots to specific London coffeehouses.<sup><a href="#source-5" id="ref-5c">[^5]</a></sup>
+    </p>
+    <p>
+      And then there was the English king who tried to shut it all down. In December 1675, <strong>King Charles II issued a royal proclamation suppressing coffeehouses</strong>, citing their role in spreading &ldquo;false news and libelous matter.&rdquo; The public outcry was so immediate and fierce that he was forced to retract the proclamation within <strong>11 days</strong>, before it could even take effect.<sup><a href="#source-5" id="ref-5d">[^5]</a></sup>
+    </p>
+  </div>
+
+  <!-- Coffeehouse institution cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+    <div class="surface rounded-xl p-5 card-hover scale-in">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">&#x1F3DB;</span>
+        <div>
+          <div class="font-semibold text-sm mb-1">Lloyd&apos;s of London</div>
+          <div class="muted text-xs leading-relaxed">Founded 1686 at Edward Lloyd&apos;s coffee house. Today one of the world&apos;s largest insurance markets.</div>
+        </div>
+      </div>
+    </div>
+    <div class="surface rounded-xl p-5 card-hover scale-in">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">&#x1F4C8;</span>
+        <div>
+          <div class="font-semibold text-sm mb-1">London Stock Exchange</div>
+          <div class="muted text-xs leading-relaxed">Grew from Jonathan&apos;s Coffee House (c.1680). Brokers first posted stock prices here before formalizing into an exchange.</div>
+        </div>
+      </div>
+    </div>
+    <div class="surface rounded-xl p-5 card-hover scale-in">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">&#x1F4DA;</span>
+        <div>
+          <div class="font-semibold text-sm mb-1">Caf&eacute; Procope, Paris</div>
+          <div class="muted text-xs leading-relaxed">Opened 1686. Voltaire, Rousseau, Diderot, Benjamin Franklin — all regulars. A crucible of Enlightenment thought.</div>
+        </div>
+      </div>
+    </div>
+    <div class="surface rounded-xl p-5 card-hover scale-in">
+      <div class="flex items-start gap-3">
+        <span class="text-2xl">&#x1F4F0;</span>
+        <div>
+          <div class="font-semibold text-sm mb-1">Reuters &amp; Christie&apos;s</div>
+          <div class="muted text-xs leading-relaxed">Reuters grew from coffeehouse news-sharing networks. Christie&apos;s auction house traces its origins to a London coffeehouse as well.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Global Coffee Today -->
+<section id="global" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="globe" class="w-5 h-5 accent"></i> Global Coffee Today
+  </h2>
+
+  <!-- Stat badges -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+    <div class="surface rounded-xl stat-badge card-hover scale-in">
+      <div class="stat-num"><span data-target="225" data-suffix="">225</span><span style="font-size:1.2rem">B</span></div>
+      <div class="stat-lbl">cups consumed per day</div>
+      <div class="text-xs muted mt-1">2.25 billion globally <sup><a href="#source-9">[^9]</a></sup></div>
+    </div>
+    <div class="surface rounded-xl stat-badge card-hover scale-in">
+      <div class="stat-num"><span data-target="176" data-suffix="">176</span><span style="font-size:1.2rem">M</span></div>
+      <div class="stat-lbl">60-kg bags produced (2024/25)</div>
+      <div class="text-xs muted mt-1">Record output <sup><a href="#source-6">[^6]</a></sup></div>
+    </div>
+    <div class="surface rounded-xl stat-badge card-hover scale-in">
+      <div class="stat-num">$<span data-target="461" data-suffix="">461</span><span style="font-size:1.2rem">B</span></div>
+      <div class="stat-lbl">global market value (2024)</div>
+      <div class="text-xs muted mt-1">And growing <sup><a href="#source-17">[^17]</a></sup></div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="surface rounded-xl p-6 card-hover fade-up">
+    <h3 class="font-semibold mb-1 text-sm">Top Coffee Producing Countries (2024/25)</h3>
+    <p class="muted text-xs mb-4">Share of world production by 60-kg bags <sup><a href="#source-6">[^6]</a></sup></p>
+    <canvas id="productionChart" height="220"></canvas>
+  </div>
+</section>
+
+<!-- Arabica vs Robusta -->
+<section id="varieties" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="layers" class="w-5 h-5 accent"></i> Arabica vs. Robusta
+  </h2>
+  <div class="flex flex-wrap gap-4">
+    <!-- Arabica -->
+    <div class="surface rounded-xl p-6 variety-card card-hover fade-left">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="bg-accent-soft accent px-2 py-1 rounded-md text-xs font-semibold">Arabica</span>
+        <span class="muted text-xs">Coffea arabica</span>
+      </div>
+      <ul class="space-y-3 text-sm">
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0"></i>
+          <span><strong>Caffeine:</strong> ~1.5% by dry weight — lower, smoother buzz</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0"></i>
+          <span><strong>Flavour:</strong> Complex, nuanced — fruity, floral, acidic notes</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0"></i>
+          <span><strong>Altitude:</strong> 610&ndash;1,830m — high-altitude specialist</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0"></i>
+          <span><strong>Market share:</strong> ~57&ndash;70% of global production</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0"></i>
+          <span><strong>Origin:</strong> Ethiopian highlands; dominant in specialty coffee</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0"></i>
+          <span><strong>Sensitivity:</strong> Vulnerable to climate change; needs narrow temperature band</span>
+        </li>
+      </ul>
+      <div class="mt-4 text-xs muted"><sup><a href="#source-16">[^16]</a></sup></div>
+    </div>
+    <!-- Robusta -->
+    <div class="surface rounded-xl p-6 variety-card card-hover fade-left" style="transition-delay:.1s;">
+      <div class="flex items-center gap-2 mb-4">
+        <span style="background:#7C3AED1A;color:#7C3AED;" class="px-2 py-1 rounded-md text-xs font-semibold">Robusta</span>
+        <span class="muted text-xs">Coffea canephora</span>
+      </div>
+      <ul class="space-y-3 text-sm">
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0" style="color:#7C3AED;"></i>
+          <span><strong>Caffeine:</strong> ~2.7% — nearly double Arabica; stronger kick</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0" style="color:#7C3AED;"></i>
+          <span><strong>Flavour:</strong> Earthy, strong, bitter — less complexity, more body</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0" style="color:#7C3AED;"></i>
+          <span><strong>Altitude:</strong> Sea level to 800m — highly adaptable</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0" style="color:#7C3AED;"></i>
+          <span><strong>Market share:</strong> ~30&ndash;43% — rising as climate shifts</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0" style="color:#7C3AED;"></i>
+          <span><strong>Main producers:</strong> Vietnam, Indonesia, West Africa</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4 accent mt-0.5 flex-shrink-0" style="color:#7C3AED;"></i>
+          <span><strong>Uses:</strong> Espresso blends (thick crema), instant coffee</span>
+        </li>
+      </ul>
+      <div class="mt-4 text-xs muted"><sup><a href="#source-16">[^16]</a></sup></div>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-4 mt-4 text-sm muted prose-content fade-up">
+    <p><strong>Note on market share:</strong> Historical figures quote Arabica at ~70% of global production. Current 2024/25 production data (Arabica: 99.9M bags vs. Robusta: 76.4M bags) implies a ~57/43 split — indicating Robusta&apos;s share has grown substantially, partly driven by climate change forcing Arabica cultivation to higher, narrower altitudes. The trend toward parity is real and accelerating.<sup><a href="#source-6">[^6]</a></sup><sup><a href="#source-16">[^16]</a></sup></p>
+  </div>
+</section>
+
+<!-- Surprising Facts -->
+<section id="facts" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="sparkles" class="w-5 h-5 accent"></i> Surprising Facts
+  </h2>
+  <div class="space-y-4" id="factsContainer"></div>
+</section>
+
+<!-- Sources -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm">
+    <div id="sourcesList"></div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-03</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<script>
+lucide.createIcons();
+
+/* ── Scroll progress bar ── */
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('prog').style.width = pct + '%';
+}, { passive: true });
+
+/* ── Active side-nav highlighting ── */
+const navLinks = document.querySelectorAll('nav.side-nav a');
+const sections = document.querySelectorAll('section[id]');
+const navObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`nav.side-nav a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => navObserver.observe(s));
+
+/* ── Entrance animations ── */
+if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('anim-visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(el => io.observe(el));
+}
+
+/* ── Animated stat counters ── */
+function animCounter(el, target, duration) {
+  const t0 = performance.now();
+  (function tick(now) {
+    const p = Math.min((now - t0) / duration, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(ease * target);
+    if (p < 1) requestAnimationFrame(tick);
+  })(performance.now());
+}
+const cntObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animCounter(e.target, +e.target.dataset.target, 1200);
+      cntObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-target]').forEach(el => cntObs.observe(el));
+
+/* ── INSIGHT REEL ── */
+const slides = [
+  {
+    stat: '2.25B',
+    statLabel: 'cups per day',
+    color: '#6366F1',
+    headline: '2.25 billion cups of coffee are consumed every single day',
+    body: `Coffee is the world's most widely consumed psychoactive substance, drunk by an estimated one-third of the global population daily.`,
+    animate: false
+  },
+  {
+    stat: '15',
+    statSuffix: 'th C',
+    statLabel: 'century — first brewed',
+    color: '#92400E',
+    headline: 'Coffee was first brewed as a drink in 15th-century Yemen',
+    body: `Yemeni Sufi monks discovered that roasting and brewing the bean created an alertness-enhancing drink. The Kaldi goat-herder legend wasn't written down until 1671.`,
+    animate: true,
+    animTarget: 15
+  },
+  {
+    stat: '176',
+    statSuffix: 'M',
+    statLabel: 'bags produced (2024/25)',
+    color: '#10B981',
+    headline: '176 million 60-kg bags of coffee were produced in 2024/25',
+    body: `Brazil leads with 31% of world supply, followed by Vietnam (16.5%) and Colombia (7%). Global coffee market value exceeds $461 billion.`,
+    animate: true,
+    animTarget: 176
+  },
+  {
+    stat: '5',
+    statLabel: 'independent evolutions',
+    color: '#8B5CF6',
+    headline: 'Caffeine evolved independently 5 times across different plant species',
+    body: `A 2016 PNAS study found that coffee, tea, cacao, guaraná, and maté each evolved caffeine biosynthesis separately — one of the most striking cases of convergent evolution.`,
+    animate: true,
+    animTarget: 5
+  },
+  {
+    stat: '#1',
+    statLabel: 'Finland — most coffee per capita',
+    color: '#F59E0B',
+    headline: 'Finland, not America, drinks the most coffee per person',
+    body: `Finns consume ~9.6 kg of coffee per person per year (~4.1 cups/day). Luxembourg leads at 12.5 kg. The US ranks 22nd. Scandinavia dominates the top per-capita nations globally.`,
+    animate: false
+  }
+];
+
+let reelCurrent = 0;
+let reelPaused = false;
+let reelTimer = null;
+let reelProgressStart = null;
+let reelProgressRAF = null;
+const REEL_DURATION = 4000;
+
+const reelSlidesEl = document.getElementById('reelSlides');
+const reelProgressEl = document.getElementById('reelProgress');
+const reelDotsEl = document.getElementById('reelDots');
+
+function buildReelSlides() {
+  reelSlidesEl.innerHTML = '';
+  slides.forEach((s, i) => {
+    const div = document.createElement('div');
+    div.className = 'reel-slide' + (i === 0 ? ' active' : '');
+    div.style.cssText = `display:${i === 0 ? 'flex' : 'none'};align-items:center;gap:2rem;flex-wrap:wrap;padding:2rem;`;
+    div.innerHTML = `
+      <div style="min-width:140px;text-align:center;">
+        <div class="reel-stat" style="color:${s.color};" id="reel-stat-${i}">
+          ${s.animate ? '0' + (s.statSuffix || '') : s.stat}
+        </div>
+        <div style="font-size:.7rem;color:#71717a;margin-top:.35rem;">${s.statLabel}</div>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:1.05rem;font-weight:700;margin-bottom:.5rem;line-height:1.3;">${s.headline}</div>
+        <div style="font-size:.85rem;color:#71717a;line-height:1.6;">${s.body}</div>
+      </div>
+    `;
+    reelSlidesEl.appendChild(div);
+  });
+}
+
+function buildReelDots() {
+  reelDotsEl.innerHTML = '';
+  slides.forEach((_, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    btn.setAttribute('aria-label', `Slide ${i + 1}`);
+    const idx = i;
+    btn.onclick = () => goToSlide(idx);
+    reelDotsEl.appendChild(btn);
+  });
+}
+
+function animReelCounter(slideIdx) {
+  const s = slides[slideIdx];
+  if (!s.animate) return;
+  const el = document.getElementById(`reel-stat-${slideIdx}`);
+  if (!el) return;
+  const suffix = s.statSuffix || '';
+  const t0 = performance.now();
+  const dur = 900;
+  (function tick(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(ease * s.animTarget) + suffix;
+    if (p < 1) requestAnimationFrame(tick);
+  })(performance.now());
+}
+
+function goToSlide(idx) {
+  const allSlideEls = reelSlidesEl.querySelectorAll('.reel-slide');
+  allSlideEls[reelCurrent].style.display = 'none';
+  reelCurrent = idx;
+  allSlideEls[reelCurrent].style.display = 'flex';
+
+  const dots = reelDotsEl.querySelectorAll('.nav-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === reelCurrent));
+
+  animReelCounter(reelCurrent);
+  resetProgress();
+}
+
+function nextSlide() {
+  goToSlide((reelCurrent + 1) % slides.length);
+}
+
+function resetProgress() {
+  cancelAnimationFrame(reelProgressRAF);
+  reelProgressEl.style.width = '0%';
+  if (!reelPaused) startProgress();
+}
+
+function startProgress() {
+  reelProgressStart = performance.now();
+  (function tick(now) {
+    if (reelPaused) return;
+    const elapsed = now - reelProgressStart;
+    const pct = Math.min(elapsed / REEL_DURATION * 100, 100);
+    reelProgressEl.style.width = pct + '%';
+    if (pct < 100) {
+      reelProgressRAF = requestAnimationFrame(tick);
+    } else {
+      nextSlide();
+    }
+  })(performance.now());
+}
+
+buildReelSlides();
+buildReelDots();
+animReelCounter(0);
+startProgress();
+
+const reelEl = document.getElementById('reel');
+reelEl.addEventListener('mouseenter', () => { reelPaused = true; cancelAnimationFrame(reelProgressRAF); });
+reelEl.addEventListener('mouseleave', () => {
+  reelPaused = false;
+  reelProgressStart = performance.now() - (parseFloat(reelProgressEl.style.width) / 100 * REEL_DURATION);
+  startProgress();
+});
+reelEl.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); goToSlide((reelCurrent - 1 + slides.length) % slides.length); }
+});
+
+/* ── Timeline milestones ── */
+const milestones = [
+  {
+    year: "~9th–10th c. CE",
+    title: "The Kaldi Legend",
+    body: "The beloved oral tradition of Ethiopian goat-herder Kaldi, whose flock danced after eating red berries, places coffee's first discovery in the Ethiopian highlands. Not written down until 1671 CE — culturally foundational but historically unverified.",
+    tag: "Ancient",
+    tagColor: "amber"
+  },
+  {
+    year: "c. 1414",
+    title: "Coffee Reaches Mecca",
+    body: "The coffee plant becomes known in Mecca and enters Islamic pilgrimage networks, beginning its spread across the Arab world.",
+    tag: "Ancient",
+    tagColor: "amber"
+  },
+  {
+    year: "c. 1450",
+    title: "First Brewed Beverage — Yemen",
+    body: "Yemeni Sufi monks of the Shadhiliyya order begin roasting and brewing coffee beans to sustain long nights of devotional prayer. This is the earliest credible written record of coffee as a beverage.",
+    tag: "Ancient",
+    tagColor: "amber"
+  },
+  {
+    year: "1511",
+    title: "First Coffee Ban — Mecca",
+    body: "Conservative imams in Mecca ban coffee as an intoxicant. The ban is overturned by Ottoman Sultan Selim I in 1524, who rules coffee permissible.",
+    tag: "Ottoman",
+    tagColor: "rose"
+  },
+  {
+    year: "1554–55",
+    title: "First Ottoman Coffeehouses — Istanbul",
+    body: "Two traders from Aleppo and Damascus open the first coffeehouses in Constantinople during the reign of Suleiman the Magnificent. Coffee culture rapidly institutionalizes across the Ottoman Empire.",
+    tag: "Ottoman",
+    tagColor: "rose"
+  },
+  {
+    year: "1616",
+    title: "Yemen's Monopoly Broken",
+    body: "Dutch traders smuggle live coffee plants out of Yemen, ending the near two-century Yemeni export monopoly. By 1699, commercial cultivation is established in Java, Indonesia.",
+    tag: "Ottoman",
+    tagColor: "rose"
+  },
+  {
+    year: "1645",
+    title: "Coffee Enters Europe — Venice",
+    body: "The first coffeehouse outside Ottoman territories opens in Venice, bringing coffee into European public life for the first time.",
+    tag: "European",
+    tagColor: "sky"
+  },
+  {
+    year: "1652",
+    title: "First English Coffeehouse — London",
+    body: "Pasqua Rosée opens the first English coffeehouse in St Michael's Alley, London. By 1700, London has an estimated 2,000–3,000 coffeehouses — the 'Penny Universities.'",
+    tag: "European",
+    tagColor: "sky"
+  },
+  {
+    year: "1675",
+    title: "Charles II Bans Coffeehouses — for 11 Days",
+    body: "King Charles II issues a proclamation suppressing English coffeehouses for spreading 'false news.' Public outrage forces him to retract it within 11 days before it takes effect.",
+    tag: "European",
+    tagColor: "sky"
+  },
+  {
+    year: "1686",
+    title: "Lloyd's Coffee House & Café Procope",
+    body: "Edward Lloyd opens his coffee house in London — origin of Lloyd's of London insurance. Café Procope opens in Paris, becoming salon to Voltaire, Rousseau, Diderot. Lloyd's precedes the formal insurance market by decades.",
+    tag: "European",
+    tagColor: "sky"
+  },
+  {
+    year: "1727",
+    title: "Coffee Reaches Brazil",
+    body: "Portuguese officer Francisco de Melo Palheta allegedly obtains coffee seedlings via diplomatic seduction, smuggled in a floral bouquet from French Guiana. These seeds launch what will become the world's dominant coffee industry.",
+    tag: "Modern",
+    tagColor: "emerald"
+  },
+  {
+    year: "1788–1804",
+    title: "Haiti & Revolution",
+    body: "By 1788, Saint-Domingue (Haiti) supplies half the world's coffee. The Haitian Revolution of 1791–1804 disrupts that supply, accelerating Brazil's rise to dominance.",
+    tag: "Modern",
+    tagColor: "emerald"
+  },
+  {
+    year: "1884",
+    title: "The Espresso Machine Invented",
+    body: "Angelo Moriondo of Turin patents the first steam-pressure brewing device — the original espresso machine. Luigi Bezzera improves the design in 1901; Desiderio Pavoni commercializes it from 1903.",
+    tag: "Modern",
+    tagColor: "emerald"
+  },
+  {
+    year: "1901–1903",
+    title: "Instant Coffee Patented",
+    body: "Satori Kato demonstrates soluble instant coffee at the 1901 Pan-American Exposition and receives a US patent in 1903. Coffee becomes shelf-stable, cheap, and truly mass-market.",
+    tag: "Modern",
+    tagColor: "emerald"
+  },
+  {
+    year: "1966–1971",
+    title: "Second Wave Begins",
+    body: "Peet's Coffee (Berkeley, 1966) and Starbucks (Seattle, 1971) introduce Americans to darker roasts, espresso drinks, and the concept of coffee as an experience rather than a utility.",
+    tag: "Modern",
+    tagColor: "emerald"
+  },
+  {
+    year: "1999",
+    title: "Vietnam: World's #2 Producer",
+    body: "Vietnam overtakes Colombia to become the world's second-largest coffee producer. From negligible output in 1980, Vietnam now supplies 16.5% of global production — predominantly Robusta beans.",
+    tag: "Modern",
+    tagColor: "emerald"
+  },
+  {
+    year: "2002",
+    title: "Third Wave Coined",
+    body: "Barista and roaster Trish Rothgeb coins 'third-wave coffee' in The Flamekeeper newsletter, formalizing the movement that treats coffee as a fine artisanal product — traceable, single-origin, lightly roasted.",
+    tag: "Modern",
+    tagColor: "emerald"
+  },
+  {
+    year: "2024/25",
+    title: "Record Production & Price Surge",
+    body: "World coffee production reaches 176.2 million 60-kg bags. Consumption approaches record 174 million bags. Coffee prices near three-decade highs as demand outpaces supply in key crop years.",
+    tag: "Modern",
+    tagColor: "emerald"
+  }
+];
+
+const wrap = document.getElementById('milestones');
+const allTags = [...new Set(milestones.map(m => m.tag).filter(Boolean))];
+
+function render(activeTag) {
+  wrap.innerHTML = '';
+  milestones
+    .filter(m => activeTag === 'all' || m.tag === activeTag)
+    .forEach((m, i) => {
+      const colorClass = `tag-${m.tagColor || 'indigo'}`;
+      const delay = Math.min(i * 70, 420);
+      const div = document.createElement('div');
+      div.className = 'milestone fade-left';
+      div.style.transitionDelay = delay + 'ms';
+      div.innerHTML = `
+        <div class="milestone-dot"></div>
+        <div class="flex items-center gap-3 mb-2">
+          <div class="font-mono text-sm muted">${m.year}</div>
+          ${m.tag ? `<span class="${colorClass} text-xs px-2 py-0.5 rounded-md font-medium">${m.tag}</span>` : ''}
+        </div>
+        <h3 class="font-semibold text-lg mb-2">${m.title}</h3>
+        <p class="muted leading-relaxed">${m.body}</p>
+      `;
+      wrap.appendChild(div);
+    });
+
+  // Re-observe new fade-left elements
+  if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    const io2 = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('anim-visible'); io2.unobserve(e.target); } });
+    }, { threshold: 0.07 });
+    wrap.querySelectorAll('.fade-left').forEach(el => io2.observe(el));
+  }
+}
+
+const chipsWrap = document.getElementById('filterChips');
+function renderChips(active) {
+  chipsWrap.innerHTML = '';
+  ['all', ...allTags].forEach(t => {
+    const btn = document.createElement('button');
+    const isActive = t === active;
+    btn.className = `text-xs px-3 py-1.5 rounded-md transition ${isActive ? 'text-white' : 'surface hover:bg-accent-soft'}`;
+    if (isActive) btn.style.background = 'var(--accent)';
+    btn.textContent = t === 'all' ? 'All' : t;
+    const tag = t;
+    btn.onclick = () => { renderChips(tag); render(tag); };
+    chipsWrap.appendChild(btn);
+  });
+}
+renderChips('all');
+render('all');
+
+/* ── Surprising Facts ── */
+const facts = [
+  {
+    icon: 'dna',
+    num: '5',
+    title: 'Caffeine Evolved Independently 5 Times',
+    body: `Caffeine is not unique to coffee — it independently evolved in coffee, tea, cacao, guaraná, and citrus plants through entirely different genes and biochemical pathways. Published in <em>PNAS</em> (2016), this convergent evolution is remarkable: nature "invented" the same protective molecule five separate times as a pesticide against insects. <sup><a href="#source-7">[^7]</a></sup>`,
+    color: '#8B5CF6'
+  },
+  {
+    icon: 'x-circle',
+    num: '114th',
+    title: 'The "World\'s Second Most Traded Commodity" Is a Myth',
+    body: `The claim that coffee is the world&apos;s second most traded commodity after oil is false — yet Starbucks repeated it in front of the US Senate. PolitiFact and economists found that green coffee ranks approximately 114th among globally traded products. Wheat, soybeans, aluminum, copper, and iron ore all have markets four or more times larger. <sup><a href="#source-8">[^8]</a></sup>`,
+    color: '#EF4444'
+  },
+  {
+    icon: 'globe',
+    num: '22nd',
+    title: 'Americans Are Only 22nd in Per-Capita Coffee Consumption',
+    body: `Despite the US being home to global coffee chains, Americans rank 22nd in per-capita consumption. Luxembourg leads at 12.5 kg/person/year; Finland follows at 9.6 kg (~4.1 cups/day). The top five per-capita consumers are all Northern European countries. <sup><a href="#source-9">[^9]</a></sup>`,
+    color: '#F59E0B'
+  },
+  {
+    icon: 'timer',
+    num: '11 days',
+    title: 'King Charles II\'s Coffeehouse Ban Lasted Just 11 Days',
+    body: `In December 1675, Charles II issued a royal proclamation suppressing English coffeehouses for spreading &ldquo;false news and libelous matter.&rdquo; The public outcry was so fierce he was forced to retract the proclamation before it could even take effect &mdash; within 11 days. <sup><a href="#source-5">[^5]</a></sup>`,
+    color: '#6366F1'
+  },
+  {
+    icon: 'flower-2',
+    num: '1727',
+    title: 'Brazil\'s Coffee Empire Was Founded on Smuggled Seeds',
+    body: `The entire Brazilian coffee industry — today 31% of world supply — traces to 1727, when Portuguese officer Francisco de Melo Palheta allegedly charmed the governor&apos;s wife of French Guiana into hiding coffee seedlings in a bouquet of flowers. Those smuggled plants launched an industry that within 125 years would dominate global markets. <sup><a href="#source-12">[^12]</a></sup>`,
+    color: '#10B981'
+  },
+  {
+    icon: 'flask-conical',
+    num: '10–15%',
+    title: 'Caffeine Is Only a Fraction of Coffee\'s Bitterness',
+    body: `Caffeine accounts for just 10–15% of coffee&apos;s perceived bitterness. The majority comes from chlorogenic acid lactones and phenylindanes — compounds created during roasting. This means a dark roast can taste &ldquo;stronger&rdquo; not because it has more caffeine (roasting actually slightly reduces it) but because it generates more bitter compounds. <sup><a href="#source-11">[^11]</a></sup>`,
+    color: '#92400E'
+  }
+];
+
+const factsContainer = document.getElementById('factsContainer');
+facts.forEach((f, i) => {
+  const delay = Math.min(i * 60, 400);
+  const div = document.createElement('div');
+  div.className = 'surface rounded-xl fact-card card-hover scale-in';
+  div.style.cssText = `border-left-color:${f.color};transition-delay:${delay}ms;`;
+  div.innerHTML = `
+    <div class="flex items-start gap-4">
+      <div style="min-width:48px;height:48px;border-radius:.75rem;background:${f.color}1A;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <i data-lucide="${f.icon}" style="width:20px;height:20px;color:${f.color};"></i>
+      </div>
+      <div>
+        <div style="font-size:.65rem;font-weight:700;color:${f.color};text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;">${f.num}</div>
+        <h3 class="font-semibold mb-2">${f.title}</h3>
+        <p class="muted text-sm leading-relaxed">${f.body}</p>
+      </div>
+    </div>
+  `;
+  factsContainer.appendChild(div);
+});
+lucide.createIcons();
+
+/* ── Sources ── */
+const sources = [
+  { id: 1, title: "Kaldi - Wikipedia", url: "https://en.wikipedia.org/wiki/Kaldi", publisher: "Wikipedia", author: "Wikipedia contributors", date: "2024" },
+  { id: 2, title: "Yemen vs. Ethiopia | Coffee's True Origin Debate", url: "https://sagebrushcoffee.com/blogs/education/yemen-vs-ethiopia-coffee-s-true-origin-debate", publisher: "Sagebrush Coffee", author: "Sagebrush Coffee Editorial", date: "2024" },
+  { id: 3, title: "History of coffee - Wikipedia", url: "https://en.wikipedia.org/wiki/History_of_coffee", publisher: "Wikipedia", author: "Wikipedia contributors", date: "2024" },
+  { id: 4, title: "Lloyd's Coffee House - Wikipedia", url: "https://en.wikipedia.org/wiki/Lloyd%27s_Coffee_House", publisher: "Wikipedia", author: "Wikipedia contributors", date: "2024" },
+  { id: 5, title: "How Coffee Fueled Revolutions—and Revolutionary Ideas", url: "https://www.history.com/articles/coffee-houses-revolutions", publisher: "HISTORY (A&E Networks)", author: "HISTORY editorial staff", date: "2024" },
+  { id: 6, title: "World coffee production in 2024/25 is estimated at 176.2 million bags", url: "https://www.tridge.com/news/world-coffee-production-in-202425-is-estimat-yeogrq", publisher: "Tridge", author: "Tridge Research Team", date: "2025" },
+  { id: 7, title: "Convergent evolution of caffeine in plants by co-option of exapted ancestral enzymes", url: "https://www.pnas.org/doi/10.1073/pnas.1602575113", publisher: "PNAS", author: "Huang et al.", date: "2016" },
+  { id: 8, title: "No, coffee is not the second-most traded commodity after oil", url: "https://www.politifact.com/factchecks/2017/may/08/starbucks/no-coffee-not-second-most-traded-commodity-after-o/", publisher: "PolitiFact", author: "PolitiFact staff", date: "2017" },
+  { id: 9, title: "Coffee Consumption Statistics 2026 - Global & U.S. Data", url: "https://www.verenastreet.com/blogs/news/coffee-statistics", publisher: "Verena Street Coffee Co.", author: "Verena Street Research", date: "2025-2026" },
+  { id: 10, title: "USDA forecasts world coffee production for 2025/26 at an all-time high of 178.8 million bags", url: "https://www.comunicaffe.com/usda-sees-world-coffee-production-for-2025-26-at-an-all-time-high-of-178-8-million-bags-2-consumption-at-a-record-173-9-million-1-3/", publisher: "Comunicaffe", author: "Comunicaffe editorial staff", date: "2025" },
+  { id: 11, title: "The biology of coffee, one of the world's most popular drinks", url: "https://theconversation.com/the-biology-of-coffee-one-of-the-worlds-most-popular-drinks-129179", publisher: "The Conversation", author: "Academic contributor", date: "2020" },
+  { id: 12, title: "Coffee and Colonialism / History of Labor on Coffee Plantations", url: "https://coffeeannan.com/en/blogs/blog/coffee-and-colonialism", publisher: "Coffee Annan", author: "Coffee Annan editorial", date: "2023" },
+  { id: 13, title: "Ottoman coffeehouse - Wikipedia", url: "https://en.wikipedia.org/wiki/Ottoman_coffeehouse", publisher: "Wikipedia", author: "Wikipedia contributors", date: "2024" },
+  { id: 14, title: "The Long History of the Espresso Machine", url: "https://www.smithsonianmag.com/arts-culture/the-long-history-of-the-espresso-machine-126012814/", publisher: "Smithsonian Magazine", author: "Smithsonian staff", date: "2012" },
+  { id: 15, title: "Third-wave coffee - Wikipedia", url: "https://en.wikipedia.org/wiki/Third-wave_coffee", publisher: "Wikipedia", author: "Wikipedia contributors", date: "2024" },
+  { id: 16, title: "Arabica vs Robusta: Complete Coffee Bean Guide 2025", url: "https://espressobarista.com/arabica-vs-robusta-coffee-guide/", publisher: "Espresso Barista", author: "Espresso Barista editorial staff", date: "2025" },
+  { id: 17, title: "Coffee Market Size, Share, Trends & Forecast 2025-2033", url: "https://www.renub.com/global-coffee-market-p.php", publisher: "Renub Research", author: "Renub Research analysts", date: "2024" }
+];
+
+const sourcesList = document.getElementById('sourcesList');
+sources.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'source-item';
+  div.id = `source-${s.id}`;
+  div.innerHTML = `
+    <div class="flex items-baseline gap-2">
+      <span class="font-mono text-xs muted font-semibold" style="min-width:1.5rem;">[${s.id}]</span>
+      <div>
+        <a href="${s.url}" target="_blank" rel="noopener" class="font-medium text-sm">${s.title}</a>
+        <div class="muted text-xs mt-0.5">${s.author} &mdash; ${s.publisher} &mdash; ${s.date}</div>
+      </div>
+    </div>
+  `;
+  sourcesList.appendChild(div);
+});
+
+/* ── Chart.js — Production Chart ── */
+let chartTriggered = false;
+const chartCanvas = document.getElementById('productionChart');
+const chartObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !chartTriggered) {
+      chartTriggered = true;
+      chartObs.unobserve(e.target);
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const textColor = isDark ? '#a1a1aa' : '#71717a';
+      const gridColor = isDark ? '#27272a' : '#e4e4e7';
+      new Chart(chartCanvas, {
+        type: 'bar',
+        data: {
+          labels: ['Brazil', 'Vietnam', 'Colombia', 'Indonesia', 'Ethiopia', 'Rest of world'],
+          datasets: [{
+            label: 'Production share (%)',
+            data: [31, 16.5, 7, 6, 4.5, 35],
+            backgroundColor: [
+              '#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#d4d4d8'
+            ],
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          animation: { duration: 900, easing: 'easeOutQuart' },
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.parsed.y}% of world production`
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: textColor },
+              grid: { color: gridColor }
+            },
+            y: {
+              ticks: {
+                color: textColor,
+                callback: v => v + '%'
+              },
+              grid: { color: gridColor }
+            }
+          }
+        }
+      });
+    }
+  });
+}, { threshold: 0.3 });
+chartObs.observe(chartCanvas);
+</script>
+</body>
+</html>
