@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Story of a Cat's Life — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .timeline-line { background: #27272a !important; }
+    .fact-card { background: #131316 !important; border-color: #27272a !important; }
+    .stage-card { background: #131316 !important; border-color: #27272a !important; }
+  }
+
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 2.5rem; }
+  .timeline-line { position: absolute; left: 0.875rem; top: 0; bottom: 0; width: 2px; background: #e4e4e7; }
+  .milestone { position: relative; margin-bottom: 2rem; }
+  .milestone:last-child { margin-bottom: 0; }
+  .milestone-dot {
+    position: absolute; left: -2rem; top: 0.5rem;
+    width: 14px; height: 14px; border-radius: 999px;
+    background: var(--accent); box-shadow: 0 0 0 4px #fafafa, 0 0 0 5px var(--accent);
+    transition: transform .2s ease;
+  }
+  @media (prefers-color-scheme: dark) {
+    .milestone-dot { box-shadow: 0 0 0 4px #0a0a0b, 0 0 0 5px var(--accent); }
+  }
+  .milestone:hover .milestone-dot { transform: scale(1.3); }
+
+  /* Tags */
+  .tag-indigo { background: #6366F11A; color: #6366F1; }
+  .tag-emerald { background: #10B9811A; color: #10B981; }
+  .tag-amber { background: #F59E0B1A; color: #B45309; }
+  .tag-rose { background: #F43F5E1A; color: #E11D48; }
+  .tag-sky { background: #0EA5E91A; color: #0284C7; }
+  .tag-violet { background: #8B5CF61A; color: #7C3AED; }
+
+  /* Animations */
+  .fade-in { animation: fadeIn .5s ease-out both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Prose */
+  .prose-content p { margin-bottom: 1em; line-height: 1.75; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content sup a { color: var(--accent); font-size: 0.7em; }
+  .prose-content ul { list-style: disc; padding-left: 1.5em; margin-bottom: 1em; }
+  .prose-content ul li { margin-bottom: 0.4em; line-height: 1.6; }
+
+  /* Fact cards */
+  .fact-card {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    border-left: 4px solid var(--accent);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .fact-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px 0 rgba(99,102,241,0.1);
+  }
+
+  /* Stage arc */
+  .arc-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    min-width: 100px;
+  }
+  .arc-bar {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    transition: opacity 0.2s;
+  }
+  .arc-bar:hover { opacity: 0.8; }
+
+  /* Lifespan chart container */
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* Stat badges */
+  .stat-badge {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-soft);
+    border-radius: 0.75rem;
+    padding: 1.25rem 1rem;
+    min-width: 120px;
+    text-align: center;
+  }
+  .stat-badge .stat-num {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-badge .stat-label {
+    font-size: 0.7rem;
+    color: #71717a;
+    margin-top: 0.4rem;
+    line-height: 1.3;
+  }
+
+  /* Scroll spy nav */
+  .spy-nav a { display: block; padding: 4px 0; font-size: 0.8rem; color: #71717a; border-left: 2px solid transparent; padding-left: 0.75rem; transition: all 0.2s; }
+  .spy-nav a.active { border-left-color: var(--accent); color: var(--accent); font-weight: 600; }
+  .spy-nav a:hover { color: var(--accent); }
+
+  /* Print */
+  @media print {
+    header, .spy-nav-wrap, #filterChips, footer { display: none !important; }
+    .surface { border: 1px solid #ccc !important; }
+    body { background: #fff !important; color: #000 !important; }
+    .muted { color: #555 !important; }
+    a { color: #000 !important; }
+  }
+
+  /* Responsive chart */
+  @media (max-width: 640px) {
+    .stat-badges-wrap { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Header -->
+<header class="border-b border-soft sticky top-0 z-40" style="background: inherit; backdrop-filter: blur(8px);">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">cat-life-stories · 2026-06-03</div>
+  </div>
+</header>
+
+<div class="max-w-5xl mx-auto px-6 flex gap-8">
+
+  <!-- Sticky side nav (hidden on mobile) -->
+  <aside class="spy-nav-wrap hidden lg:block w-44 shrink-0 pt-16">
+    <nav class="spy-nav sticky top-20 text-sm space-y-1">
+      <div class="text-xs font-semibold muted uppercase tracking-wider mb-3">On this page</div>
+      <a href="#intro">Introduction</a>
+      <a href="#stages">Life Arc</a>
+      <a href="#timeline">Milestones</a>
+      <a href="#communication">Communication</a>
+      <a href="#facts">Surprising Facts</a>
+      <a href="#longevity">Longevity</a>
+      <a href="#outlook">The Final Chapter</a>
+      <a href="#sources">Sources</a>
+    </nav>
+  </aside>
+
+  <main class="flex-1 min-w-0">
+
+    <!-- Hero -->
+    <section id="intro" class="pt-16 pb-8 fade-in">
+      <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+        <span class="bg-accent-soft accent px-2 py-1 rounded-md">Timeline</span>
+        <span class="bg-accent-soft accent px-2 py-1 rounded-md">Feline Biology</span>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">The Story of a Cat's Life</h1>
+      <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">A domestic cat's life unfolds across five distinct stages — from helpless newborn to wise senior — spanning an average of 13–17 years and driven by instincts millions of years older than the living rooms they now inhabit.</p>
+    </section>
+
+    <!-- Intro narrative -->
+    <section class="mb-12 reveal">
+      <div class="surface rounded-xl p-8 prose-content">
+        <p>In an estimated 10,000 years of shared history with humans, the domestic cat (<em>Felis catus</em>) has undergone a remarkable transformation — and arguably, no transformation at all. Unlike dogs, cats were never deliberately bred for tasks; they domesticated themselves, drawn to rodents in early human settlements and discovering, over millennia, that people were useful to have around. <sup><a href="#source-1">[1]</a></sup></p>
+        <p>What resulted is one of nature's most fascinating paradoxes: an animal simultaneously wild and domestic, deeply bonded to humans yet ferociously independent, communicative on its own terms and only its own terms. A domestic cat is, in essence, a small ambush predator that has learned to live in a very comfortable savanna — your home — and has even invented a language to speak with you. <sup><a href="#source-6">[6]</a></sup></p>
+        <p>This dashboard walks through every stage of a cat's life: the biological milestones, the behavioral shifts, the emotional landscape, and the surprising science behind behaviors you've witnessed but perhaps never fully understood. Whether you've lived with cats for decades or are simply curious, the story that follows is one of <strong>dependence giving way to curiosity, independence hardening into confidence, and companionship deepening into something research is only beginning to measure.</strong></p>
+      </div>
+    </section>
+
+    <!-- Life Arc Visual -->
+    <section id="stages" class="mb-12 reveal">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        <i data-lucide="activity" class="w-5 h-5 accent"></i> The Life Arc
+      </h2>
+      <div class="surface rounded-xl p-8">
+        <p class="text-sm muted mb-6">Cats have <strong class="accent">five officially recognized life stages</strong> per the 2021 AAHA/AAFP Feline Life Stage Guidelines — plus an End-of-Life category. <sup><a href="#source-1" class="accent">[1]</a></sup></p>
+
+        <!-- Stage bars -->
+        <div class="flex gap-2 items-end mb-4 overflow-x-auto pb-2">
+          <!-- Newborn -->
+          <div class="arc-stage" style="max-width:80px;">
+            <div class="arc-bar" style="height:60px; background:#6366F1; opacity:0.5;"></div>
+            <div class="text-xs font-semibold mt-2 text-center" style="color:#6366F1;">Newborn</div>
+            <div class="text-xs muted text-center">0–2 wks</div>
+          </div>
+          <!-- Early Kitten -->
+          <div class="arc-stage" style="max-width:100px;">
+            <div class="arc-bar" style="height:100px; background:#10B981; opacity:0.7;"></div>
+            <div class="text-xs font-semibold mt-2 text-center" style="color:#10B981;">Kitten</div>
+            <div class="text-xs muted text-center">2 wks–1 yr</div>
+          </div>
+          <!-- Young Adult -->
+          <div class="arc-stage" style="max-width:160px;">
+            <div class="arc-bar" style="height:180px; background:#6366F1;"></div>
+            <div class="text-xs font-semibold mt-2 text-center" style="color:#6366F1;">Young Adult</div>
+            <div class="text-xs muted text-center">1–6 years</div>
+          </div>
+          <!-- Mature Adult -->
+          <div class="arc-stage" style="max-width:120px;">
+            <div class="arc-bar" style="height:150px; background:#F59E0B;"></div>
+            <div class="text-xs font-semibold mt-2 text-center" style="color:#B45309;">Mature Adult</div>
+            <div class="text-xs muted text-center">7–10 years</div>
+          </div>
+          <!-- Senior -->
+          <div class="arc-stage" style="max-width:140px;">
+            <div class="arc-bar" style="height:110px; background:#8B5CF6;"></div>
+            <div class="text-xs font-semibold mt-2 text-center" style="color:#7C3AED;">Senior</div>
+            <div class="text-xs muted text-center">10+ years</div>
+          </div>
+          <!-- End of Life -->
+          <div class="arc-stage" style="max-width:100px;">
+            <div class="arc-bar" style="height:60px; background:#F43F5E; opacity:0.6;"></div>
+            <div class="text-xs font-semibold mt-2 text-center" style="color:#E11D48;">End of Life</div>
+            <div class="text-xs muted text-center">15+ years</div>
+          </div>
+        </div>
+        <p class="text-xs muted">Bar height represents relative activity/vitality level at each stage. <sup><a href="#source-1">[1]</a></sup></p>
+
+        <!-- Emotional arc labels -->
+        <div class="mt-6 flex flex-wrap gap-2 text-xs">
+          <span class="px-2 py-1 rounded-md" style="background:#6366F11A; color:#6366F1;">Dependence</span>
+          <span class="muted">→</span>
+          <span class="px-2 py-1 rounded-md" style="background:#10B9811A; color:#10B981;">Curiosity</span>
+          <span class="muted">→</span>
+          <span class="px-2 py-1 rounded-md" style="background:#6366F11A; color:#6366F1;">Independence</span>
+          <span class="muted">→</span>
+          <span class="px-2 py-1 rounded-md" style="background:#F59E0B1A; color:#B45309;">Companionship</span>
+          <span class="muted">→</span>
+          <span class="px-2 py-1 rounded-md" style="background:#8B5CF61A; color:#7C3AED;">Vulnerability</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline milestones -->
+    <section id="timeline" class="mb-12 reveal">
+      <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+        <i data-lucide="clock" class="w-5 h-5 accent"></i> Milestones Timeline
+      </h2>
+
+      <!-- Filter chips -->
+      <div class="flex flex-wrap gap-2 items-center mb-6">
+        <span class="text-sm muted mr-1">Filter by stage:</span>
+        <div id="filterChips" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <div class="surface rounded-xl p-8">
+        <div class="timeline">
+          <div class="timeline-line"></div>
+          <div id="milestones"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Communication section -->
+    <section id="communication" class="mb-12 reveal">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        <i data-lucide="message-circle" class="w-5 h-5 accent"></i> How Cats Communicate
+      </h2>
+      <div class="surface rounded-xl p-8 prose-content">
+        <p>Cats possess one of the most sophisticated multi-channel communication systems in the animal kingdom — but most of it was never designed for us. <strong>Meowing, uniquely, was invented for humans.</strong> Adult cats almost never meow to other cats; they communicate with fellow felines through scent and body language. The meow is a post-domestication repurposing of the kitten "mew" used to call the mother — adult cats essentially treat their owners as permanent parent figures. <sup><a href="#source-6">[6]</a></sup> <sup><a href="#source-9">[9]</a></sup></p>
+
+        <p>Cats produce <strong>up to 21 distinct vocalizations</strong>, organized by mouth position: closed-mouth sounds (purrs, trills), transitional sounds (meows, howls), and open-mouth sounds (hisses, growls, chatters). <sup><a href="#source-6">[6]</a></sup></p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-6 not-prose">
+          <div class="fact-card">
+            <div class="font-semibold text-sm mb-1 accent">Purr</div>
+            <div class="text-sm muted leading-relaxed">Produced on both inhale and exhale via laryngeal oscillations. Cats purr when content <em>and</em> when stressed, injured, or giving birth — suggesting a self-soothing function. Frequency: 25–150 Hz. <sup><a href="#source-15">[15]</a></sup></div>
+          </div>
+          <div class="fact-card">
+            <div class="font-semibold text-sm mb-1 accent">Meow</div>
+            <div class="text-sm muted leading-relaxed">Exclusively human-directed. Each cat tailors its meow repertoire to its specific human over time. Your cat's meow is a personalized vocabulary built for you. <sup><a href="#source-6">[6]</a></sup></div>
+          </div>
+          <div class="fact-card">
+            <div class="font-semibold text-sm mb-1 accent">Trill / Chirrup</div>
+            <div class="text-sm muted leading-relaxed">A warm, rolling closed-mouth greeting. Mothers use it to call kittens. When your cat trills at you, it's treating you like a kitten. <sup><a href="#source-6">[6]</a></sup></div>
+          </div>
+          <div class="fact-card">
+            <div class="font-semibold text-sm mb-1 accent">Chatter</div>
+            <div class="text-sm muted leading-relaxed">The staccato clicking sound when watching birds. Possibly a frustrated hunting reflex, possibly prey-mimicry. Still debated by researchers. <sup><a href="#source-6">[6]</a></sup></div>
+          </div>
+        </div>
+
+        <p><strong>Body language:</strong> Tail position is the most reliable emotional indicator. Vertical tail = happy approach. Puffed tail = fear or aggression. Low tail = anxiety. The "slow blink" — a deliberate, heavy blink directed at a human — is a documented gesture of trust and affection, sometimes called the "cat kiss." Slow-blinking back at your cat is a scientifically supported way to deepen your bond. <sup><a href="#source-6">[6]</a></sup></p>
+
+        <p><strong>Scent communication:</strong> Cats have <strong>9 scent gland locations</strong> on their body (ears, temples, cheeks, jaw, mouth corners, paw pads, anus, tail base, and tail). When a cat rubs its face on you — called "bunting" — it is depositing pheromones that mark you as familiar, safe, and belonging to their territory. When cats scratch furniture, they simultaneously leave visual marks and scent from their paw pad glands. <sup><a href="#source-6">[6]</a></sup></p>
+      </div>
+    </section>
+
+    <!-- Surprising Facts -->
+    <section id="facts" class="mb-12 reveal">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        <i data-lucide="sparkles" class="w-5 h-5 accent"></i> 8 Things You Probably Didn't Know
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="factsGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- Longevity -->
+    <section id="longevity" class="mb-12 reveal">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        <i data-lucide="heart-pulse" class="w-5 h-5 accent"></i> Lifespan & Longevity
+      </h2>
+      <div class="surface rounded-xl p-8">
+
+        <!-- Stat badges -->
+        <div class="flex flex-wrap gap-4 mb-8 stat-badges-wrap">
+          <div class="stat-badge">
+            <div class="stat-num">13–17</div>
+            <div class="stat-label">avg. years<br>(domestic cats)</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-num">15–20</div>
+            <div class="stat-label">avg. years<br>(indoor cats)</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-num">2–5</div>
+            <div class="stat-label">avg. years<br>(outdoor-only)</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-num">38</div>
+            <div class="stat-label">years<br>(world record, Creme Puff)</div>
+          </div>
+        </div>
+
+        <!-- Lifespan comparison chart -->
+        <div class="mb-6">
+          <div class="text-sm font-semibold mb-3">Lifespan by lifestyle &amp; neuter status <sup><a href="#source-3" class="accent">[3]</a></sup></div>
+          <div class="chart-wrap">
+            <canvas id="lifespanChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Key factors -->
+        <div class="prose-content mt-8">
+          <p class="text-sm font-semibold mb-3">Key factors that influence longevity:</p>
+          <ul class="text-sm muted">
+            <li><strong>Indoor vs. outdoor lifestyle</strong> — the single largest environmental factor. Outdoor cats face predators, disease, toxins, and traffic. <sup><a href="#source-3">[3]</a></sup></li>
+            <li><strong>Spay/neuter status</strong> — neutered males live approximately <strong>62% longer</strong> than intact males; spayed females approximately <strong>39% longer</strong> than unspayed females. <sup><a href="#source-3">[3]</a></sup></li>
+            <li><strong>Sex</strong> — female cats tend to outlive males by 1–1.5 years on average. <sup><a href="#source-3">[3]</a></sup></li>
+            <li><strong>Genetics</strong> — mixed-breed cats generally outlive purebreds; hybrid vigor confers resilience. <sup><a href="#source-3">[3]</a></sup></li>
+            <li><strong>Veterinary care</strong> — regular checkups, early disease detection, dental care, and parasite prevention collectively extend healthy lifespan.</li>
+            <li><strong>Weight</strong> — obesity drives arthritis, diabetes, and organ stress, shortening lifespan significantly.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Outlook / Final Chapter -->
+    <section id="outlook" class="mb-12 reveal">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        <i data-lucide="sunset" class="w-5 h-5 accent"></i> The Final Chapter: Senior Life
+      </h2>
+      <div class="surface rounded-xl p-8 prose-content">
+        <p>The threshold of seniority arrives at <strong>age 10</strong> by clinical definition <sup><a href="#source-1">[1]</a></sup>, though individual variation is wide — some cats at 12 move like healthy 5-year-olds, while others show significant decline by 9. What the senior stage reliably brings is a shift in the emotional arc: less active, more dependent on human warmth and routine, and in many cases more visibly affectionate than in younger years.</p>
+
+        <p>The most underdiagnosed condition in senior cats is <strong>Feline Cognitive Dysfunction Syndrome (CDS)</strong> — an Alzheimer's-like neurodegeneration. More than <strong>55% of cats aged 11–15</strong> show clinical signs, rising to over <strong>80% of cats aged 16–20</strong>. <sup><a href="#source-11">[11]</a></sup> Signs include spatial disorientation, nighttime yowling, litter box accidents, failing to recognize familiar people, vacant staring, and reduced engagement. Most owners attribute these signs to "just getting old" — but many are manageable once diagnosed. <sup><a href="#source-4">[4]</a></sup></p>
+
+        <p>The senior cat who is well-cared for often demonstrates a quality rarely observed in younger cats: a settled, visible gratitude for warmth, routine, and presence. A sleeping senior cat in a sunbeam is not disengaged — it is, researchers suggest, a creature whose emotional needs have simplified to what matters most.</p>
+
+        <p><strong>CDS prevalence by age group:</strong></p>
+        <div class="chart-wrap my-4 not-prose" style="height:180px;">
+          <canvas id="cdsChart"></canvas>
+        </div>
+
+        <p class="text-sm muted">Note: CDS figures come from veterinary studies of varying methodology and should be treated as estimates. Many cases are treatable or manageable with veterinary guidance and environmental modifications. <sup><a href="#source-11">[11]</a></sup> <sup><a href="#source-19">[19]</a></sup></p>
+      </div>
+    </section>
+
+    <!-- Sources -->
+    <section id="sources" class="mb-16 reveal">
+      <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+        <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+      </h2>
+      <div class="surface rounded-xl p-8 text-sm">
+        <ol class="space-y-3 muted" style="list-style:none; padding:0; margin:0;">
+          <li id="source-1"><span class="accent font-mono mr-2">[1]</span><a href="https://www.aaha.org/resources/2021-aaha-aafp-feline-life-stage-guidelines/feline-life-stage-definitions/" target="_blank" rel="noopener">2021 AAHA/AAFP Feline Life Stage Guidelines</a> — American Animal Hospital Association (AAHA), 2021-03-02.</li>
+          <li id="source-2"><span class="accent font-mono mr-2">[2]</span><a href="https://www.petmd.com/cat/care/kitten-development-understanding-kittens-major-growth-milestones" target="_blank" rel="noopener">Kitten Development Stages and Kitten Age Chart</a> — PetMD Editorial, 2024.</li>
+          <li id="source-3"><span class="accent font-mono mr-2">[3]</span><a href="https://www.petmd.com/cat/care/how-long-do-cats-live" target="_blank" rel="noopener">How Long Do Cats Live? Here's What To Expect</a> — PetMD Editorial, 2024.</li>
+          <li id="source-4"><span class="accent font-mono mr-2">[4]</span><a href="https://www.vet.cornell.edu/departments-centers-and-institutes/cornell-feline-health-center/health-information/feline-health-topics/cognitive-dysfunction" target="_blank" rel="noopener">Cognitive Dysfunction</a> — Cornell University College of Veterinary Medicine, 2024.</li>
+          <li id="source-5"><span class="accent font-mono mr-2">[5]</span><a href="https://www.aaha.org/aaha-and-aafp-release-updated-feline-life-stage-guidelines-to-the-veterinary-community/" target="_blank" rel="noopener">AAHA and AAFP Release Updated Feline Life Stage Guidelines</a> — AAHA Communications, 2021-03-02.</li>
+          <li id="source-6"><span class="accent font-mono mr-2">[6]</span><a href="https://en.wikipedia.org/wiki/Cat_communication" target="_blank" rel="noopener">Cat Communication</a> — Wikipedia (Multiple contributors), 2025.</li>
+          <li id="source-7"><span class="accent font-mono mr-2">[7]</span><a href="https://cats.com/do-cats-go-through-puberty" target="_blank" rel="noopener">Do Cats Go Through Puberty?</a> — Cats.com Editorial, 2024.</li>
+          <li id="source-8"><span class="accent font-mono mr-2">[8]</span><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11274030/" target="_blank" rel="noopener">Attachment as the Catalyst for the Attribution of Complex Cognition and Emotion to Companion Cats</a> — PMC / NIH, 2024.</li>
+          <li id="source-9"><span class="accent font-mono mr-2">[9]</span><a href="https://www.hartz.com/truth-or-myth-cats-only-meow-to-humans/" target="_blank" rel="noopener">Truth or Myth: Cats Only Meow to Humans</a> — Hartz Editorial, 2023.</li>
+          <li id="source-10"><span class="accent font-mono mr-2">[10]</span><a href="https://news.oregonstate.edu/news/cats-children-and-dogs-develop-attachments-their-caregivers-study-shows" target="_blank" rel="noopener">Cats, like children and dogs, develop attachments to their caregivers, study shows</a> — Oregon State University Newsroom (Kristyn Vitale), 2019-09-23.</li>
+          <li id="source-11"><span class="accent font-mono mr-2">[11]</span><a href="https://www.aspca.org/pet-care/cat-care/common-cat-behavior-issues/older-cats-behavior-problems" target="_blank" rel="noopener">Older Cats with Behavior Problems</a> — ASPCA Animal Behavior Team, 2024.</li>
+          <li id="source-12"><span class="accent font-mono mr-2">[12]</span><a href="https://www.companionanimalpsychology.com/2017/07/the-sensitive-period-for-socialization.html" target="_blank" rel="noopener">The Sensitive Period for Socialization in Puppies and Kittens</a> — Zazie Todd, PhD / Companion Animal Psychology, 2017-07.</li>
+          <li id="source-13"><span class="accent font-mono mr-2">[13]</span><a href="https://vcahospitals.com/know-your-pet/socialization-and-fear-prevention-in-kittens" target="_blank" rel="noopener">Socialization and Fear Prevention in Kittens</a> — VCA Animal Hospitals, 2024.</li>
+          <li id="source-14"><span class="accent font-mono mr-2">[14]</span><a href="https://www.sciencedaily.com/releases/2019/04/190408101120.htm" target="_blank" rel="noopener">Hello, kitty: Cats recognize their own names, according to new Japanese research</a> — ScienceDaily (Atsuko Saito, University of Tokyo), 2019-04-08.</li>
+          <li id="source-15"><span class="accent font-mono mr-2">[15]</span><a href="https://pubs.aip.org/asa/jasa/article/110/5_Supplement/2666/550913/The-felid-purr-A-healing-mechanism" target="_blank" rel="noopener">The felid purr: A healing mechanism?</a> — Elizabeth von Muggenthaler / Journal of the Acoustical Society of America, 2001.</li>
+          <li id="source-16"><span class="accent font-mono mr-2">[16]</span><a href="https://www.petmd.com/cat/general-health/are-cats-nocturnal" target="_blank" rel="noopener">Are Cats Nocturnal?</a> — PetMD Editorial, 2024.</li>
+          <li id="source-17"><span class="accent font-mono mr-2">[17]</span><a href="https://www.guinnessworldrecords.com/world-records/oldest-cat-ever" target="_blank" rel="noopener">Oldest cat ever</a> — Guinness World Records, 2010.</li>
+          <li id="source-18"><span class="accent font-mono mr-2">[18]</span><a href="https://www.merckvetmanual.com/behavior/behavior-of-cats/social-behavior-of-cats" target="_blank" rel="noopener">Social Behavior of Cats</a> — Merck Veterinary Manual, 2024.</li>
+          <li id="source-19"><span class="accent font-mono mr-2">[19]</span><a href="https://icatcare.org/articles/cognitive-dysfunction-syndrome-in-cats" target="_blank" rel="noopener">Cognitive dysfunction syndrome (senility, dementia) in cats</a> — International Cat Care, 2024.</li>
+          <li id="source-20"><span class="accent font-mono mr-2">[20]</span><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8228645/" target="_blank" rel="noopener">My Cat and Me — A Study of Cat Owner Perceptions of Their Bond and Relationship</a> — PMC / NIH, 2021.</li>
+        </ol>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Footer -->
+<footer class="border-t border-soft mt-8 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-03</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<script>
+  // ── Icons ─────────────────────────────────────────────────────────────────
+  lucide.createIcons();
+
+  // ── Milestone data ────────────────────────────────────────────────────────
+  const milestones = [
+    { year: "Birth", title: "Eyes and ears sealed shut", body: "A kitten arrives in sensory darkness. The only guidance systems available are smell and warmth. Cannot regulate body temperature; clusters against mother or littermates to survive.", tag: "Newborn", tagColor: "indigo" },
+    { year: "Day 7", title: "Umbilical cord detaches", body: "A healthy newborn weighs 1.8–5.3 oz and gains 0.25–0.5 oz per day. The mother still stimulates elimination by licking — kittens cannot urinate or defecate independently at this stage.", tag: "Newborn", tagColor: "indigo" },
+    { year: "Days 7–14", title: "Eyes begin opening", body: "Eyes open for the first time — blue at first. Adult eye color will not emerge until weeks 7–8. The world arrives in blurry color.", tag: "Newborn", tagColor: "indigo" },
+    { year: "Week 3", title: "Ears open; first steps; first teeth", body: "Ears unfold and begin to function. First teeth (incisors) break through. Wobbly walking begins. The socialization window — the most consequential developmental period of a cat's life — is now open.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "Week 4", title: "Canine teeth, retractable claws, litter box", body: "Canines emerge. Claws become retractable for the first time. Litter box use begins. Social play with littermates starts — teaching predatory sequences and social negotiation.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "Week 5–6", title: "Vision and hearing fully developed", body: "Full sensory capability arrives. The kitten runs, pounces, and plays with confidence. Play-fighting peaks between weeks 6–9. First FVRCP vaccine is recommended around week 6.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "Week 7", title: "Socialization window begins to close", body: "This is the most critical deadline in a kitten's development. Kittens handled gently by at least 4 different people before this point grow up measurably friendlier toward strangers. After week 7, the window narrows sharply.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "Week 8", title: "Fully weaned; ready for adoption", body: "Eyes have transitioned to adult color. Fully weaned from mother's milk. At this point, most kittens are adopted — ironically, just after the socialization window has closed.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "4–5 months", title: "Female cats enter first heat (estrus)", body: "The teenage phase begins. Puberty arrives earlier than most owners expect. Females can become pregnant before they appear fully grown. Spaying before first heat is recommended to maximize lifespan benefits.", tag: "Juvenile", tagColor: "sky" },
+    { year: "6–12 months", title: "Male sexual maturity; roaming begins", body: "Intact males begin roaming, spraying urine to mark territory, and competing physically with other males. Both sexes show increased boldness and boundary-testing — the feline equivalent of adolescence.", tag: "Juvenile", tagColor: "sky" },
+    { year: "1–2 years", title: "Full physical maturity", body: "Territorial confidence is established. The cat enters its prime. A full adult vocalization repertoire of up to 21 distinct sounds is now in use — many of them developed specifically for their human.", tag: "Young Adult", tagColor: "indigo" },
+    { year: "1–6 years", title: "Prime of life: peak coordination and energy", body: "Healthy young adult cats sleep 12–16 hours daily (about 70% of their lives), with peak activity at dawn and dusk — the crepuscular pattern inherited from wildcat ancestors. During waking hours: hunt, groom (up to 30% of wake time), patrol, bond.", tag: "Young Adult", tagColor: "indigo" },
+    { year: "7–10 years", title: "Middle age: first signs of slowing", body: "Physical changes begin to show subtly: slight weight gain or muscle loss, reduced intensity of play. Behaviorally, cats in this stage are often at their most settled and companionable — confident, less reactive, deeply bonded to routines.", tag: "Mature Adult", tagColor: "amber" },
+    { year: "10 years", title: "Senior threshold (AAFP/AAHA)", body: "Clinical seniority begins. Veterinary guidelines recommend biannual checkups for cats 10+. Age-related conditions — hyperthyroidism, chronic kidney disease, dental disease, hypertension — become more common.", tag: "Senior", tagColor: "violet" },
+    { year: "11–15 years", title: "Cognitive dysfunction affects over half of cats", body: "More than 55% of cats in this age range show clinical signs of Cognitive Dysfunction Syndrome (CDS) — an Alzheimer's-like neurodegeneration. Signs: disorientation, nighttime yowling, litter box accidents, reduced engagement.", tag: "Senior", tagColor: "violet" },
+    { year: "15+ years", title: "Deepened quiet; heightened dependency", body: "The senior cat who is well-cared for often shows a settled quietude — less active, more dependent on human warmth and routine, and in many cases more visibly affectionate than in younger years.", tag: "Senior", tagColor: "violet" },
+    { year: "16–20 years", title: "Cognitive dysfunction in over 80% of cats", body: "The vast majority of cats in this age range show some signs of CDS. Environmental modifications (night lights, predictable routines, easy litter box access) significantly improve quality of life.", tag: "Senior", tagColor: "violet" },
+    { year: "38 years", title: "Creme Puff — world record holder", body: "Born 1967 in Austin, Texas. Died 2005. The oldest domestic cat ever documented by Guinness World Records. A reminder that the upper bound of feline life remains extraordinary.", tag: "Record", tagColor: "rose" }
+  ];
+
+  // ── Render timeline ────────────────────────────────────────────────────────
+  const wrap = document.getElementById('milestones');
+  const allTags = [...new Set(milestones.map(m => m.tag).filter(Boolean))];
+
+  function render(activeTag = 'all') {
+    wrap.innerHTML = '';
+    milestones
+      .filter(m => activeTag === 'all' || m.tag === activeTag)
+      .forEach(m => {
+        const colorClass = `tag-${m.tagColor || 'indigo'}`;
+        wrap.innerHTML += `
+          <div class="milestone">
+            <div class="milestone-dot"></div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="font-mono text-sm muted">${m.year}</div>
+              ${m.tag ? `<span class="${colorClass} text-xs px-2 py-0.5 rounded-md font-medium">${m.tag}</span>` : ''}
+            </div>
+            <h3 class="font-semibold text-lg mb-2">${m.title}</h3>
+            <p class="muted leading-relaxed text-sm">${m.body}</p>
+          </div>
+        `;
+      });
+  }
+
+  const chipsWrap = document.getElementById('filterChips');
+  function renderChips(active) {
+    chipsWrap.innerHTML = '';
+    ['all', ...allTags].forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = `text-xs px-3 py-1.5 rounded-md border border-soft transition`;
+      btn.style.cssText = t === active
+        ? 'background: var(--accent); color: white; border-color: var(--accent);'
+        : '';
+      btn.textContent = t === 'all' ? 'All Stages' : t;
+      btn.onclick = () => { renderChips(t); render(t); };
+      chipsWrap.appendChild(btn);
+    });
+  }
+  renderChips('all');
+  render('all');
+
+  // ── Surprising facts ───────────────────────────────────────────────────────
+  const facts = [
+    {
+      num: '1',
+      title: 'Meowing was invented for humans',
+      body: 'Adult cats almost never meow to other cats. The meow is a post-domestication behavior derived from kitten "mewing," repurposed to communicate with humans who respond to it.',
+      cite: '[6][9]',
+      citeLinks: ['source-6', 'source-9']
+    },
+    {
+      num: '2',
+      title: '64% of cats are securely attached — like human infants',
+      body: 'A 2019 Oregon State University study found 64.3% of kittens and 65.8% of adult cats show secure attachment to their owners — nearly identical to the 65% baseline for human infants.',
+      cite: '[10]',
+      citeLinks: ['source-10']
+    },
+    {
+      num: '3',
+      title: 'A 5-week window shapes personality for life',
+      body: 'The socialization window (weeks 2–7) is the most consequential developmental period. Kittens handled by 4+ people before week 7 grow into permanently more trusting adults. Most kittens are adopted after this window closes.',
+      cite: '[12][13]',
+      citeLinks: ['source-12', 'source-13']
+    },
+    {
+      num: '4',
+      title: 'The purr may be a built-in healing mechanism',
+      body: 'Cats purr at 25–150 Hz. Frequencies of 25–50 Hz specifically promote bone growth and fracture repair. Cats purr when content, stressed, injured, and giving birth — suggesting self-therapy, not just communication.',
+      cite: '[15]',
+      citeLinks: ['source-15']
+    },
+    {
+      num: '5',
+      title: 'Neutering extends male cat life by over 60%',
+      body: 'Neutered male cats live approximately 62% longer than intact males. Spayed females live 39% longer. The mechanisms: reduced cancer risk, less roaming and fighting, lower disease exposure.',
+      cite: '[3]',
+      citeLinks: ['source-3']
+    },
+    {
+      num: '6',
+      title: 'Cognitive dysfunction affects most elderly cats',
+      body: 'Over 55% of cats aged 11–15 show clinical signs of CDS — an Alzheimer's-like syndrome. This rises to over 80% at ages 16–20. It is massively underdiagnosed because owners assume the signs are "just aging."',
+      cite: '[11]',
+      citeLinks: ['source-11']
+    },
+    {
+      num: '7',
+      title: 'Cats know their name — and choose to ignore it',
+      body: 'A 2019 University of Tokyo study (78 cats) found cats consistently show subtle responses to their own name after tuning out similar-sounding words — even when spoken by strangers. They know. They just decide.',
+      cite: '[14]',
+      citeLinks: ['source-14']
+    },
+    {
+      num: '8',
+      title: 'Cats sleep 70% of their lives',
+      body: 'Domestic cats sleep 12–16 hours daily — roughly 70% of their lives. This is not laziness; it is the energy-conservation strategy of a small ambush predator. Your cat is always ready for the hunt.',
+      cite: '[16]',
+      citeLinks: ['source-16']
+    }
+  ];
+
+  const factsGrid = document.getElementById('factsGrid');
+  facts.forEach(f => {
+    const citeHtml = f.citeLinks.map((id, i) => {
+      const label = f.cite.split('][').map(s => s.replace(/[\[\]]/g,'')).join('],[').split('],[')[i] || '';
+      return `<a href="#${id}" class="accent">[${label}]</a>`;
+    }).join(' ');
+
+    factsGrid.innerHTML += `
+      <div class="fact-card reveal">
+        <div class="flex items-start gap-3">
+          <div class="text-2xl font-bold accent shrink-0" style="line-height:1;">${f.num}</div>
+          <div>
+            <div class="font-semibold mb-1">${f.title}</div>
+            <div class="text-sm muted leading-relaxed">${f.body} <sup>${citeHtml}</sup></div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  // ── Lifespan chart ─────────────────────────────────────────────────────────
+  const lifespanCtx = document.getElementById('lifespanChart').getContext('2d');
+  new Chart(lifespanCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Indoor cat', 'Avg. domestic', 'Neutered male\n(indoor)', 'Outdoor-only', 'Intact male\n(outdoor)'],
+      datasets: [{
+        label: 'Typical lifespan (years)',
+        data: [17.5, 15, 18, 3.5, 5],
+        backgroundColor: ['#6366F1CC', '#6366F199', '#10B981CC', '#F43F5ECC', '#F59E0BCC'],
+        borderRadius: 6,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ~${ctx.raw} years (midpoint estimate)`
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 22,
+          ticks: { color: '#71717a', font: { size: 11 } },
+          grid: { color: '#e4e4e71A' }
+        },
+        x: {
+          ticks: { color: '#71717a', font: { size: 11 } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // ── CDS chart ──────────────────────────────────────────────────────────────
+  const cdsCtx = document.getElementById('cdsChart').getContext('2d');
+  new Chart(cdsCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Ages 11–15', 'Ages 16–20'],
+      datasets: [{
+        label: '% showing CDS signs',
+        data: [55, 80],
+        backgroundColor: ['#8B5CF6AA', '#8B5CF6EE'],
+        borderRadius: 6,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` >${ctx.raw}% show signs of cognitive dysfunction`
+          }
+        }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          max: 100,
+          ticks: {
+            callback: v => v + '%',
+            color: '#71717a',
+            font: { size: 11 }
+          },
+          grid: { color: '#e4e4e71A' }
+        },
+        y: {
+          ticks: { color: '#71717a', font: { size: 11 } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // ── Scroll spy ────────────────────────────────────────────────────────────
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.spy-nav a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+        });
+      }
+    });
+  }, { rootMargin: '-20% 0% -70% 0%' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // ── Reveal on scroll ──────────────────────────────────────────────────────
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  revealEls.forEach(el => revealObserver.observe(el));
+</script>
+
+</body>
+</html>

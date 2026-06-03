@@ -1,11 +1,39 @@
 {
   "currentRun": null,
   "currentSlug": null,
-  "lastUpdate": "2026-06-03T00:00:00Z",
+  "lastUpdate": "2026-06-03T05:42:04Z",
   "agents": [
-    { "id": "intake",     "name": "Iris",   "role": "Intake Specialist", "emoji": "🎙️", "status": "offline", "task": "" },
-    { "id": "researcher", "name": "Ravi",   "role": "Research Analyst",  "emoji": "🔍", "status": "offline", "task": "" },
-    { "id": "builder",    "name": "Bram",   "role": "Dashboard Builder", "emoji": "🎨", "status": "offline", "task": "" },
-    { "id": "reporter",   "name": "Rosa",   "role": "Reporter",          "emoji": "📋", "status": "offline", "task": "" }
+    {
+      "id": "intake",
+      "name": "Iris",
+      "role": "Intake Specialist",
+      "emoji": "🎙️",
+      "status": "idle",
+      "task": ""
+    },
+    {
+      "id": "researcher",
+      "name": "Ravi",
+      "role": "Research Analyst",
+      "emoji": "🔍",
+      "status": "idle",
+      "task": ""
+    },
+    {
+      "id": "builder",
+      "name": "Bram",
+      "role": "Dashboard Builder",
+      "emoji": "🎨",
+      "status": "busy",
+      "task": "Building timeline dashboard for cat life"
+    },
+    {
+      "id": "reporter",
+      "name": "Rosa",
+      "role": "Reporter",
+      "emoji": "📋",
+      "status": "offline",
+      "task": ""
+    }
   ]
 }
