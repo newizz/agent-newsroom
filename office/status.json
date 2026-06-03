@@ -1,7 +1,7 @@
 {
   "currentRun": null,
   "currentSlug": null,
-  "lastUpdate": "2026-06-03T09:57:40Z",
+  "lastUpdate": "2026-06-03T10:04:19Z",
   "agents": [
     {
       "id": "intake",
@@ -24,7 +24,7 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "idle",
+      "status": "offline",
       "task": ""
     },
     {
