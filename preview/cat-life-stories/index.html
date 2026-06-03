@@ -175,6 +175,7 @@
     <nav class="spy-nav sticky top-20 text-sm space-y-1">
       <div class="text-xs font-semibold muted uppercase tracking-wider mb-3">On this page</div>
       <a href="#intro">Introduction</a>
+      <a href="#overview">Key Insights</a>
       <a href="#stages">Life Arc</a>
       <a href="#timeline">Milestones</a>
       <a href="#communication">Communication</a>
@@ -195,6 +196,18 @@
       </div>
       <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">The Story of a Cat's Life</h1>
       <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">A domestic cat's life unfolds across five distinct stages — from helpless newborn to wise senior — spanning an average of 13–17 years and driven by instincts millions of years older than the living rooms they now inhabit.</p>
+    </section>
+
+    <!-- ── Animated Insight Reel ──────────────────────────────────────────── -->
+    <section id="overview" class="mb-10 fade-in" style="animation-delay:.2s;">
+      <div class="surface rounded-2xl overflow-hidden" id="reel" tabindex="0"
+           style="outline:none; box-shadow: 0 4px 24px rgba(99,102,241,.07);">
+        <div id="reelSlides" style="position:relative; min-height:160px; transition: opacity .35s ease, transform .35s ease;"></div>
+        <div style="padding: 0 2.5rem 0.5rem; position:relative;">
+          <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;border-radius:999px;transition:none;"></div>
+        </div>
+        <div id="reelDots" class="flex justify-center gap-2 pb-4"></div>
+      </div>
     </section>
 
     <!-- Intro narrative -->
@@ -358,23 +371,154 @@
     document.getElementById('prog').style.width = pct + '%';
   }, { passive: true });
 
+  // ── Insight Reel ────────────────────────────────────────────────────────────
+  var insights = [
+    { stat: '5',   statLabel: 'life stages',           color: '#6366F1',
+      headline: 'A cat\'s life has 5 clinically distinct stages',
+      body: 'Newborn, Kitten, Young Adult, Mature Adult, and Senior — each with different biology, behaviour, and care needs per the 2021 AAFP/AAHA guidelines.' },
+    { stat: '64',  statSuffix: '%', statLabel: 'securely attached', color: '#10B981',
+      headline: 'Most cats are as attached to you as a baby is to a parent',
+      body: 'A 2019 Oregon State University study found 64% of cats form secure attachments to their owners — nearly identical to the 65% baseline for human infants.' },
+    { stat: '7',   statLabel: 'weeks — the window',    color: '#F59E0B',
+      headline: 'Personality is set in a window that closes at week 7',
+      body: 'Kittens handled by 4+ people before week 7 grow into permanently friendlier adults. Most kittens are adopted after this window has already closed.' },
+    { stat: '62',  statSuffix: '%', statLabel: 'longer life (neutered ♂)', color: '#8B5CF6',
+      headline: 'Neutering is the single biggest controllable lifespan factor',
+      body: 'Neutered males live ~62% longer than intact males. Spayed females live ~39% longer — less roaming, fighting, and disease exposure.' },
+    { stat: '55',  statSuffix: '%', statLabel: 'of cats aged 11–15', color: '#F43F5E',
+      headline: 'Most elderly cats have Alzheimer\'s-like cognitive decline',
+      body: 'Over 55% of cats aged 11–15 show signs of Feline Cognitive Dysfunction Syndrome, rising to 80% at age 16–20. It is massively underdiagnosed.' },
+  ];
+
+  // Counter animation
+  function animCounter(el, target, suffix, duration) {
+    var t0 = performance.now();
+    (function tick(now) {
+      var p = Math.min((now - t0) / duration, 1);
+      var ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(ease * target) + (suffix || '');
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+
+  function buildSlide(ins) {
+    var suffix = ins.statSuffix || '';
+    return '<div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;min-height:160px;">' +
+      '<div style="text-align:center;min-width:130px;flex-shrink:0;">' +
+        '<div class="reel-stat-num" data-target="' + ins.stat + '" data-suffix="' + suffix + '"' +
+             ' style="font-size:3rem;font-weight:800;color:' + ins.color + ';line-height:1;font-variant-numeric:tabular-nums;">' +
+          ins.stat + suffix +
+        '</div>' +
+        '<div style="font-size:0.7rem;color:#71717a;margin-top:6px;line-height:1.3;">' + ins.statLabel + '</div>' +
+      '</div>' +
+      '<div style="border-left:3px solid ' + ins.color + '22;padding-left:1.5rem;flex:1;">' +
+        '<div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;line-height:1.4;">' + ins.headline + '</div>' +
+        '<div style="font-size:0.875rem;color:#71717a;line-height:1.65;">' + ins.body + '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  var reelIdx = 0, reelTimer = null, reelBusy = false;
+
+  function showSlide(idx, animate) {
+    if (reelBusy) return;
+    reelBusy = true;
+    reelIdx = ((idx % insights.length) + insights.length) % insights.length;
+    var wrap = document.getElementById('reelSlides');
+
+    function apply() {
+      wrap.innerHTML = buildSlide(insights[reelIdx]);
+      wrap.style.opacity = '1';
+      wrap.style.transform = 'none';
+      // Animate the counter
+      var numEl = wrap.querySelector('.reel-stat-num');
+      var target = Number(numEl.dataset.target);
+      var suffix = numEl.dataset.suffix;
+      if (target > 0) animCounter(numEl, target, suffix, 900);
+      reelBusy = false;
+    }
+
+    if (animate) {
+      wrap.style.opacity = '0';
+      wrap.style.transform = 'translateY(10px)';
+      setTimeout(apply, 360);
+    } else {
+      wrap.style.opacity = '1';
+      wrap.style.transform = 'none';
+      apply();
+      reelBusy = false;
+    }
+
+    // Update dots
+    document.querySelectorAll('.reel-dot').forEach(function(d, i) {
+      d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+      d.style.transform = i === reelIdx ? 'scale(1.3)' : 'scale(1)';
+    });
+
+    // Reset + restart progress bar
+    var bar = document.getElementById('reelProgress');
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        bar.style.transition = 'width 4s linear';
+        bar.style.width = '100%';
+      });
+    });
+  }
+
+  function startReel() {
+    stopReel();
+    reelTimer = setInterval(function() { showSlide(reelIdx + 1, true); }, 4000);
+  }
+  function stopReel() { clearInterval(reelTimer); reelTimer = null; }
+
+  // Build dots
+  var dotsWrap = document.getElementById('reelDots');
+  insights.forEach(function(_, i) {
+    var d = document.createElement('button');
+    d.className = 'reel-dot';
+    d.setAttribute('aria-label', 'Slide ' + (i + 1));
+    d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s,transform .2s;padding:0;';
+    d.style.background = i === 0 ? 'var(--accent)' : '#d4d4d8';
+    d.onclick = (function(idx) {
+      return function() { stopReel(); showSlide(idx, true); startReel(); };
+    })(i);
+    dotsWrap.appendChild(d);
+  });
+
+  // Pause on hover
+  var reelEl = document.getElementById('reel');
+  reelEl.addEventListener('mouseenter', stopReel);
+  reelEl.addEventListener('mouseleave', startReel);
+
+  // Keyboard nav
+  reelEl.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1, true); startReel(); }
+    if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1, true); startReel(); }
+  });
+
+  // Init — show first slide without animation, then start timer
+  showSlide(0, false);
+  startReel();
+
   // ── Milestone data ────────────────────────────────────────────────────────
   var milestones = [
     { year: "Birth", title: "Eyes and ears sealed shut", body: "A kitten arrives in sensory darkness. The only guidance systems available are smell and warmth. Cannot regulate body temperature; clusters against mother or littermates to survive.", tag: "Newborn", tagColor: "indigo" },
     { year: "Day 7", title: "Umbilical cord detaches", body: "A healthy newborn weighs 1.8–5.3 oz and gains 0.25–0.5 oz per day. The mother still stimulates elimination by licking — kittens cannot urinate or defecate independently at this stage.", tag: "Newborn", tagColor: "indigo" },
     { year: "Days 7–14", title: "Eyes begin opening", body: "Eyes open for the first time — blue at first. Adult eye color will not emerge until weeks 7–8. The world arrives in blurry color.", tag: "Newborn", tagColor: "indigo" },
-    { year: "Week 3", title: "Ears open; first steps; first teeth", body: "Ears unfold and begin to function. First teeth (incisors) break through. Wobbly walking begins. The socialization window — the most consequential developmental period of a cat’s life — is now open.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "Week 3", title: "Ears open; first steps; first teeth", body: "Ears unfold and begin to function. First teeth (incisors) break through. Wobbly walking begins. The socialization window — the most consequential developmental period of a cat's life — is now open.", tag: "Early Kitten", tagColor: "emerald" },
     { year: "Week 4", title: "Canine teeth, retractable claws, litter box", body: "Canines emerge. Claws become retractable for the first time. Litter box use begins. Social play with littermates starts — teaching predatory sequences and social negotiation.", tag: "Early Kitten", tagColor: "emerald" },
     { year: "Week 5–6", title: "Vision and hearing fully developed", body: "Full sensory capability arrives. The kitten runs, pounces, and plays with confidence. Play-fighting peaks between weeks 6–9. First FVRCP vaccine is recommended around week 6.", tag: "Early Kitten", tagColor: "emerald" },
-    { year: "Week 7", title: "Socialization window begins to close", body: "This is the most critical deadline in a kitten’s development. Kittens handled gently by at least 4 different people before this point grow up measurably friendlier toward strangers. After week 7, the window narrows sharply.", tag: "Early Kitten", tagColor: "emerald" },
-    { year: "Week 8", title: "Fully weaned; ready for adoption", body: "Eyes have transitioned to adult color. Fully weaned from mother’s milk. At this point, most kittens are adopted — ironically, just after the socialization window has closed.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "Week 7", title: "Socialization window begins to close", body: "This is the most critical deadline in a kitten's development. Kittens handled gently by at least 4 different people before this point grow up measurably friendlier toward strangers. After week 7, the window narrows sharply.", tag: "Early Kitten", tagColor: "emerald" },
+    { year: "Week 8", title: "Fully weaned; ready for adoption", body: "Eyes have transitioned to adult color. Fully weaned from mother's milk. At this point, most kittens are adopted — ironically, just after the socialization window has closed.", tag: "Early Kitten", tagColor: "emerald" },
     { year: "4–5 months", title: "Female cats enter first heat (estrus)", body: "The teenage phase begins. Puberty arrives earlier than most owners expect. Females can become pregnant before they appear fully grown. Spaying before first heat is recommended to maximize lifespan benefits.", tag: "Juvenile", tagColor: "sky" },
     { year: "6–12 months", title: "Male sexual maturity; roaming begins", body: "Intact males begin roaming, spraying urine to mark territory, and competing physically with other males. Both sexes show increased boldness and boundary-testing — the feline equivalent of adolescence.", tag: "Juvenile", tagColor: "sky" },
     { year: "1–2 years", title: "Full physical maturity", body: "Territorial confidence is established. The cat enters its prime. A full adult vocalization repertoire of up to 21 distinct sounds is now in use — many of them developed specifically for their human.", tag: "Young Adult", tagColor: "indigo" },
     { year: "1–6 years", title: "Prime of life: peak coordination and energy", body: "Healthy young adult cats sleep 12–16 hours daily (about 70% of their lives), with peak activity at dawn and dusk — the crepuscular pattern inherited from wildcat ancestors. During waking hours: hunt, groom (up to 30% of wake time), patrol, bond.", tag: "Young Adult", tagColor: "indigo" },
     { year: "7–10 years", title: "Middle age: first signs of slowing", body: "Physical changes begin to show subtly: slight weight gain or muscle loss, reduced intensity of play. Behaviorally, cats in this stage are often at their most settled and companionable — confident, less reactive, deeply bonded to routines.", tag: "Mature Adult", tagColor: "amber" },
     { year: "10 years", title: "Senior threshold (AAFP/AAHA)", body: "Clinical seniority begins. Veterinary guidelines recommend biannual checkups for cats 10+. Age-related conditions — hyperthyroidism, chronic kidney disease, dental disease, hypertension — become more common.", tag: "Senior", tagColor: "violet" },
-    { year: "11–15 years", title: "Cognitive dysfunction affects over half of cats", body: "More than 55% of cats in this age range show clinical signs of Cognitive Dysfunction Syndrome (CDS) — an Alzheimer’s-like neurodegeneration. Signs: disorientation, nighttime yowling, litter box accidents, reduced engagement.", tag: "Senior", tagColor: "violet" },
+    { year: "11–15 years", title: "Cognitive dysfunction affects over half of cats", body: "More than 55% of cats in this age range show clinical signs of Cognitive Dysfunction Syndrome (CDS) — an Alzheimer's-like neurodegeneration. Signs: disorientation, nighttime yowling, litter box accidents, reduced engagement.", tag: "Senior", tagColor: "violet" },
     { year: "15+ years", title: "Deepened quiet; heightened dependency", body: "The senior cat who is well-cared for often shows a settled quietude — less active, more dependent on human warmth and routine, and in many cases more visibly affectionate than in younger years.", tag: "Senior", tagColor: "violet" },
     { year: "16–20 years", title: "Cognitive dysfunction in over 80% of cats", body: "The vast majority of cats in this age range show some signs of CDS. Environmental modifications (night lights, predictable routines, easy litter box access) significantly improve quality of life.", tag: "Senior", tagColor: "violet" },
     { year: "38 years", title: "Creme Puff — world record holder", body: "Born 1967 in Austin, Texas. Died 2005. The oldest domestic cat ever documented by Guinness World Records. A reminder that the upper bound of feline life remains extraordinary.", tag: "Record", tagColor: "rose" }
@@ -480,8 +624,8 @@
   // ── Communication cards with scale-in + stagger ───────────────────────────
   var commData = [
     { title: 'Purr', body: 'Produced on both inhale and exhale via laryngeal oscillations. Cats purr when content and when stressed, injured, or giving birth — suggesting a self-soothing function. Frequency: 25–150 Hz.', cite: '[15]', citeId: 'source-15' },
-    { title: 'Meow', body: 'Exclusively human-directed. Each cat tailors its meow repertoire to its specific human over time. Your cat’s meow is a personalized vocabulary built for you.', cite: '[6]', citeId: 'source-6' },
-    { title: 'Trill / Chirrup', body: 'A warm, rolling closed-mouth greeting. Mothers use it to call kittens. When your cat trills at you, it’s treating you like a kitten.', cite: '[6]', citeId: 'source-6' },
+    { title: 'Meow', body: 'Exclusively human-directed. Each cat tailors its meow repertoire to its specific human over time. Your cat\'s meow is a personalized vocabulary built for you.', cite: '[6]', citeId: 'source-6' },
+    { title: 'Trill / Chirrup', body: 'A warm, rolling closed-mouth greeting. Mothers use it to call kittens. When your cat trills at you, it\'s treating you like a kitten.', cite: '[6]', citeId: 'source-6' },
     { title: 'Chatter', body: 'The staccato clicking sound when watching birds. Possibly a frustrated hunting reflex, possibly prey-mimicry. Still debated by researchers.', cite: '[6]', citeId: 'source-6' }
   ];
   var commGrid = document.getElementById('commGrid');
