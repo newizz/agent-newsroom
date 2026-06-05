@@ -272,7 +272,7 @@
     </div>
   </div>
   <div class="surface rounded-xl p-6 md:order-1 fade-up" style="transition-delay:80ms;">
-    <h3 class="text-sm font-medium muted mb-3">Reported Productivity Gains by Industry (% improvement)</h3>
+    <h3 class="text-sm font-medium muted mb-3">Reported headline metrics by industry (each metric measures a different dimension)</h3>
     <div class="h-64"><canvas id="chart2"></canvas></div>
     <p class="text-xs muted mt-2">Each metric measures a different dimension — see narrative for context. Bars marked * are vendor claims without independent verification.</p>
   </div>
@@ -425,7 +425,7 @@ const chart1Data = {
     },
     {
       label: 'Exploring / planning',
-      data: [30, 22],
+      data: [30, null],
       backgroundColor: '#e0e7ff'
     }
   ]
@@ -468,7 +468,7 @@ const chart2Data = {
     'Drug discovery speedup (Insilico)'
   ],
   datasets: [{
-    label: 'Reported improvement (%)',
+    label: 'Reported headline metric (%)',
     data: [51, 84, 40, 25, 90, 75],
     backgroundColor: [
       '#6366F1','#6366F1','#818cf8','#a5b4fc','#a5b4fc','#6366F1'
@@ -488,7 +488,7 @@ new Chart(document.getElementById('chart2'), {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: ctx => `${ctx.parsed.x}% improvement`
+          label: ctx => `${ctx.parsed.x}%`
         }
       }
     },
@@ -869,11 +869,11 @@ const insights = [
   },
   {
     icon: 'alert-triangle',
-    stat: 40,
-    statSuffix: '%',
-    statLabel: 'projects may be cancelled by 2027',
+    stat: 11,
+    statSuffix: '–33%',
+    statLabel: 'enterprises in active production',
     headline: 'The biggest barrier is organisational, not technical',
-    body: 'Gartner predicts 40%+ of agentic AI projects will be cancelled by 2027 due to legacy system incompatibility and organisational readiness gaps — not model limitations. Only 11–33% of enterprises have agentic AI in active production.',
+    body: 'Despite 69–79% of enterprises claiming some level of agentic AI adoption, only 11–33% have systems in active production. Gartner predicts 40%+ of agentic AI projects will be cancelled by 2027 due to legacy system incompatibility and org readiness gaps.',
     color: '#dc2626'
   }
 ];
@@ -1008,10 +1008,8 @@ const maturityObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 document.querySelectorAll('.industry-card').forEach(el => maturityObserver.observe(el));
 
-// Trigger immediately for cards already in view
-document.querySelectorAll('.maturity-bar-fill').forEach(f => {
-  f.setAttribute('data-width', f.style.width || '0');
-});
+// Note: data-width is already set on each .maturity-bar-fill in the card template;
+// the maturityObserver reads it directly — no inline-style clobber needed here.
 
 // ── Entrance observer (fade-up / fade-left / scale-in) ───────────────────────
 if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
