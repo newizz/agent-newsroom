@@ -60,6 +60,7 @@ Use exactly this structure:
 **Created:** <ISO date>
 **Template hint:** <one of: concept-explorer | data-story | comparison-matrix | timeline | simulator>
 **Ambiguity:** <green | yellow>
+**Mode:** <quick | deep>  <!-- passed by orchestrator from user choice -->
 **Estimated depth:** <quick | standard | deep>
 
 ## Original prompt

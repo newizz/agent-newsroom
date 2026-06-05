@@ -19,3 +19,5 @@ Thumbs.db
 node_modules/
 .env
 .env.local
+tools/notebooklm/.venv/
+tools/notebooklm/.python-version

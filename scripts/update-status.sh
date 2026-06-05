@@ -33,26 +33,28 @@ trap sync_to_gist EXIT
 case "${1:-}" in
   --run)
     SLUG="${2:?slug required}"
-    jq --arg slug "$SLUG" --arg now "$NOW" \
-      '.currentSlug = $slug | .currentRun = $slug | .lastUpdate = $now' \
+    MODE="${3:-quick}"
+    jq --arg slug "$SLUG" --arg mode "$MODE" --arg now "$NOW" \
+      '.currentSlug = $slug | .currentRun = $slug | .currentMode = $mode | .lastUpdate = $now' \
       "$STATUS_FILE" > "$STATUS_FILE.tmp" && mv "$STATUS_FILE.tmp" "$STATUS_FILE"
     exit 0
     ;;
   --clear-run)
-    jq --arg now "$NOW" '.currentSlug = null | .currentRun = null | .lastUpdate = $now' \
+    jq --arg now "$NOW" \
+      '.currentSlug = null | .currentRun = null | .currentMode = null | .lastUpdate = $now' \
       "$STATUS_FILE" > "$STATUS_FILE.tmp" && mv "$STATUS_FILE.tmp" "$STATUS_FILE"
     exit 0
     ;;
   --reset)
     jq --arg now "$NOW" \
-      '.currentSlug = null | .currentRun = null | .lastUpdate = $now |
+      '.currentSlug = null | .currentRun = null | .currentMode = null | .lastUpdate = $now |
        .agents = (.agents | map(.status = "offline" | .task = ""))' \
       "$STATUS_FILE" > "$STATUS_FILE.tmp" && mv "$STATUS_FILE.tmp" "$STATUS_FILE"
     exit 0
     ;;
 esac
 
-AGENT="${1:?agent-id required: intake|researcher|builder|reporter}"
+AGENT="${1:?agent-id required: intake|researcher|deep-researcher|builder|reporter}"
 STATUS="${2:?status required: busy|idle|online|offline}"
 TASK="${3:-}"
 

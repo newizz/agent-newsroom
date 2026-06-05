@@ -2,12 +2,17 @@
 
 > A 4-agent virtual newsroom that turns any topic into a deep-research interactive dashboard, auto-published to GitHub Pages.
 
-**agent-newsroom** is a minimal pipeline that runs entirely on top of [Claude Code](https://docs.claude.com/en/docs/claude-code). Give it a topic and four specialized agents take it from question to published artifact:
+**agent-newsroom** is a minimal pipeline that runs entirely on top of [Claude Code](https://docs.claude.com/en/docs/claude-code). Give it a topic and a team of specialized agents take it from question to published artifact:
 
-- 🎙️ **Intake Agent** — clarifies the brief, asks back if vague
-- 🔍 **Research Agent** — deep-researches the topic with cited sources
-- 🎨 **Builder Agent** — picks a template and ships a polished interactive HTML dashboard
-- 📋 **Reporter Agent** — summarizes the run and hands back the live URL
+- 🎙️ **Iris (Intake)** — clarifies the brief, asks back if vague
+- 🔍 **Ravi (Researcher)** — deep-researches via Claude WebSearch + cites sources
+- 🧬 **Rin (Deep Researcher, optional)** — runs a parallel pass through NotebookLM for stronger synthesis, YouTube ingestion, mind map + infographic
+- 🎨 **Bram (Builder)** — picks a template, merges all research, ships an interactive HTML dashboard
+- 📋 **Rosa (Reporter)** — summarizes the run and hands back the live URL
+
+**Two run modes:**
+- ⚡ **Quick** (default) — Iris → Ravi → Bram → Rosa (~2-3 min)
+- 🔬 **Deep** — Iris → (Ravi ∥ Rin) → Bram → Rosa (~5-10 min, richer output)
 
 The output is a single-file HTML dashboard, auto-deployed to GitHub Pages. A pixel-style "virtual office" UI lets you watch the agents work and submit new topics from the browser.
 
@@ -110,6 +115,51 @@ When you're happy with a `/preview/<slug>/` dashboard, run:
 ```
 
 This copies it to `/published/<slug>/` and pushes — that URL becomes the "official" version.
+
+## Deep mode setup (NotebookLM via Rin)
+
+Deep mode adds **Rin**, a Deep Researcher that runs NotebookLM in parallel with Ravi. NotebookLM provides stronger multi-source synthesis, can ingest YouTube videos as sources, and generates a mind map + infographic that the Builder embeds in the dashboard.
+
+### One-time install (uses [uv](https://docs.astral.sh/uv/) — no global Python pollution)
+
+```bash
+# Install uv if you don't have it
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install NotebookLM tool (creates tools/notebooklm/.venv/)
+./tools/notebooklm/scripts/setup.sh
+
+# Authenticate (reuses Chrome cookies, or opens browser)
+./tools/notebooklm/scripts/login.sh
+```
+
+### Run in deep mode
+
+In Claude Code session:
+```
+@orchestrator.md Run the newsroom in deep mode on: "<topic>"
+```
+
+Orchestrator spawns Ravi (Task) and Rin (Task) in the same message so they run in parallel. Rin's worker (`./scripts/deep-research.sh`) calls into `tools/notebooklm/` to:
+
+1. Create a NotebookLM notebook
+2. Auto-discover web sources (`add-research --mode deep`)
+3. Add 3-5 YouTube videos Rin curates via WebSearch
+4. Ask the brief's Key Questions in the notebook
+5. Generate mind map (JSON) + infographic (PNG)
+6. Write outputs to `runs/<slug>/deep-research/`
+
+Builder then merges Rin's findings with Ravi's, preferring Rin on conflict (NotebookLM grounding is stricter), and embeds the mind map (via [markmap](https://markmap.js.org/)) + infographic into the dashboard.
+
+### Refresh auth (every ~2 weeks when cookies expire)
+
+```bash
+./tools/notebooklm/scripts/login.sh
+```
+
+### Disable deep mode
+
+Just don't install `tools/notebooklm/` — Rin will silently report "tool not installed" and orchestrator falls back to quick mode automatically.
 
 ## Live status on GitHub Pages
 

@@ -1,0 +1,191 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "Kaldi - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Kaldi",
+      "publisher": "Wikipedia",
+      "author": "Wikipedia contributors",
+      "date": "2024",
+      "type": "reference",
+      "notes": "Documents that the Kaldi legend was first written down in 1671 by Antoine Faustus Nairon; treats it as folklore rather than documented history.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 2,
+      "title": "Yemen vs. Ethiopia | Coffee's True Origin Debate",
+      "url": "https://sagebrushcoffee.com/blogs/education/yemen-vs-ethiopia-coffee-s-true-origin-debate",
+      "publisher": "Sagebrush Coffee",
+      "author": "Sagebrush Coffee Editorial",
+      "date": "2024",
+      "type": "secondary",
+      "notes": "Discusses the distinction between Ethiopia as the plant's geographic origin and Yemen as the site of the first documented beverage consumption by Sufi monks in the mid-15th century.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 3,
+      "title": "History of coffee - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/History_of_coffee",
+      "publisher": "Wikipedia",
+      "author": "Wikipedia contributors",
+      "date": "2024",
+      "type": "reference",
+      "notes": "Comprehensive reference article covering the spread from Yemen to Mecca (1414), Ottoman Empire (1554-55), Europe (1645 Venice, 1652 London), and the Americas (1720 Martinique, 1727 Brazil). Notes the 2020 Scalabrin genetic study. Used as cross-check for multiple date claims. Not sole source for any figure.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 4,
+      "title": "Lloyd's Coffee House - Wikipedia; Jonathan's Coffee-House - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Lloyd%27s_Coffee_House",
+      "publisher": "Wikipedia",
+      "author": "Wikipedia contributors",
+      "date": "2024",
+      "type": "reference",
+      "notes": "Documents Lloyd's Coffee House (opened 1686 by Edward Lloyd) as origin of Lloyd's of London insurance market. Jonathan's Coffee-House Wikipedia article documents its role as origin of the London Stock Exchange (c.1680, formally renamed 1773). Cross-checked with history.co.uk and rgadvantage.com.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 5,
+      "title": "How Coffee Fueled Revolutions—and Revolutionary Ideas",
+      "url": "https://www.history.com/articles/coffee-houses-revolutions",
+      "publisher": "HISTORY (A&E Networks)",
+      "author": "HISTORY editorial staff",
+      "date": "2024",
+      "type": "secondary",
+      "notes": "Authoritative popular-history source on coffeehouses as intellectual and political hubs. Documents penny universities concept, King Charles II's failed 11-day ban (1675), Café Procope's Enlightenment role, Ottoman bans under Murad IV, Boston's Green Dragon Tavern. Cross-checked with History.co.uk and retrospectjournal.com.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 6,
+      "title": "World coffee production in 2024/25 is estimated at 176.2 million bags",
+      "url": "https://www.tridge.com/news/world-coffee-production-in-202425-is-estimat-yeogrq",
+      "publisher": "Tridge (global agricultural trade intelligence)",
+      "author": "Tridge Research Team",
+      "date": "2025",
+      "type": "primary",
+      "notes": "Provides production data for 2024/25 crop year: global total 176.2 million 60-kg bags; Brazil 54.78M bags (31%), Vietnam 29.1M bags (16.5%), Colombia 12.4M bags (7%). Arabica 99.9M bags, Robusta 76.4M bags. Cross-checked with USDA FAS circular.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 7,
+      "title": "Convergent evolution of caffeine in plants by co-option of exapted ancestral enzymes",
+      "url": "https://www.pnas.org/doi/10.1073/pnas.1602575113",
+      "publisher": "Proceedings of the National Academy of Sciences (PNAS)",
+      "author": "Huang et al.",
+      "date": "2016",
+      "type": "primary",
+      "notes": "Peer-reviewed academic study demonstrating that caffeine evolved independently at least five times in flowering plants (coffee, tea, cacao, guarana, citrus) via different biosynthetic pathways. Cross-checked with rarebird.coffee summary and ResearchGate abstract.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 8,
+      "title": "No, coffee is not the second-most traded commodity after oil",
+      "url": "https://www.politifact.com/factchecks/2017/may/08/starbucks/no-coffee-not-second-most-traded-commodity-after-o/",
+      "publisher": "PolitiFact",
+      "author": "PolitiFact staff",
+      "date": "2017",
+      "type": "secondary",
+      "notes": "Fact-check debunking the 'second most traded commodity' claim made by Starbucks to the US Senate. Cites MIT Observatory of Economic Complexity (green coffee ranked ~114th), and notes multiple commodities — wheat, soybeans, aluminum, copper, iron ore — have substantially larger global markets. Cross-checked with perfectdailygrind.com and SCA statement.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 9,
+      "title": "Coffee Consumption Statistics 2026 - Global & U.S. Data",
+      "url": "https://www.verenastreet.com/blogs/news/coffee-statistics",
+      "publisher": "Verena Street Coffee Co.",
+      "author": "Verena Street Research",
+      "date": "2025-2026",
+      "type": "secondary",
+      "notes": "Aggregates multiple industry sources. Key figures used: 2.25 billion cups/day (attributed to Specialty Coffee Association, Q3 2025); Luxembourg 12.5 kg/capita/year (rank 1); Finland 9.6 kg (rank 2, 4.1 cups/day); US 66% of adults drink daily (highest in 20 years); 3.1 average cups/drinker/day; 68% brew at home. Cross-checked with coffeedasher.com and economyinsights.com.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 10,
+      "title": "USDA forecasts world coffee production for 2025/26 at an all-time high of 178.8 million bags (+2%), consumption to reach a record 173.9 million (+1.3%)",
+      "url": "https://www.comunicaffe.com/usda-sees-world-coffee-production-for-2025-26-at-an-all-time-high-of-178-8-million-bags-2-consumption-at-a-record-173-9-million-1-3/",
+      "publisher": "Comunicaffe (reporting on USDA FAS data)",
+      "author": "Comunicaffe editorial staff",
+      "date": "2025",
+      "type": "secondary",
+      "notes": "Reports on USDA Foreign Agricultural Service projections: production 178.8M bags (record), consumption 173.9M bags (record) for 2025/26. Cross-checked with USDA FAS direct publication and ecofinagency.com report.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 11,
+      "title": "The biology of coffee, one of the world's most popular drinks",
+      "url": "https://theconversation.com/the-biology-of-coffee-one-of-the-worlds-most-popular-drinks-129179",
+      "publisher": "The Conversation",
+      "author": "Academic contributor (The Conversation)",
+      "date": "2020",
+      "type": "secondary",
+      "notes": "Explains caffeine's mechanism as adenosine receptor blocker; covers genetic variation in caffeine sensitivity; discusses coffee's antioxidant properties and associations with reduced risk of Parkinson's, Type 2 diabetes, and certain cancers. Source for bitterness composition figure (caffeine = 10-15% of perceived bitterness) cross-checked with coffeechemistry.com.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 12,
+      "title": "Coffee and Colonialism / History of Labor on Coffee Plantations",
+      "url": "https://coffeeannan.com/en/blogs/blog/coffee-and-colonialism",
+      "publisher": "Coffee Annan",
+      "author": "Coffee Annan editorial",
+      "date": "2023",
+      "type": "secondary",
+      "notes": "Documents the colonial history of coffee cultivation, including the 1727 Palheta/Brazil smuggling story, the role of enslaved African labor (1.7 million enslaved Africans transported to Brazil 1700-1800), and Haiti supplying half the world's coffee by 1788. Cross-checked with Wikipedia 'Brazilian coffee cycle' article and perfectdailygrind.com slavery article.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 13,
+      "title": "Ottoman coffeehouse - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Ottoman_coffeehouse",
+      "publisher": "Wikipedia",
+      "author": "Wikipedia contributors",
+      "date": "2024",
+      "type": "reference",
+      "notes": "Documents Ottoman coffeehouse social functions, 1554-55 Istanbul founding dates, range of clientele (merchants, madrasa students, janissaries), and role in political discourse. Cross-checked with lovekoffi.com and helvaciali.ca.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 14,
+      "title": "The Long History of the Espresso Machine",
+      "url": "https://www.smithsonianmag.com/arts-culture/the-long-history-of-the-espresso-machine-126012814/",
+      "publisher": "Smithsonian Magazine",
+      "author": "Smithsonian staff",
+      "date": "2012",
+      "type": "secondary",
+      "notes": "Documents Angelo Moriondo's 1884 Turin patent as the first espresso machine; Luigi Bezzera's 1901 improvements; Desiderio Pavoni's commercialization from 1903. Cross-checked with Wikipedia Angelo Moriondo article and coffeeness.de. For instant coffee: Satori Kato's 1903 US patent cross-checked with Smithsonian Lemelson Center (invention.si.edu) and Satori Kato Wikipedia article.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 15,
+      "title": "Third-wave coffee - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Third-wave_coffee",
+      "publisher": "Wikipedia",
+      "author": "Wikipedia contributors",
+      "date": "2024",
+      "type": "reference",
+      "notes": "Documents Trish Rothgeb coining 'third-wave coffee' in 2002 in The Flamekeeper (Roasters Guild newsletter). Lists pioneer companies: Intelligentsia (1995), Stumptown (1999), Counter Culture (1995). Notes Peet's Coffee (1966) and Starbucks (1971) as second-wave markers. Cross-checked with fourscorecoffee.com and cafealtura.com.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 16,
+      "title": "Arabica vs Robusta: Complete Coffee Bean Guide 2025",
+      "url": "https://espressobarista.com/arabica-vs-robusta-coffee-guide/",
+      "publisher": "Espresso & Coffee Guide (espressobarista.com)",
+      "author": "Espresso Barista editorial staff",
+      "date": "2025",
+      "type": "secondary",
+      "notes": "Key facts used: Arabica caffeine ~1.5%, Robusta ~2.7%; Arabica altitude requirements 610-1830m; Robusta more disease-resistant; Arabica market share ~70% (historical average). Cross-checked with USITC report on Robusta trends, USDA data (Tridge), and sfbaycoffee.com.",
+      "accessed": "2026-06-03"
+    },
+    {
+      "id": 17,
+      "title": "Coffee Market Size, Share, Trends & Forecast 2025-2033",
+      "url": "https://www.renub.com/global-coffee-market-p.php",
+      "publisher": "Renub Research",
+      "author": "Renub Research analysts",
+      "date": "2024",
+      "type": "secondary",
+      "notes": "Market research report estimating global coffee market at over $461 billion in 2024. Used only for market value figure; cross-checked against Statista and everydaypeoplecoffeeandtea.com for consistency.",
+      "accessed": "2026-06-03"
+    }
+  ]
+}

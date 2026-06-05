@@ -155,6 +155,16 @@
   .live-chip .pulse { width: 6px; height: 6px; border-radius: 999px; background: #6dd97c; animation: pulse 2s ease-in-out infinite; }
   .live-chip[data-mode="demo"] .pulse { background: #f59e0b; }
   .live-chip[data-mode="error"] .pulse { background: #ef4444; }
+  .mode-badge {
+    margin-left: 8px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .mode-badge.quick { background: rgba(99,102,241,0.25); color: #c7d2fe; }
+  .mode-badge.deep  { background: rgba(20,184,166,0.25); color: #99f6e4; }
   @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: 0.4 } }
   .error-banner {
     position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
@@ -241,7 +251,7 @@
     <div class="office-scene" id="officeScene">
 
       <div class="office-title">agent-newsroom Virtual Office 🏢</div>
-      <div class="live-chip" id="liveChip"><span class="pulse"></span> <span id="liveLabel">LIVE</span> · <span id="lastUpdate">—</span></div>
+      <div class="live-chip" id="liveChip"><span class="pulse"></span> <span id="liveLabel">LIVE</span> · <span id="lastUpdate">—</span><span id="modeBadge" class="mode-badge" style="display:none"></span></div>
       <div class="error-banner" id="errBanner">⚠️ status.json fetch failed — open via local server (<code>python3 -m http.server</code>) or wait for GitHub Pages</div>
 
       <svg class="office-svg" id="officeSvg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
@@ -395,8 +405,9 @@
           <path d="M  4,-26 Q  14,-14  8,0  L 0,0  Q   2,-12  4,-26 Z" fill="#1f6b44"/>
         </g>
 
-        <!-- ── Desks (fixed — characters can leave and return) ─── -->
-        <g transform="translate(280,150)" id="desk-intake">
+        <!-- ── Desks (5 total: 3 top row + 2 bottom row) ─── -->
+        <!-- Top row (y=150) -->
+        <g transform="translate(180,150)" id="desk-intake">
           <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
           <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
           <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
@@ -408,7 +419,7 @@
           <rect x="-50" y="20" width="10" height="16" fill="#3b3b40"/>
           <rect x="-50" y="20" width="10" height="3"  fill="#2a2a2e"/>
         </g>
-        <g transform="translate(460,150)" id="desk-researcher">
+        <g transform="translate(400,150)" id="desk-researcher">
           <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
           <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
           <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
@@ -421,7 +432,26 @@
           <rect x="-46" y="28" width="10" height="8"  fill="#a55a2a"/>
           <path d="M -41,28 Q -50,18 -44,10 L -38,10 Q -32,18 -41,28 Z" fill="#2d8659"/>
         </g>
-        <g transform="translate(280,340)" id="desk-builder">
+        <!-- Rin's desk — has tablet + stack of notebooks (NotebookLM theme) -->
+        <g transform="translate(620,150)" id="desk-deep-researcher">
+          <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
+          <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
+          <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
+          <rect x="-30" y="-2" width="60" height="22" fill="#1a1a1f"/>
+          <rect x="-28" y="0"  width="56" height="16" fill="#14b8a6"/>
+          <rect x="-26" y="2"  width="52" height="2"  fill="#5eead4"/>
+          <rect x="-4"  y="14" width="8"  height="6"  fill="#1a1a1f"/>
+          <!-- tablet on desk -->
+          <rect x="-50" y="22" width="22" height="14" fill="#1a1a1f"/>
+          <rect x="-48" y="24" width="18" height="10" fill="#5eead4"/>
+          <!-- stack of notebooks -->
+          <rect x="32" y="20" width="20" height="4" fill="#a78bfa"/>
+          <rect x="32" y="24" width="20" height="4" fill="#14b8a6"/>
+          <rect x="32" y="28" width="20" height="4" fill="#f59e0b"/>
+          <rect x="32" y="32" width="20" height="4" fill="#6366f1"/>
+        </g>
+        <!-- Bottom row (y=340) -->
+        <g transform="translate(290,340)" id="desk-builder">
           <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
           <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
           <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
@@ -433,7 +463,7 @@
           <rect x="48"  y="24" width="3"  height="6"  fill="#dadbe0"/>
           <rect x="36"  y="23" width="10" height="6"  fill="#5a3a1a"/>
         </g>
-        <g transform="translate(460,340)" id="desk-reporter">
+        <g transform="translate(510,340)" id="desk-reporter">
           <rect x="-58" y="0"  width="116" height="40" fill="#8b6f47"/>
           <rect x="-58" y="0"  width="116" height="3"  fill="#a98662"/>
           <rect x="-58" y="37" width="116" height="3"  fill="#6b4f32"/>
@@ -446,55 +476,68 @@
         </g>
 
         <!-- ── Static chairs at home desks (stay put when character walks away) -->
-        <g class="static-chair" transform="translate(280,220)">
+        <g class="static-chair" transform="translate(180,220)">
           <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
           <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
         </g>
-        <g class="static-chair" transform="translate(460,220)">
+        <g class="static-chair" transform="translate(400,220)">
           <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
           <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
         </g>
-        <g class="static-chair" transform="translate(280,410)">
+        <g class="static-chair" transform="translate(620,220)">
           <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
           <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
         </g>
-        <g class="static-chair" transform="translate(460,410)">
+        <g class="static-chair" transform="translate(290,410)">
+          <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
+          <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
+          <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
+        </g>
+        <g class="static-chair" transform="translate(510,410)">
           <rect x="-30" y="22"  width="60" height="8"  fill="#1a1a1f"/>
           <rect x="-32" y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="26"  y="18"  width="6"  height="22" fill="#1a1a1f"/>
           <rect x="-26" y="30"  width="52" height="3"  fill="#0a0a0c"/>
         </g>
 
-        <!-- ── Characters (moveable groups — JS controls transform) -->
+        <!-- ── Characters (5 moveable groups — JS controls transform) -->
         <!-- Legs/feet are direct children so CSS animations work (they cannot animate inside <use>) -->
-        <g id="char-intake" class="char" data-agent="intake" data-status="offline" transform="translate(280,220)">
+        <g id="char-intake" class="char" data-agent="intake" data-status="offline" transform="translate(180,220)">
           <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
           <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
           <use href="#char-body"/>
         </g>
-        <g id="char-researcher" class="char" data-agent="researcher" data-status="offline" transform="translate(460,220)">
+        <g id="char-researcher" class="char" data-agent="researcher" data-status="offline" transform="translate(400,220)">
           <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
           <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
           <use href="#char-body"/>
         </g>
-        <g id="char-builder" class="char" data-agent="builder" data-status="offline" transform="translate(280,410)">
+        <g id="char-deep-researcher" class="char" data-agent="deep-researcher" data-status="offline" transform="translate(620,220)">
           <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
           <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
           <use href="#char-body"/>
         </g>
-        <g id="char-reporter" class="char" data-agent="reporter" data-status="offline" transform="translate(460,410)">
+        <g id="char-builder" class="char" data-agent="builder" data-status="offline" transform="translate(290,410)">
+          <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
+          <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <rect class="foot foot-r" x="3"   y="32" width="8" height="4"  fill="#1a1a1f"/>
+          <use href="#char-body"/>
+        </g>
+        <g id="char-reporter" class="char" data-agent="reporter" data-status="offline" transform="translate(510,410)">
           <rect class="leg leg-l"  x="-10" y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="leg leg-r"  x="4"   y="22" width="6"  height="12" fill="#2a2a30"/>
           <rect class="foot foot-l" x="-11" y="32" width="8" height="4"  fill="#1a1a1f"/>
@@ -506,12 +549,14 @@
 
       <!-- Overlay: bubble above head + name tag below feet (positioned independently) -->
       <div class="overlay-layer" id="overlayLayer">
-        <div class="bubble-ov" id="bub-intake"     data-status="offline">offline</div>
-        <div class="bubble-ov" id="bub-researcher" data-status="offline">offline</div>
-        <div class="bubble-ov" id="bub-builder"    data-status="offline">offline</div>
-        <div class="bubble-ov" id="bub-reporter"   data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-intake"          data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-researcher"      data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-deep-researcher" data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-builder"         data-status="offline">offline</div>
+        <div class="bubble-ov" id="bub-reporter"        data-status="offline">offline</div>
         <div class="name-ov" id="name-intake">Iris<span class="role">· intake</span></div>
         <div class="name-ov" id="name-researcher">Ravi<span class="role">· research</span></div>
+        <div class="name-ov" id="name-deep-researcher">Rin<span class="role">· deep research</span></div>
         <div class="name-ov" id="name-builder">Bram<span class="role">· builder</span></div>
         <div class="name-ov" id="name-reporter">Rosa<span class="role">· reporter</span></div>
       </div>
@@ -538,11 +583,18 @@
       <label class="text-xs font-medium muted">Topic</label>
       <textarea id="topicInput" rows="3" placeholder="e.g. Explain how stablecoins maintain their peg, with worked examples"
         class="mt-2 w-full px-4 py-3 rounded-lg border border-soft bg-white focus:outline-none focus:ring-2 focus:ring-indigo-200 transition resize-none"></textarea>
-      <div class="flex items-center justify-between mt-3 flex-wrap gap-3">
-        <div class="flex items-center gap-2">
-          <label class="text-xs font-medium muted mr-1">Mode:</label>
-          <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="auto" checked class="accent-indigo-500"> Auto-preview</label>
-          <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="approve" class="accent-indigo-500"> Approve before deploy</label>
+      <div class="flex items-start justify-between mt-3 flex-wrap gap-3">
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-3">
+            <label class="text-xs font-medium muted w-16">Research:</label>
+            <label class="text-xs flex items-center gap-1"><input type="radio" name="research" value="quick" checked class="accent-indigo-500"> ⚡ Quick <span class="muted">(Ravi only)</span></label>
+            <label class="text-xs flex items-center gap-1"><input type="radio" name="research" value="deep" class="accent-indigo-500"> 🔬 Deep <span class="muted">(Ravi + Rin/NotebookLM)</span></label>
+          </div>
+          <div class="flex items-center gap-3">
+            <label class="text-xs font-medium muted w-16">Deploy:</label>
+            <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="auto" checked class="accent-indigo-500"> Auto-preview</label>
+            <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="approve" class="accent-indigo-500"> Approve first</label>
+          </div>
         </div>
         <button id="copyBtn" class="bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition flex items-center gap-2">
           <i data-lucide="copy" class="w-4 h-4"></i> Copy command
@@ -591,13 +643,15 @@
 <!-- Character palette — CSS variables inherit through SVG <use> shadow DOM -->
 <style>
   /* Iris — intake — orange hair + indigo shirt */
-  [data-agent="intake"]     { --shirt: #6366f1; --shirt-hi: #7c7ff5; --hair: #d97757; --hair-tip: #c25f3f; }
+  [data-agent="intake"]          { --shirt: #6366f1; --shirt-hi: #7c7ff5; --hair: #d97757; --hair-tip: #c25f3f; }
   /* Ravi — researcher — black hair + violet shirt */
-  [data-agent="researcher"] { --shirt: #8b5cf6; --shirt-hi: #a78bfa; --hair: #1a1a1a; --hair-tip: #1a1a1a; }
+  [data-agent="researcher"]      { --shirt: #8b5cf6; --shirt-hi: #a78bfa; --hair: #1a1a1a; --hair-tip: #1a1a1a; }
+  /* Rin — deep researcher — silver hair + teal shirt (NotebookLM vibe) */
+  [data-agent="deep-researcher"] { --shirt: #14b8a6; --shirt-hi: #5eead4; --hair: #94a3b8; --hair-tip: #64748b; }
   /* Bram — builder — blue hair + sky shirt */
-  [data-agent="builder"]    { --shirt: #0ea5e9; --shirt-hi: #38bdf8; --hair: #3b82f6; --hair-tip: #2563eb; }
+  [data-agent="builder"]         { --shirt: #0ea5e9; --shirt-hi: #38bdf8; --hair: #3b82f6; --hair-tip: #2563eb; }
   /* Rosa — reporter — green hair + rose shirt */
-  [data-agent="reporter"]   { --shirt: #f43f5e; --shirt-hi: #fb7185; --hair: #10b981; --hair-tip: #059669; }
+  [data-agent="reporter"]        { --shirt: #f43f5e; --shirt-hi: #fb7185; --hair: #10b981; --hair-tip: #059669; }
 </style>
 
 <script>
@@ -608,11 +662,13 @@
   // ══════════════════════════════════════════════════════════════
 
   // SVG viewBox is 800 × 500. All coords below are in that space.
+  // 5 agents: 3 top row (Iris/Ravi/Rin) + 2 bottom row (Bram/Rosa)
   const HOMES = {
-    intake:     { x: 280, y: 220 },
-    researcher: { x: 460, y: 220 },
-    builder:    { x: 280, y: 410 },
-    reporter:   { x: 460, y: 410 }
+    intake:           { x: 180, y: 220 },
+    researcher:       { x: 400, y: 220 },
+    'deep-researcher':{ x: 620, y: 220 },
+    builder:          { x: 290, y: 410 },
+    reporter:         { x: 510, y: 410 }
   };
 
   // Activity points (where to stand) — in front of back-wall items + middle floor
@@ -621,7 +677,7 @@
     printer:  { x: 560, y: 160, label: 'at printer 🖨️' },
     cabinet:  { x: 640, y: 160, label: 'filing 🗂️' },
     cooler:   { x: 720, y: 160, label: 'water break 💧' },
-    meeting:  { x: 370, y: 280, label: 'standup 🗣️' },
+    meeting:  { x: 400, y: 290, label: 'standup 🗣️' },
     plant_tl: { x:  70, y: 180, label: 'watering plants 🪴' },
     plant_bl: { x:  70, y: 400, label: 'watering plants 🪴' },
     side_l:   { x:  90, y: 290, label: 'side desk 💻' },
@@ -861,6 +917,19 @@
     } else {
       bar.style.display = 'none';
     }
+    // Mode badge
+    const mb = document.getElementById('modeBadge');
+    if (data.currentMode === 'deep') {
+      mb.style.display = 'inline-block';
+      mb.className = 'mode-badge deep';
+      mb.textContent = '🔬 DEEP';
+    } else if (data.currentMode === 'quick') {
+      mb.style.display = 'inline-block';
+      mb.className = 'mode-badge quick';
+      mb.textContent = '⚡ QUICK';
+    } else {
+      mb.style.display = 'none';
+    }
     (data.agents || []).forEach(a => setStatus(a.id, a.status, a.task));
   }
   // On GH Pages, prefer the Gist URL (raw status.json on Pages is stale until next push)
@@ -889,15 +958,16 @@
   let demoTick = 0;
   function demoStep() {
     if (window.__realStatusSeen) return;
-    const agents = ['intake', 'researcher', 'builder', 'reporter'];
+    const agents = ['intake', 'researcher', 'deep-researcher', 'builder', 'reporter'];
     agents.forEach((id, i) => setStatus(id, DEMO_CYCLE[(demoTick + i) % DEMO_CYCLE.length]));
     demoTick++;
   }
   // Stagger initial demo appearance — guarded by __realStatusSeen so real data wins
-  setTimeout(() => { if (!window.__realStatusSeen) setStatus('intake', 'busy');     }, 800);
-  setTimeout(() => { if (!window.__realStatusSeen) setStatus('researcher', 'idle'); }, 1100);
-  setTimeout(() => { if (!window.__realStatusSeen) setStatus('builder', 'online');  }, 1400);
-  setTimeout(() => { if (!window.__realStatusSeen) setStatus('reporter', 'idle');   }, 1700);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('intake', 'busy');          }, 700);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('researcher', 'idle');      }, 1000);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('deep-researcher', 'busy', 'NotebookLM research'); }, 1300);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('builder', 'online');       }, 1600);
+  setTimeout(() => { if (!window.__realStatusSeen) setStatus('reporter', 'idle');        }, 1900);
   setInterval(demoStep, 9000);
 
   // ══════════════════════════════════════════════════════════════
@@ -909,13 +979,15 @@
 
   function buildCommand() {
     const topic = topicInput.value.trim() || '<your topic here>';
-    const mode = document.querySelector('input[name="mode"]:checked').value;
-    const flag = mode === 'approve' ? ' (approve before deploy)' : '';
-    return `@orchestrator.md Run the newsroom on this topic${flag}:\n"${topic}"`;
+    const research = document.querySelector('input[name="research"]:checked').value;
+    const deploy = document.querySelector('input[name="mode"]:checked').value;
+    const researchFlag = research === 'deep' ? 'deep' : 'quick';
+    const deployFlag = deploy === 'approve' ? ' — approve before deploy' : '';
+    return `@orchestrator.md Run the newsroom in ${researchFlag} mode${deployFlag}:\n"${topic}"`;
   }
   function refreshPreview() { cmdPreview.textContent = buildCommand(); }
   topicInput.addEventListener('input', refreshPreview);
-  document.querySelectorAll('input[name="mode"]').forEach(r => r.addEventListener('change', refreshPreview));
+  document.querySelectorAll('input[name="mode"], input[name="research"]').forEach(r => r.addEventListener('change', refreshPreview));
   refreshPreview();
   copyBtn.addEventListener('click', async () => {
     const cmd = buildCommand();
