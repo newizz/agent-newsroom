@@ -2,22 +2,22 @@
   "currentRun": null,
   "currentSlug": null,
   "currentMode": null,
-  "lastUpdate": "2026-06-05T04:32:16Z",
+  "lastUpdate": "2026-06-05T05:00:47Z",
   "agents": [
     {
       "id": "intake",
       "name": "Iris",
       "role": "Intake Specialist",
       "emoji": "🎙️",
-      "status": "offline",
-      "task": ""
+      "status": "busy",
+      "task": "spawning subagent"
     },
     {
       "id": "researcher",
       "name": "Ravi",
       "role": "Research Analyst",
       "emoji": "🔍",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -25,7 +25,7 @@
       "name": "Rin",
       "role": "Deep Researcher",
       "emoji": "🧬",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -33,8 +33,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "offline",
-      "task": ""
+      "status": "busy",
+      "task": "writing dashboard"
     },
     {
       "id": "reporter",

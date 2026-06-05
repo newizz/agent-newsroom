@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic AI Industry Use Cases — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --accent: #6366F1;
+    --accent-soft: #6366F11A;
+    --accent-line: #6366F133;
+  }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .kpi { background: #131316 !important; border-color: #27272a !important; }
+    .industry-card { background: #131316 !important; border-color: #27272a !important; }
+    .pattern-card { background: #131316 !important; border-color: #27272a !important; }
+    .timeline-item { background: #131316 !important; border-color: #27272a !important; }
+  }
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .kpi { padding: 1.25rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .kpi-value { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent); }
+  .kpi-label { font-size: 0.75rem; color: #71717a; margin-top: 0.25rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .kpi-note  { font-size: 0.72rem; color: #a1a1aa; margin-top: 0.35rem; line-height: 1.4; }
+
+  .industry-card {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 0.875rem;
+    padding: 1.25rem;
+    transition: transform .2s ease, box-shadow .2s ease;
+    cursor: default;
+  }
+  .industry-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99,102,241,.13);
+  }
+
+  .maturity-bar-wrap { margin-top: 0.6rem; }
+  .maturity-bar-bg { background: #e4e4e7; border-radius: 999px; height: 6px; width: 100%; overflow: hidden; }
+  .maturity-bar-fill { height: 6px; border-radius: 999px; background: var(--accent); width: 0%; transition: width 1s cubic-bezier(.25,.46,.45,.94); }
+  @media (prefers-color-scheme: dark) {
+    .maturity-bar-bg { background: #27272a; }
+  }
+
+  .pattern-card {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 0.875rem;
+    padding: 1.25rem;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .pattern-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99,102,241,.13);
+  }
+
+  .timeline-item {
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    border-radius: 0.75rem;
+    padding: 1rem 1.25rem;
+    position: relative;
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .timeline-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(99,102,241,.1);
+  }
+  .timeline-connector { width: 2px; background: var(--accent-line); flex-shrink: 0; }
+
+  .prose-content p { margin-bottom: 1em; line-height: 1.75; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.7; }
+
+  /* ─── Entrance animations ─────────────────────────────────────── */
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .55s ease, transform .55s ease; }
+    .scale-in  { opacity: 0; transform: scale(0.93);      transition: opacity .45s ease, transform .45s ease; }
+    .visible   { opacity: 1 !important; transform: none !important; }
+  }
+
+  /* ─── Card hover micro ────────────────────────────────────────── */
+  .card-hover {
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99,102,241,.13);
+  }
+
+  /* ─── Maturity badge ──────────────────────────────────────────── */
+  .badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .badge-production { background: #d1fae5; color: #065f46; }
+  .badge-early      { background: #fef3c7; color: #92400e; }
+  .badge-pilot      { background: #e0e7ff; color: #3730a3; }
+  @media (prefers-color-scheme: dark) {
+    .badge-production { background: #064e3b; color: #6ee7b7; }
+    .badge-early      { background: #451a03; color: #fcd34d; }
+    .badge-pilot      { background: #1e1b4b; color: #a5b4fc; }
+  }
+
+  /* ─── Risk tag ────────────────────────────────────────────────── */
+  .risk-tag {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #fee2e2;
+    color: #991b1b;
+    display: inline-block;
+    margin-top: 0.4rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    .risk-tag { background: #450a0a; color: #fca5a5; }
+  }
+
+  /* ─── Scrollbar ───────────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 999px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Scroll progress bar -->
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Header -->
+<header class="border-b border-soft" style="border-color:#e4e4e7;">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">agentic-ai-industry-use-cases &middot; 2026-06-05</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-6xl mx-auto px-6 pt-14 pb-6">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Data Story</span>
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Deep Research</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">Agentic AI in the Real World</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+    Concrete applications of agentic AI are transforming core business functions — from customer service and finance to drug discovery and factory floors — moving from simple chat interactions to autonomous, multi-step task execution across at least eight major industries.
+  </p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     INSIGHT REEL (Step 4.4 — first thing after subtitle)
+═══════════════════════════════════════════════════════════ -->
+<section id="overview" class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="surface rounded-2xl overflow-hidden card-hover" id="reel" tabindex="0" style="outline:none;">
+    <div id="reelSlides" style="position:relative; min-height:160px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DEEP SYNTHESIS CALLOUT (Step 4.3C)
+═══════════════════════════════════════════════════════════ -->
+<aside class="max-w-6xl mx-auto px-6 mb-12 fade-up">
+  <div class="rounded-xl p-5 border-l-4" style="border-left-color: var(--accent); background: var(--accent-soft);">
+    <div class="text-xs font-medium accent mb-2">🔬 DEEP RESEARCH — synthesized from 5 sources via NotebookLM</div>
+    <p class="text-sm leading-relaxed" style="color:inherit;">
+      Concrete applications of agentic AI are currently transforming core business functions by moving from simple chat interactions to autonomous task execution. In customer support, systems now handle up to <strong>70% of inquiries without human intervention</strong> by accessing real-time data to resolve complex issues such as order refunds and reverse logistics. Within financial services, "agentic factories" autonomously perform high-toil reconciliation of purchase orders to invoices overnight, while in the legal domain, agents deployed to learn from past cases have achieved a <strong>4x reduction in end-to-end processing time</strong>. In manufacturing, one bottling plant achieved a <strong>9% increase in Overall Equipment Effectiveness (OEE)</strong> — rising from 67% to 76% — within six months, and a single operator can now manage up to <strong>ten machines</strong> instead of one.
+    </p>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════
+     KPI CARDS
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="kpiGrid"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     WHAT IS AGENTIC AI — Context
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12 grid md:grid-cols-2 gap-6">
+  <div class="surface rounded-xl p-6 fade-up">
+    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="brain" class="w-5 h-5 accent"></i> What makes AI "agentic"?
+    </h2>
+    <div class="prose-content text-sm">
+      <p>
+        Agentic AI is the <strong>third generation</strong> of enterprise AI — systems that hold a goal across multiple steps, invoke tools (APIs, databases, code execution), observe results, re-plan when needed, and loop until done. MIT Sloan defines it as <em>"autonomous software systems that perceive, reason, and act in digital environments to achieve goals on behalf of human principals."</em> <sup><a href="#src-1">[1]</a></sup>
+      </p>
+      <p>Four characteristics separate agentic AI from chatbots or RPA:</p>
+      <ul>
+        <li><strong>Autonomous multi-step execution</strong> — no continuous human prompting</li>
+        <li><strong>Tool / API use</strong> — reads databases, submits forms, calls external services</li>
+        <li><strong>Iterative self-correction</strong> — replans when a step fails</li>
+        <li><strong>Goal-directed behaviour</strong> — acts toward an outcome, not just a response</li>
+      </ul>
+      <p>
+        Three enablers converged in 2024–2025: LLMs reliable enough for reasoning, standardised tool-calling APIs (function-calling, MCP), and productised orchestration from cloud hyperscalers — dramatically lowering the enterprise adoption barrier.
+      </p>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-6 fade-up" style="transition-delay:100ms;">
+    <h3 class="text-sm font-medium muted mb-3">Enterprise Adoption Funnel (2025–26)</h3>
+    <div class="h-64"><canvas id="chart1"></canvas></div>
+    <p class="text-xs muted mt-2">Sources: Deloitte Tech Trends 2026 <sup><a href="#src-15">[15]</a></sup> and Battery Ventures survey <sup><a href="#src-16">[16]</a></sup>. Survey variance reflects differing definitions of "in production."</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     INDUSTRY MATURITY MAP
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2 fade-up">
+    <i data-lucide="layout-grid" class="w-5 h-5 accent"></i> Industry deployment map
+  </h2>
+  <p class="text-sm muted mb-6 fade-up" style="transition-delay:60ms;">
+    Maturity assessed from production evidence. Find your industry to see current deployment status, leading example, and primary risk.
+  </p>
+  <div id="industryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     IMPACT METRICS + CHART
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12 grid md:grid-cols-2 gap-6">
+  <div class="surface rounded-xl p-6 md:order-2 fade-up">
+    <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="bar-chart-3" class="w-5 h-5 accent"></i> Reported impact metrics
+    </h2>
+    <div class="prose-content text-sm">
+      <p>
+        Impact metrics vary widely in how they are reported — some are independently verified, many are single-vendor claims. The numbers below are sourced from published reports, earnings calls, and independent benchmarks. Treat vendor-only claims as directional.<sup><a href="#src-2">[2]</a></sup><sup><a href="#src-4">[4]</a></sup><sup><a href="#src-5">[5]</a></sup>
+      </p>
+      <ul>
+        <li><strong>Software engineering:</strong> 51% faster task completion; 67% faster code review (Duolingo via Copilot) <sup><a href="#src-2">[2]</a></sup></li>
+        <li><strong>Customer service:</strong> 84% autonomous case resolution (Salesforce internal); 80% at Finnair <sup><a href="#src-4">[4]</a></sup></li>
+        <li><strong>Healthcare:</strong> 40% of prior authorisations completed without human touch (MUSC Health) <sup><a href="#src-5">[5]</a></sup></li>
+        <li><strong>Manufacturing:</strong> 25% reduction in reactive maintenance time (Siemens/Senseye) <sup><a href="#src-13">[13]</a></sup>; 9% OEE gain at unnamed bottling plant (via Symphony AI / Cognizant)</li>
+        <li><strong>Legal:</strong> CoCounsel scored 79.5% vs. 50.3% lawyer baseline on document summarisation (independent Vals AI study) <sup><a href="#src-21">[21]</a></sup></li>
+        <li><strong>Pharma:</strong> Drug discovery cycle compressed from 4–6 years to 18 months (Insilico Medicine) <sup><a href="#src-8">[8]</a></sup></li>
+      </ul>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-6 md:order-1 fade-up" style="transition-delay:80ms;">
+    <h3 class="text-sm font-medium muted mb-3">Reported Productivity Gains by Industry (% improvement)</h3>
+    <div class="h-64"><canvas id="chart2"></canvas></div>
+    <p class="text-xs muted mt-2">Each metric measures a different dimension — see narrative for context. Bars marked * are vendor claims without independent verification.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AGENTIC WORKFLOW PATTERNS
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2 fade-up">
+    <i data-lucide="git-branch" class="w-5 h-5 accent"></i> Cross-industry workflow patterns
+  </h2>
+  <p class="text-sm muted mb-6 fade-up" style="transition-delay:60ms;">
+    Despite different domains, the same architectural patterns recur across industries.
+  </p>
+  <div id="patternsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ADOPTION TIMELINE
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="calendar" class="w-5 h-5 accent"></i> Deployment timeline
+  </h2>
+  <div id="timelineWrap" class="relative pl-4"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     RISK FACTORS
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2 fade-up">
+    <i data-lucide="shield-alert" class="w-5 h-5 accent"></i> Risks &amp; failure modes
+  </h2>
+  <p class="text-sm muted mb-6 fade-up" style="transition-delay:60ms;">
+    Real deployments have surfaced distinct risk categories. Addressing them is now the primary blocker to scaling.
+  </p>
+  <div id="risksGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     ANALYSIS / TAKEAWAYS
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="sparkles" class="w-5 h-5 accent"></i> Key takeaways
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content fade-up" style="transition-delay:80ms;">
+    <p>
+      <strong>The adoption gap is organisational, not technical.</strong> Despite 69–79% of enterprises claiming some level of agentic AI adoption, only 11–33% have systems in active production — a gap caused by legacy system incompatibility and change-management failures, not model capability. Gartner warns that over 40% of agentic AI projects will be cancelled by 2027 for these reasons. <sup><a href="#src-15">[15]</a></sup>
+    </p>
+    <p>
+      <strong>Software engineering and customer service lead on production evidence.</strong> GitHub Copilot (15+ million users, 90% of Fortune 100) and Salesforce Agentforce (29,000+ enterprise customers, 2.4 billion agentic work units completed) are the two largest agentic deployments with independently verifiable scale metrics. Both demonstrate that high-volume, digital-native, reversible tasks are where agentic AI matures first. <sup><a href="#src-2">[2]</a></sup><sup><a href="#src-4">[4]</a></sup>
+    </p>
+    <p>
+      <strong>Regulated industries are a step behind but moving fast.</strong> Healthcare administrative AI (prior auth, claims) is in early production; clinical AI is strictly regulated and pilot-stage. Finance is the most data-rich regulated case — 70% of banking executives report using agentic AI, with fraud detection leading. Legal is entering production concentrated around document review with RAG grounding to mitigate the hallucination risk that has already produced court sanctions. <sup><a href="#src-5">[5]</a></sup><sup><a href="#src-6">[6]</a></sup><sup><a href="#src-11">[11]</a></sup>
+    </p>
+    <p>
+      <strong>Pharma shows the largest gap between pilot results and production scale.</strong> The 18-month drug discovery timeline (Insilico Medicine, vs. the 4–6-year average) is the most dramatic documented outcome in any industry — but the 173+ AI-originated drug programs in clinical development include many that use ML-based molecular modelling predating modern agentic architectures. The "self-driving lab" (fully agentic DMTA loop) is real at several large pharma companies but details remain proprietary. <sup><a href="#src-8">[8]</a></sup><sup><a href="#src-9">[9]</a></sup>
+    </p>
+    <p>
+      <strong>The "agentic mesh" is emerging as the enterprise architecture pattern.</strong> Top-performing organisations are consolidating dozens of small pilots into enterprise-wide "digital factories" — unified agentic architectures where specialised agents share data sources and reuse integrations. This prevents technical debt accumulation and allows 70–80% of a function's workload to be handled by digital labour while humans manage exceptions and guardrails.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SOURCES
+═══════════════════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm fade-up" style="transition-delay:60ms;">
+    <ol class="space-y-2" style="list-style:decimal;padding-left:1.5em;">
+      <li id="src-1"><a href="https://mitsloan.mit.edu/ideas-made-to-matter/agentic-ai-explained" target="_blank" rel="noopener">Agentic AI, explained — MIT Sloan Management Review (2025)</a></li>
+      <li id="src-2"><a href="https://www.secondtalent.com/resources/github-copilot-statistics/" target="_blank" rel="noopener">GitHub Copilot Statistics &amp; Adoption Trends [2025] — Second Talent (2025)</a></li>
+      <li id="src-3"><a href="https://www.timesofai.com/industry-insights/agentic-coding-in-software-development/" target="_blank" rel="noopener">Agentic Coding in 2026: AI's Impact on Software Development — Times of AI (2026)</a></li>
+      <li id="src-4"><a href="https://cyntexa.com/blog/agentforce-statistics-and-trends/" target="_blank" rel="noopener">Agentforce Statistics and Trends (2024–2025) — Cyntexa citing Salesforce earnings (2025)</a></li>
+      <li id="src-5"><a href="https://www.deloitte.com/us/en/insights/industry/health-care/agentic-ai-health-care-operating-model-change.html" target="_blank" rel="noopener">Many health care leaders are leaning into agentic AI as adoption hurdles ease — Deloitte Insights (2025)</a></li>
+      <li id="src-6"><a href="https://www.technologyreview.com/2025/09/04/1123023/imagining-the-future-of-banking-with-agentic-ai/" target="_blank" rel="noopener">Reimagining the future of banking with agentic AI — MIT Technology Review (2025-09-04)</a></li>
+      <li id="src-7"><a href="https://www.ey.com/en_ca/insights/banking-capital-markets/the-rise-of-agentic-ai-transforming-fraud-risk-management" target="_blank" rel="noopener">The rise of agentic AI: transforming fraud risk management — EY Canada (2025)</a></li>
+      <li id="src-8"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12298131/" target="_blank" rel="noopener">From Lab to Clinic: How AI Is Reshaping Drug Discovery Timelines — PubMed Central / NLM (2025)</a></li>
+      <li id="src-9"><a href="https://intuitionlabs.ai/articles/measuring-ai-roi-drug-discovery" target="_blank" rel="noopener">Measuring AI ROI in Drug Discovery: Key Metrics &amp; Outcomes — IntuitionLabs (2026)</a></li>
+      <li id="src-10"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12048886/" target="_blank" rel="noopener">The Agentic Era: Why Biopharma Must Embrace AI That Acts, Not Just Informs — PubMed Central / NLM (2025)</a></li>
+      <li id="src-11"><a href="https://www.thomsonreuters.com/en/press-releases/2025/august/thomson-reuters-launches-cocounsel-legal-transforming-legal-work-with-agentic-ai-and-deep-research" target="_blank" rel="noopener">Thomson Reuters Launches CoCounsel Legal — Thomson Reuters press release (2025-08)</a></li>
+      <li id="src-12"><a href="https://leahai.com/news/agentic-ai-legal/" target="_blank" rel="noopener">Agentic AI in Law: Transforming Legal &amp; Enterprise Workflows — Leah AI (2025)</a></li>
+      <li id="src-13"><a href="https://press.siemens.com/global/en/pressrelease/siemens-introduces-ai-agents-industrial-automation" target="_blank" rel="noopener">Siemens introduces AI agents for industrial automation — Siemens Press (2025-05)</a></li>
+      <li id="src-14"><a href="https://www.xcubelabs.com/blog/agentic-ai-in-retail-real-world-examples-and-case-studies/" target="_blank" rel="noopener">Agentic AI in Retail: Real-World Examples and Case Studies — [x]cube LABS (2025)</a></li>
+      <li id="src-15"><a href="https://www.deloitte.com/us/en/insights/topics/technology-management/tech-trends/2026/agentic-ai-strategy.html" target="_blank" rel="noopener">Agentic AI strategy: Deloitte Tech Trends 2026 — Deloitte Insights (2026)</a></li>
+      <li id="src-16"><a href="https://www.battery.com/blog/survey-says-enterprises-shift-from-ai-pilots-to-production-and-agentic-systems-surge-ahead/" target="_blank" rel="noopener">Survey says: Enterprises shift from AI pilots to production — Battery Ventures (2025)</a></li>
+      <li id="src-17"><a href="https://www.deloitte.com/us/en/insights/industry/manufacturing-industrial-products/agentic-supply-chain-artificial-intelligence-manufacturing.html" target="_blank" rel="noopener">The agentic supply chain in manufacturing — Deloitte Insights (2025)</a></li>
+      <li id="src-18"><a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-agentic-commerce-opportunity-how-ai-agents-are-ushering-in-a-new-era-for-consumers-and-merchants" target="_blank" rel="noopener">The agentic commerce opportunity — McKinsey &amp; Company (2025)</a></li>
+      <li id="src-19"><a href="https://scet.berkeley.edu/the-next-next-big-thing-agentic-ais-opportunities-and-risks/" target="_blank" rel="noopener">The Next 'Next Big Thing': Agentic AI's Opportunities and Risks — UC Berkeley SCET (2025)</a></li>
+      <li id="src-20"><a href="https://arxiv.org/html/2507.09023v1" target="_blank" rel="noopener">Accelerating Drug Discovery Through Agentic AI: A Multi-Agent Approach to Laboratory Automation — arXiv preprint (2025)</a></li>
+      <li id="src-21"><a href="https://toppeconsulting.com/cocounsel-vs-harvey-ai-vs-lexis-which-legal-ai-tool-delivers-the-best-roi-in-2025/" target="_blank" rel="noopener">CoCounsel vs. Harvey AI vs. Lexis+: Which Legal AI Tool Delivers the Best ROI in 2025? — Toppe Consulting, citing Vals AI benchmark (2025)</a></li>
+    </ol>
+    <div class="mt-6 pt-4" style="border-top:1px solid #e4e4e7;">
+      <h3 class="font-semibold text-sm mb-3">Video sources (via NotebookLM deep research)</h3>
+      <ol class="space-y-2" start="22" style="list-style:decimal;padding-left:1.5em;">
+        <li id="src-22"><a href="https://www.youtube.com/watch?v=DsRNp3cmJm0" target="_blank" rel="noopener">Agentic AI Explained — McKinsey &amp; Company (YouTube)</a></li>
+        <li id="src-23"><a href="https://www.youtube.com/watch?v=Q6lqxjkHoTI" target="_blank" rel="noopener">Agentic AI in Manufacturing: Impacts, ROI, and the Playbook for 2026–2030 (YouTube)</a></li>
+        <li id="src-24"><a href="https://www.youtube.com/watch?v=IXp9YJYIJ1M" target="_blank" rel="noopener">Agentic AI: Moving Beyond Pilots to Enterprise Impact (YouTube)</a></li>
+        <li id="src-25"><a href="https://www.youtube.com/watch?v=5MBqdvWWiQ8" target="_blank" rel="noopener">NextMed Health 2025: Agentic AI in Healthcare and Beyond (YouTube)</a></li>
+        <li id="src-26"><a href="https://www.youtube.com/watch?v=pgqisYQtHDk" target="_blank" rel="noopener">Top Ten Use Cases of Agentic AI for Enterprises (YouTube)</a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-soft mt-8 py-8" style="border-color:#e4e4e7;">
+  <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-05</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<script>
+// ── Lucide icons ─────────────────────────────────────────────────────────────
+lucide.createIcons();
+
+// ── Scroll progress ───────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── Dark-mode helpers for charts ──────────────────────────────────────────────
+const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const gridColor = isDark ? '#27272a' : '#e4e4e7';
+const tickColor = isDark ? '#a1a1aa' : '#71717a';
+
+// ── Chart 1: Adoption funnel ──────────────────────────────────────────────────
+const chart1Data = {
+  labels: ['Deloitte (stricter def.)', 'Battery Ventures (broader def.)'],
+  datasets: [
+    {
+      label: 'In active production',
+      data: [11, 33],
+      backgroundColor: '#6366F1'
+    },
+    {
+      label: 'Piloting',
+      data: [38, 69],
+      backgroundColor: '#a5b4fc'
+    },
+    {
+      label: 'Exploring / planning',
+      data: [30, 22],
+      backgroundColor: '#e0e7ff'
+    }
+  ]
+};
+new Chart(document.getElementById('chart1'), {
+  type: 'bar',
+  data: chart1Data,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 900, easing: 'easeOutQuart' },
+    plugins: {
+      legend: { labels: { color: tickColor, font: { family: 'Inter', size: 11 } } },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) { return `${ctx.dataset.label}: ${ctx.parsed.y}%`; }
+        }
+      }
+    },
+    scales: {
+      x: { stacked: false, grid: { color: gridColor }, ticks: { color: tickColor } },
+      y: {
+        beginAtZero: true,
+        max: 100,
+        grid: { color: gridColor },
+        ticks: { color: tickColor, callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+// ── Chart 2: Impact metrics bar ───────────────────────────────────────────────
+const chart2Data = {
+  labels: [
+    'Coding speed (Copilot)',
+    'Case resolution (Agentforce)',
+    'Prior-auth automation (MUSC)',
+    'Maint. time cut (Siemens)*',
+    'Catalog processing cut (agents)',
+    'Drug discovery speedup (Insilico)'
+  ],
+  datasets: [{
+    label: 'Reported improvement (%)',
+    data: [51, 84, 40, 25, 90, 75],
+    backgroundColor: [
+      '#6366F1','#6366F1','#818cf8','#a5b4fc','#a5b4fc','#6366F1'
+    ],
+    borderRadius: 4
+  }]
+};
+new Chart(document.getElementById('chart2'), {
+  type: 'bar',
+  data: chart2Data,
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 900, easing: 'easeOutQuart' },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => `${ctx.parsed.x}% improvement`
+        }
+      }
+    },
+    scales: {
+      x: {
+        beginAtZero: true, max: 100,
+        grid: { color: gridColor },
+        ticks: { color: tickColor, callback: v => v + '%' }
+      },
+      y: { grid: { display: false }, ticks: { color: tickColor, font: { size: 11 } } }
+    }
+  }
+});
+
+// ── KPI Cards ─────────────────────────────────────────────────────────────────
+const kpis = [
+  { value: 15, suffix: 'M+', label: 'GitHub Copilot users', note: 'Largest single agentic coding deployment', src: '2' },
+  { value: 29, suffix: 'K+', label: 'Agentforce enterprise deals', note: 'By Q4 FY26; 2.4B agentic work units completed', src: '4' },
+  { value: 173, suffix: '+', label: 'AI drug programs in clinical dev', note: 'Up from ~24 in late 2023', src: '9' },
+  { value: 70, suffix: '%', label: 'Banking execs using agentic AI', note: '16% in active deployment; 52% in pilots', src: '6' }
+];
+
+const kpiGrid = document.getElementById('kpiGrid');
+kpis.forEach((k, i) => {
+  const div = document.createElement('div');
+  div.className = 'kpi scale-in card-hover';
+  div.style.transitionDelay = `${i * 60}ms`;
+  div.innerHTML = `
+    <div class="kpi-value"><span data-target="${k.value}" data-suffix="${k.suffix}">0${k.suffix}</span></div>
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-note">${k.note} <sup><a href="#src-${k.src}">[${k.src}]</a></sup></div>
+  `;
+  kpiGrid.appendChild(div);
+});
+
+// ── Industry cards ────────────────────────────────────────────────────────────
+const industries = [
+  {
+    icon: 'code-2',
+    name: 'Software Engineering',
+    badge: 'production',
+    badgeLabel: 'Production (scaled)',
+    maturity: 95,
+    pattern: 'Plan → Generate → Test → Self-correct',
+    autonomy: 'High (human gates merges)',
+    example: 'GitHub Copilot Agent Mode — 15M+ users, 51% faster task completion, 46% of committed code is AI-generated.',
+    risk: 'Code security leakage',
+    src: '2'
+  },
+  {
+    icon: 'headphones',
+    name: 'Customer Service',
+    badge: 'production',
+    badgeLabel: 'Production (scaled)',
+    maturity: 90,
+    pattern: 'Intent → RAG → Action → Escalate',
+    autonomy: 'High (human for complex cases)',
+    example: 'Salesforce Agentforce: 84% autonomous case resolution internally; Finnair resolves 80% of service questions autonomously.',
+    risk: 'Hallucination, customer trust',
+    src: '4'
+  },
+  {
+    icon: 'heart-pulse',
+    name: 'Healthcare (Admin)',
+    badge: 'early',
+    badgeLabel: 'Early production',
+    maturity: 60,
+    pattern: 'Data aggregation → Multi-source decision',
+    autonomy: 'Medium (human clinical gate)',
+    example: 'MUSC Health: 40% of prior authorisations completed without human involvement; Sentara: thousands of nursing hours reclaimed across 12 hospitals.',
+    risk: 'HIPAA compliance, liability',
+    src: '5'
+  },
+  {
+    icon: 'landmark',
+    name: 'Finance / Banking',
+    badge: 'early',
+    badgeLabel: 'Pilot → Early production',
+    maturity: 65,
+    pattern: 'Monitor → Score → Block / Alert',
+    autonomy: 'Medium–High',
+    example: 'JP Morgan LLM Suite for equity research & contract intelligence; 70% of banking execs report using agentic AI; Goldman Sachs generates 90% of IPO prospectuses via AI agents.',
+    risk: 'Compliance, model risk',
+    src: '6'
+  },
+  {
+    icon: 'scale',
+    name: 'Legal',
+    badge: 'pilot',
+    badgeLabel: 'Pilot → Early production',
+    maturity: 50,
+    pattern: 'Research → Draft → Human review',
+    autonomy: 'Low–Medium (attorney liability)',
+    example: 'Thomson Reuters CoCounsel: bulk review of 10,000 docs; scored 79.5% vs. 50.3% lawyer baseline (Vals AI study). Unnamed legal pilot: 4x reduction in end-to-end workflow time.',
+    risk: 'Hallucinated citations, privilege',
+    src: '11'
+  },
+  {
+    icon: 'flask-conical',
+    name: 'Pharma / Research',
+    badge: 'pilot',
+    badgeLabel: 'Pilot (discovery)',
+    maturity: 45,
+    pattern: 'Literature → Design → Lab → Analyse loop',
+    autonomy: 'Medium (human gates candidate)',
+    example: 'Insilico Medicine: 18 months from target to preclinical vs. 4–6-year average. Moderna: 750+ internal AI agent use cases in production.',
+    risk: 'Reproducibility, IP ownership',
+    src: '8'
+  },
+  {
+    icon: 'factory',
+    name: 'Manufacturing',
+    badge: 'pilot',
+    badgeLabel: 'Pilot → Early production',
+    maturity: 45,
+    pattern: 'Sensor → Diagnose → Action → Dispatch',
+    autonomy: 'Medium (safety gates)',
+    example: 'Siemens: 25% reduction in reactive maintenance time. Bottling plant (Symphony AI/Cognizant): 9% OEE improvement (67% → 76%) in 6 months. Single operator now manages 10 machines.',
+    risk: 'Physical safety, system integration',
+    src: '13'
+  },
+  {
+    icon: 'shopping-cart',
+    name: 'Retail / E-Commerce',
+    badge: 'early',
+    badgeLabel: 'Early production',
+    maturity: 55,
+    pattern: 'Browse → Profile → Recommend → Cart',
+    autonomy: 'Medium–High',
+    example: 'Shopify: 25% higher average order values via personalisation agents. Walmart: 30% fewer out-of-stock events (pilot). Traffic from GenAI sources to retail sites grew 4,700% YoY.',
+    risk: 'Consumer trust, autonomous purchasing',
+    src: '14'
+  },
+  {
+    icon: 'stethoscope',
+    name: 'Healthcare (Clinical)',
+    badge: 'pilot',
+    badgeLabel: 'Pilot / Early stage',
+    maturity: 25,
+    pattern: 'Evidence retrieval → Recommendation',
+    autonomy: 'Low (physician must decide)',
+    example: 'Stanford ChatEHR: proactively surfaces real-world evidence at point of care. Atropos Health Evidence Agent: answers clinical questions within EHR workflow without query.',
+    risk: 'Patient safety, FDA/EMA regulation',
+    src: '5'
+  }
+];
+
+const industryGrid = document.getElementById('industryGrid');
+industries.forEach((ind, i) => {
+  const div = document.createElement('div');
+  div.className = 'industry-card scale-in';
+  div.style.transitionDelay = `${Math.min(i * 60, 400)}ms`;
+
+  const badgeClass = ind.badge === 'production' ? 'badge-production'
+                   : ind.badge === 'early'       ? 'badge-early'
+                   : 'badge-pilot';
+
+  div.innerHTML = `
+    <div class="flex items-start justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <i data-lucide="${ind.icon}" class="w-4 h-4 accent" style="flex-shrink:0;"></i>
+        <span class="font-semibold text-sm">${ind.name}</span>
+      </div>
+      <span class="badge ${badgeClass}" style="white-space:nowrap;">${ind.badgeLabel}</span>
+    </div>
+    <div class="maturity-bar-wrap mb-3">
+      <div style="display:flex;justify-content:space-between;font-size:0.65rem;margin-bottom:3px;">
+        <span class="muted">Maturity</span>
+        <span class="muted">${ind.maturity}%</span>
+      </div>
+      <div class="maturity-bar-bg"><div class="maturity-bar-fill" data-width="${ind.maturity}"></div></div>
+    </div>
+    <p class="text-xs leading-relaxed mb-2" style="color:#52525b;">${ind.example} <sup><a href="#src-${ind.src}">[${ind.src}]</a></sup></p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+      <span style="font-size:0.65rem;background:#f4f4f5;color:#52525b;padding:2px 7px;border-radius:4px;">${ind.pattern}</span>
+      <span class="risk-tag">${ind.risk}</span>
+    </div>
+  `;
+  industryGrid.appendChild(div);
+});
+lucide.createIcons();
+
+// ── Workflow patterns ─────────────────────────────────────────────────────────
+const patterns = [
+  {
+    icon: 'repeat',
+    name: 'Digital Factory Loop',
+    desc: 'Plan → Execute → Test → Refine. High-volume tasks run overnight with a flywheel: human experts review outputs each morning, improving institutional data quality over time. Common in software dev and finance back-office.',
+    examples: ['Overnight invoice reconciliation (finance)', 'Automated coding + test cycle (software)']
+  },
+  {
+    icon: 'alert-triangle',
+    name: 'Detection-to-Resolution',
+    desc: 'Sense → Diagnose → Act → Notify. Agents not only detect anomalies but autonomously resolve them — booking maintenance windows, ordering parts, rerouting production — then notify a human after the fact.',
+    examples: ['Predictive maintenance (Siemens)', 'Quality deformation control (precision manufacturing)']
+  },
+  {
+    icon: 'file-search',
+    name: 'Intake, Enrichment & Verify',
+    desc: 'Ingest unstructured data → extract → match against rules → flag or resolve. Handles compliance-critical tasks that require cross-referencing multiple authoritative sources.',
+    examples: ['KYC / corporate onboarding (banking)', 'Legal contract clause review', 'Prior-authorisation processing (healthcare)']
+  },
+  {
+    icon: 'network',
+    name: 'Agentic Mesh Orchestration',
+    desc: 'A "chief agent" receives a high-level goal and orchestrates specialised sub-agents across HR, Finance, and Operations. Shared data connectors prevent tech debt. Targets 70–80% digital labour coverage per function.',
+    examples: ['Cross-functional cost-reduction programs', 'Enterprise digital workforce programmes']
+  },
+  {
+    icon: 'message-circle-check',
+    name: 'Query Deflection + Escalation',
+    desc: 'First-line agent resolves ~70% of requests autonomously via RAG + action execution (order lookup, refund, ticket). Complex or sensitive cases route to human with pre-compiled context dossier.',
+    examples: ['Salesforce Agentforce (84% autonomous)', 'Finnair (80% autonomous)', 'MUSC Health prior auth (40% fully autonomous)']
+  },
+  {
+    icon: 'user-check',
+    name: 'Tech Lead Review Pattern',
+    desc: 'Agents handle generation and iteration; humans shift to "tech lead" role — reviewing outputs for architectural coherence, safety, and compliance. Acknowledges that AI output is probabilistic and requires structured oversight.',
+    examples: ['GitHub Copilot Agent Mode (developer reviews + merges)', 'CoCounsel (attorney must sign off all legal work)']
+  }
+];
+
+const patternsGrid = document.getElementById('patternsGrid');
+patterns.forEach((p, i) => {
+  const div = document.createElement('div');
+  div.className = 'pattern-card scale-in';
+  div.style.transitionDelay = `${Math.min(i * 60, 400)}ms`;
+  div.innerHTML = `
+    <div class="flex items-center gap-2 mb-2">
+      <i data-lucide="${p.icon}" class="w-4 h-4 accent" style="flex-shrink:0;"></i>
+      <span class="font-semibold text-sm">${p.name}</span>
+    </div>
+    <p class="text-xs leading-relaxed mb-3" style="color:#52525b;">${p.desc}</p>
+    <ul style="padding-left:1.2em;margin:0;">
+      ${p.examples.map(e => `<li style="font-size:0.7rem;color:#a1a1aa;margin-bottom:3px;">${e}</li>`).join('')}
+    </ul>
+  `;
+  patternsGrid.appendChild(div);
+});
+lucide.createIcons();
+
+// ── Timeline ──────────────────────────────────────────────────────────────────
+const milestones = [
+  { year: '2017–2020', label: 'ML-based automation (RPA, predictive analytics) — not agentic', type: 'past' },
+  { year: '2022–2023', label: 'LLM-powered chatbots (ChatGPT, Copilot v1) — prompt→response, no autonomy', type: 'past' },
+  { year: '2023 Q4',   label: 'OpenAI function-calling GA; first agentic frameworks (AutoGPT, LangChain)', type: 'past' },
+  { year: '2024',      label: 'GitHub Copilot Workspace early access; Salesforce Einstein Copilot; multi-agent frameworks mature', type: 'past' },
+  { year: 'Feb 2025',  label: 'GitHub Copilot Agent Mode launched; Siemens industrial AI agents at Automate 2025', type: 'production' },
+  { year: 'Aug 2025',  label: 'Thomson Reuters CoCounsel Legal with agentic workflows launched', type: 'production' },
+  { year: 'Oct 2025',  label: 'Atropos Evidence Agent; Zapier survey: 40% of AI-agent orgs have multiple in production', type: 'production' },
+  { year: 'Q1 2026',   label: 'Finance agentic AI adoption hits ~44% (from <7% in Jan 2025). 173+ AI drug programs in clinical dev.', type: 'current' },
+  { year: '2027 (forecast)', label: 'Gartner: 40%+ of agentic AI projects cancelled due to org/integration failures', type: 'forecast' },
+  { year: '2028 (forecast)', label: 'Gartner: 15% of day-to-day decisions autonomous; 33% of enterprise software includes AI agents', type: 'forecast' },
+  { year: '2030 (forecast)', label: 'McKinsey: agents mediate $3–5 trillion of global consumer commerce; 50% of supply chains use intelligent agents', type: 'forecast' }
+];
+
+const timelineWrap = document.getElementById('timelineWrap');
+milestones.forEach((m, i) => {
+  const div = document.createElement('div');
+  div.className = 'timeline-item fade-left mb-3';
+  div.style.transitionDelay = `${Math.min(i * 70, 420)}ms`;
+
+  const dotColor = m.type === 'current' ? '#6366F1'
+                 : m.type === 'production' ? '#059669'
+                 : m.type === 'forecast' ? '#a1a1aa'
+                 : '#d4d4d8';
+
+  const yearColor = m.type === 'current' ? 'var(--accent)' : m.type === 'production' ? '#059669' : 'inherit';
+
+  div.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:10px;">
+      <div style="width:10px;height:10px;border-radius:999px;background:${dotColor};flex-shrink:0;margin-top:3px;"></div>
+      <div>
+        <span style="font-size:0.7rem;font-weight:700;color:${yearColor};text-transform:uppercase;letter-spacing:0.04em;">${m.year}</span>
+        <p style="font-size:0.82rem;line-height:1.5;margin:2px 0 0;">${m.label}</p>
+      </div>
+    </div>
+  `;
+  timelineWrap.appendChild(div);
+});
+
+// ── Risk cards ────────────────────────────────────────────────────────────────
+const risks = [
+  {
+    icon: 'zap-off',
+    name: 'Hallucinations & Non-Determinism',
+    desc: 'Foundation models produce varied outputs for the same prompt. In multi-step pipelines, errors in one step propagate downstream, compounding the risk. Legal has already seen court sanctions for hallucinated citations.'
+  },
+  {
+    icon: 'infinity',
+    name: 'Runaway Agents & Race Conditions',
+    desc: 'Multi-agent "meshes" can develop race conditions or infinite loops. Experts recommend treating agents as potential "bad actors" and limiting each agent\'s "blast radius" — the scope of actions it can take unilaterally.'
+  },
+  {
+    icon: 'eye-off',
+    name: 'Black-Box Compliance Failures',
+    desc: 'In regulated industries, AI acting as a black box poses severe risks. A healthcare agent managing sepsis or reading X-rays must be provably safe and auditable. Manufacturing agents that miss federal regulation changes can cause costly compliance failures.'
+  },
+  {
+    icon: 'lock',
+    name: 'Data Privacy & Security Exposure',
+    desc: 'Security is the top concern for enterprise deployments. Failure modes include agents inadvertently exposing sensitive databases or cloud storage. Siloed agent builds without unified architecture accumulate security tech debt rapidly.'
+  },
+  {
+    icon: 'users',
+    name: 'Workforce Resistance',
+    desc: 'Real deployments have faced active resistance — including documented cases of workers sabotaging factory equipment to protest AI programmes. If operators see inaccurate agent outputs even a few times, trust collapses entirely.'
+  },
+  {
+    icon: 'trending-down',
+    name: 'Skill Erosion (Junior Roles)',
+    desc: 'Agents handling "straightforward" tasks (initial coding, first-pass research) may deprive junior workers of foundational skill development. The paradox: AI raises the quality floor but may lower the talent pipeline ceiling.'
+  }
+];
+
+const risksGrid = document.getElementById('risksGrid');
+risks.forEach((r, i) => {
+  const div = document.createElement('div');
+  div.className = 'pattern-card scale-in';
+  div.style.transitionDelay = `${Math.min(i * 60, 400)}ms`;
+  div.innerHTML = `
+    <div class="flex items-center gap-2 mb-2">
+      <i data-lucide="${r.icon}" class="w-4 h-4" style="color:#dc2626;flex-shrink:0;"></i>
+      <span class="font-semibold text-sm">${r.name}</span>
+    </div>
+    <p class="text-xs leading-relaxed" style="color:#52525b;">${r.desc}</p>
+  `;
+  risksGrid.appendChild(div);
+});
+lucide.createIcons();
+
+// ── Insight reel ──────────────────────────────────────────────────────────────
+const insights = [
+  {
+    icon: 'code-2',
+    stat: 15,
+    statSuffix: 'M+',
+    statLabel: 'developers on Copilot',
+    headline: 'Software engineering leads in production scale',
+    body: 'GitHub Copilot Agent Mode has 15M+ users across 90% of Fortune 100 companies. Developers complete tasks 51% faster; AI now generates ~46% of all committed code for active users.',
+    color: '#6366F1'
+  },
+  {
+    icon: 'headphones',
+    stat: 84,
+    statSuffix: '%',
+    statLabel: 'cases resolved autonomously',
+    headline: 'Customer service is the most widely adopted use case',
+    body: 'Salesforce Agentforce resolved 84% of support cases autonomously (only 2% required escalation) within its own portal — handling over 1 million conversations/year. 29,000+ enterprise customers by FY26.',
+    color: '#059669'
+  },
+  {
+    icon: 'heart-pulse',
+    stat: 40,
+    statSuffix: '%',
+    statLabel: 'prior-auth without human touch',
+    headline: 'Healthcare administrative AI is entering early production',
+    body: 'MUSC Health agents complete 40% of prior authorisations without human involvement — cutting an average of 14 minutes of physician time per request. Sentara reclaimed thousands of nursing hours across 12 hospitals.',
+    color: '#0ea5e9'
+  },
+  {
+    icon: 'flask-conical',
+    stat: 18,
+    statSuffix: ' mo',
+    statLabel: 'vs. 4–6 year industry avg',
+    headline: 'Pharma shows the most dramatic speed-up in documented pilots',
+    body: 'Insilico Medicine identified a novel IPF drug target and advanced a candidate to preclinical trials in 18 months — at a discovery cost of ~$150,000. 173+ AI-originated drug programs are now in clinical development.',
+    color: '#8b5cf6'
+  },
+  {
+    icon: 'trending-up',
+    stat: 70,
+    statSuffix: '%',
+    statLabel: 'banking execs using agentic AI',
+    headline: 'Finance has the fastest regulated-industry adoption curve',
+    body: '70% of banking executives report using agentic AI (MIT Tech Review survey of 250 execs). Fraud detection is the leading use case — 56% rate it "highly capable." Finance adoption jumped from <7% to ~44% in Q1 2026.',
+    color: '#f59e0b'
+  },
+  {
+    icon: 'alert-triangle',
+    stat: 40,
+    statSuffix: '%',
+    statLabel: 'projects may be cancelled by 2027',
+    headline: 'The biggest barrier is organisational, not technical',
+    body: 'Gartner predicts 40%+ of agentic AI projects will be cancelled by 2027 due to legacy system incompatibility and organisational readiness gaps — not model limitations. Only 11–33% of enterprises have agentic AI in active production.',
+    color: '#dc2626'
+  }
+];
+
+let reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function buildSlide(ins) {
+  return `
+    <div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">
+      <div style="text-align:center;min-width:110px;flex-shrink:0;">
+        <div id="reelStatNum" style="font-size:2.8rem;font-weight:800;color:${ins.color};line-height:1;" data-target="${ins.stat}" data-suffix="${ins.statSuffix}">${ins.stat}${ins.statSuffix}</div>
+        <div style="font-size:0.7rem;color:#71717a;margin-top:4px;">${ins.statLabel}</div>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">${ins.headline}</div>
+        <div style="font-size:0.88rem;color:#71717a;line-height:1.65;">${ins.body}</div>
+      </div>
+    </div>`;
+}
+
+function animateReelStat(target, suffix, color) {
+  const el = document.getElementById('reelStatNum');
+  if (!el) return;
+  const start = performance.now();
+  const duration = 900;
+  const isInt = Number.isInteger(target);
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = (isInt ? Math.round(ease * target) : (ease * target).toFixed(1)) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+function showSlide(idx, animate) {
+  if (reelAnimating) return;
+  reelAnimating = true;
+  reelIdx = ((idx % insights.length) + insights.length) % insights.length;
+
+  const wrap = document.getElementById('reelSlides');
+  const doAnimate = animate !== false;
+
+  if (doAnimate) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+
+  const currentIns = insights[reelIdx];
+
+  setTimeout(() => {
+    wrap.innerHTML = buildSlide(currentIns);
+    lucide.createIcons();
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'none';
+    reelAnimating = false;
+    animateReelStat(currentIns.stat, currentIns.statSuffix, currentIns.color);
+  }, doAnimate ? 350 : 0);
+
+  document.querySelectorAll('.reel-dot').forEach((d, i) => {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    bar.style.transition = 'width 4s linear';
+    bar.style.width = '100%';
+  });
+}
+
+function startReel() { reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000); }
+function stopReel()  { clearInterval(reelTimer); }
+
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;background:#d4d4d8;';
+  d.setAttribute('aria-label', `Slide ${i + 1}`);
+  d.onclick = () => { stopReel(); showSlide(i); startReel(); };
+  dotsWrap.appendChild(d);
+});
+
+// Prev/next arrows via keyboard
+document.getElementById('reel').addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1); startReel(); }
+  if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1); startReel(); }
+});
+
+document.getElementById('reel').addEventListener('mouseenter', stopReel);
+document.getElementById('reel').addEventListener('mouseleave', startReel);
+
+showSlide(0, false);
+startReel();
+
+// ── Animated stat counters (KPI cards) ───────────────────────────────────────
+function animateCounter(el, target, duration, suffix) {
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min((now - start) / (duration || 1200), 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target) + (suffix || '');
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target;
+      animateCounter(el, Number(el.dataset.target), 1200, el.dataset.suffix || '');
+      counterObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+
+document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+
+// ── Maturity bar entrance observer ───────────────────────────────────────────
+const maturityObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const fills = e.target.querySelectorAll('.maturity-bar-fill');
+      fills.forEach(f => { f.style.width = f.dataset.width + '%'; });
+      maturityObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.industry-card').forEach(el => maturityObserver.observe(el));
+
+// Trigger immediately for cards already in view
+document.querySelectorAll('.maturity-bar-fill').forEach(f => {
+  f.setAttribute('data-width', f.style.width || '0');
+});
+
+// ── Entrance observer (fade-up / fade-left / scale-in) ───────────────────────
+if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(el => io.observe(el));
+}
+</script>
+</body>
+</html>
