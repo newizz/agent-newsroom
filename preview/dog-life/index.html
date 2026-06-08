@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dog Life — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --accent: #6366F1;
+    --accent-soft: #6366F11A;
+  }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .card { background: #131316 !important; border-color: #27272a !important; }
+    dd { color: #a1a1aa !important; }
+    .sense-row:nth-child(odd) { background: #0f0f12 !important; }
+    .sense-row:nth-child(even) { background: #131316 !important; }
+    .tl-dot { border-color: #131316 !important; }
+  }
+  .surface { background: #ffffff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* === Animation system === */
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .55s ease, transform .55s ease; }
+    .scale-in  { opacity: 0; transform: scale(0.93);      transition: opacity .45s ease, transform .45s ease; }
+    .visible   { opacity: 1 !important; transform: none !important; }
+  }
+  .card-hover {
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .card-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(99,102,241,.13);
+  }
+
+  /* Prose */
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.7; }
+  .prose-content h3 { font-size: 1.1rem; font-weight: 600; margin: 1.5em 0 0.5em; }
+
+  /* Glossary */
+  dl { display: grid; gap: 1em; }
+  dt { font-weight: 600; }
+  dd { margin-left: 0; color: #71717a; line-height: 1.6; }
+
+  /* Cards */
+  .card { padding: 1.5rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+
+  /* Timeline */
+  .tl-item { display: flex; gap: 1.5rem; padding-bottom: 2rem; position: relative; }
+  .tl-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 36px;
+    bottom: 0;
+    width: 2px;
+    background: #e4e4e7;
+  }
+  .tl-dot {
+    flex-shrink: 0;
+    width: 34px; height: 34px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    border: 3px solid #fafafa;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700; color: var(--accent);
+    z-index: 1;
+  }
+
+  /* Sense table */
+  .sense-row:nth-child(odd)  { background: #f9f9fb; }
+  .sense-row:nth-child(even) { background: #ffffff; }
+
+  /* Stat badge */
+  .stat-badge {
+    display: inline-flex; flex-direction: column; align-items: center;
+    padding: 1rem 1.5rem; border-radius: 1rem;
+    background: var(--accent-soft); min-width: 90px;
+  }
+
+  /* Breed pills */
+  .breed-bar { height: 8px; border-radius: 999px; background: var(--accent); }
+
+  /* Print */
+  @media print {
+    nav, #progress { display: none; }
+    .surface { border: 1px solid #ccc; box-shadow: none; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Scroll progress bar -->
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Header -->
+<header class="border-b border-soft">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      agent-newsroom
+    </a>
+    <div class="text-xs muted">dog-life · 2026-06-08</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-8">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Concept Explainer</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">Dog Life</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">A dog's world is built around scent, routine, and social connection — their nose is up to 100,000× more sensitive than ours, they sleep across 20+ daily cycles, and they form emotional bonds with humans that neurologically mirror infant-caregiver attachment.</p>
+</section>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-4 flex flex-wrap gap-1">
+    <a href="#overview"  class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Overview</a>
+    <a href="#reel-sec"  class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Key Insights</a>
+    <a href="#senses"    class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Senses</a>
+    <a href="#day"       class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">A Dog's Day</a>
+    <a href="#lifecycle" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Life Stages</a>
+    <a href="#breeds"    class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Breed Cognition</a>
+    <a href="#examples"  class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Myth-Busters</a>
+    <a href="#glossary"  class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Glossary</a>
+    <a href="#sources"   class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Sources</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ INSIGHT REEL ═══════════════════════════ -->
+<section id="reel-sec" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="zap" class="w-5 h-5 accent"></i> Key Insights
+  </h2>
+  <div class="surface rounded-2xl overflow-hidden card-hover" id="reel" tabindex="0">
+    <div id="reelSlides" style="position:relative;min-height:180px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ OVERVIEW ═══════════════════════════ -->
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> Overview
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content fade-up">
+    <p>The domestic dog (<em>Canis lupus familiaris</em>) has been selectively bred alongside humans for an estimated <strong>15,000–40,000 years</strong> — long enough to evolve unique cognitive and social traits found in no other animal. Unlike wolves or their closest wild relatives, dogs have developed specialized skills for reading human communication: they follow pointing gestures, use human gaze cues, and even prefer the smell of familiar humans over unfamiliar ones or other dogs.</p>
+    <p>Despite millennia of co-evolution, dogs experience the world through fundamentally <strong>different sensory hierarchies</strong> than we do. For humans, vision is dominant; for dogs, smell is primary, hearing second, and vision a distant third. This inversion shapes nearly everything about how a dog perceives, remembers, and responds to its environment. When your dog pauses to sniff a lamppost for 90 seconds, it isn't being stubborn — it's reading a layered community bulletin board of scent information.</p>
+    <p>Research into dog cognition and emotion has accelerated dramatically since the 2000s. Fields like anthrozoology and canine cognitive science have replaced anthropomorphic guesswork with empirical data — revealing that a dog's inner world is <strong>richer, stranger, and more emotionally sophisticated</strong> than most people assume. Some findings (emotion, time perception, dream content) remain contested and are noted as such throughout this dashboard.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SENSES ═══════════════════════════ -->
+<section id="senses" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="eye" class="w-5 h-5 accent"></i> The Sensory World
+  </h2>
+
+  <!-- Stat badges row -->
+  <div class="flex flex-wrap gap-4 mb-8" id="statBadges">
+    <!-- Filled by JS -->
+  </div>
+
+  <!-- Sense comparison table -->
+  <div class="surface rounded-xl overflow-hidden fade-up mb-8">
+    <div class="px-6 py-4 border-b border-soft font-semibold text-sm">Dog vs. Human Senses</div>
+    <table class="w-full text-sm">
+      <thead>
+        <tr class="border-b border-soft">
+          <th class="text-left px-6 py-3 font-medium muted">Sense</th>
+          <th class="text-left px-6 py-3 font-medium muted">Dog</th>
+          <th class="text-left px-6 py-3 font-medium muted">Human</th>
+          <th class="text-left px-6 py-3 font-medium muted">Dog advantage?</th>
+        </tr>
+      </thead>
+      <tbody id="senseTable"></tbody>
+    </table>
+  </div>
+
+  <!-- Smell deep-dive -->
+  <div class="surface rounded-xl p-8 prose-content fade-up">
+    <h3><i data-lucide="wind" class="w-4 h-4 accent inline-block mr-1"></i> Smell: The Primary Reality</h3>
+    <p>A dog's nose contains approximately <strong>300 million olfactory receptors</strong> compared to a human's 5–6 million. More striking: roughly <strong>33% of a dog's brain volume</strong> is dedicated to odor analysis, versus about 5% in humans — more than six times proportionally. <sup><a href="#src-3">[3]</a></sup></p>
+    <p>Functionally, a dog doesn't just smell <em>stronger</em> — it smells <em>in layers</em>. When a dog enters a room, it can likely detect who was there last, what they ate, whether they were stressed or calm (via stress hormones in perspiration), and how long ago they left (based on scent concentration decay). Researchers describe this as <strong>"smelling in time"</strong> — where humans see a snapshot, dogs experience something closer to a scent-film with a temporal dimension. <sup><a href="#src-3">[3]</a></sup></p>
+    <p>Dogs also smell in <strong>"stereo"</strong> — each nostril can move independently, giving directional information about a scent source, much as binocular vision gives humans depth perception. Detection capabilities documented in peer-reviewed literature include decaying organic matter at 200 m, whale scat at 1.93 km, and individual fingerprints on glass after 24 hours of outdoor weathering. In COVID-19 detection trials, trained dogs achieved <strong>~94% accuracy</strong> — competitive with PCR testing in some protocols. <sup><a href="#src-3">[3]</a></sup></p>
+    <h3><i data-lucide="volume-2" class="w-4 h-4 accent inline-block mr-1"></i> Hearing: Wider and More Directional</h3>
+    <p>Dogs detect frequencies from <strong>40 Hz to 60,000 Hz</strong> — three times the upper limit of humans (20,000 Hz). They can rotate each ear independently using 18 muscles (vs. 6 in humans) to triangulate sounds with precision. Dog whistles work because they operate above the human threshold while remaining clearly audible to dogs. <sup><a href="#src-6">[6]</a></sup></p>
+    <h3><i data-lucide="eye" class="w-4 h-4 accent inline-block mr-1"></i> Vision: Motion Over Clarity</h3>
+    <p>Dogs are <strong>dichromats</strong> — they see blues and yellows vividly, but reds appear yellowish or gray (similar to human red-green color blindness). Visual acuity is approximately <strong>20/75</strong> compared to human 20/20, so fine detail at a distance blurs. However, dogs excel at <strong>motion detection</strong> — spotting a moving object at nearly twice the distance they can see a stationary one — an adaptation from predatory ancestry. The tapetum lucidum gives them superior night vision. <sup><a href="#src-10">[10]</a></sup></p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ A DOG'S DAY ═══════════════════════════ -->
+<section id="day" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="clock" class="w-5 h-5 accent"></i> A Dog's 24-Hour Day
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <!-- Chart -->
+    <div class="surface rounded-xl p-6 fade-up">
+      <div class="text-sm font-semibold mb-4">Typical Activity Pattern (Adult Dog)</div>
+      <canvas id="dayChart" height="200"></canvas>
+      <p class="text-xs muted mt-3">Bimodal activity peaks (8–10 a.m. and 5–11 p.m.) correlate with human household activity. Based on NC State 2020 study of 42 dogs. <sup><a href="#src-2">[2]</a></sup></p>
+    </div>
+    <!-- Sleep facts -->
+    <div class="surface rounded-xl p-6 fade-up prose-content">
+      <h3 class="mt-0">Sleep: 12–14 Hours, 20+ Cycles</h3>
+      <p>Adult dogs average <strong>12–14 hours of sleep per day</strong> (puppies and seniors sleep more). Unlike humans who cycle through 4–5 sleep stages per night, dogs cycle through <strong>20 or more</strong> brief sleep-wake transitions daily. Each dog sleep cycle — light sleep, deep sleep, REM — lasts roughly 20–45 minutes, compared to a human's 90-minute cycle. <sup><a href="#src-2">[2]</a></sup></p>
+      <p>Dogs do experience <strong>REM sleep</strong>, observable as twitching paws, flicking eyes, and soft vocalizations. Whether this constitutes dreaming in a cognitive sense remains unconfirmed, but the physiological indicators are present.</p>
+      <p>The bimodal activity pattern (two peaks flanking a midday lull) confirms that <strong>domestic dogs entrain their schedule to ours</strong> rather than to purely biological rhythms. Weekend activity was significantly higher than weekday in the NC State study — tracking human presence at home. <sup><a href="#src-2">[2]</a></sup></p>
+      <h3>Time Perception: Clocks Without Hands</h3>
+      <p>Dogs gauge elapsed time through: <strong>fading scent cues</strong> (owner's scent decays), <strong>body state</strong> (hunger, elimination urgency), <strong>environmental cues</strong> (daylight angle, household sounds), and possibly circadian rhythm. A 2011 study found dogs react more intensely to 2-hour and 4-hour absences than 30-minute ones — but show no difference between 2 and 4 hours. This suggests a <strong>perceptual threshold</strong> ("a while") rather than a linear time scale. <sup><a href="#src-1">[1]</a></sup></p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ LIFE STAGES ═══════════════════════════ -->
+<section id="lifecycle" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="git-branch" class="w-5 h-5 accent"></i> Life Stages
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <div id="timeline"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SOCIAL & EMOTIONAL ═══════════════════════════ -->
+<section class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="heart" class="w-5 h-5 accent"></i> Social &amp; Emotional World
+  </h2>
+  <div class="grid md:grid-cols-3 gap-4" id="socialCards"></div>
+  <div class="surface rounded-xl p-8 mt-6 prose-content fade-up">
+    <h3>The Oxytocin Loop</h3>
+    <p>The human-dog bond has a measurable neurochemical basis: <strong>mutual gaze between dogs and their owners triggers oxytocin release in both species</strong> — the same hormone involved in parent-infant bonding. This cross-species oxytocin loop appears to be a genuine evolutionary adaptation unique to dogs among domesticated animals. Dogs have also evolved <strong>19 distinct referential gestures</strong> used specifically to communicate with humans — pointing, alternating gaze between a person and an object — not seen with other dogs. <sup><a href="#src-4">[4]</a></sup></p>
+    <p>Communication is primarily visual and chemical, not vocal. Key signals include <strong>tail direction</strong> (right-biased wagging = positive emotion, left-biased = negative), ear carriage, hackle height, eye softness or hardness, and whole-body posture. Vocalizations — barks, growls, whines, howls — are secondary signals rich with contextual meaning. <sup><a href="#src-4">[4]</a></sup> <sup><a href="#src-6">[6]</a></sup></p>
+    <p>Dogs also respond to human emotional states beyond conditioning. Research shows dogs can <strong>distinguish between stressed and calm human body odors</strong> and adjust their behavior accordingly — seeking proximity when owners are distressed, becoming more vigilant themselves.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ BREED COGNITION ═══════════════════════════ -->
+<section id="breeds" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="bar-chart-2" class="w-5 h-5 accent"></i> Breed Cognitive Profiles
+  </h2>
+  <div class="surface rounded-xl p-6 fade-up">
+    <p class="text-sm muted mb-6">From a study of 1,002 dogs across 13 breeds — significant differences in social cognition, inhibitory control, and problem-solving. <strong>No breed differences</strong> in memory or logical reasoning: intelligence is multidimensional. <sup><a href="#src-5">[5]</a></sup></p>
+    <div id="breedChart"></div>
+    <p class="text-xs muted mt-4">Scores are relative (0–10 scale, derived from study rankings). No breed ranked highest on all dimensions — "smartest breed" is a meaningless concept.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ MYTH-BUSTERS / EXAMPLES ═══════════════════════════ -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> Myth-Busters &amp; Worked Examples
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4" id="exampleCards"></div>
+</section>
+
+<!-- ═══════════════════════════ GLOSSARY ═══════════════════════════ -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> Key Terms
+  </h2>
+  <div class="surface rounded-xl p-8 fade-up">
+    <dl>
+      <div><dt>Dichromat</dt><dd>An animal with two types of color receptors, perceiving a narrower color spectrum than trichromats. Dogs see blues and yellows vividly but cannot distinguish reds from greens.</dd></div>
+      <div><dt>Tapetum lucidum</dt><dd>A reflective tissue layer behind the retina that bounces light back through it, greatly improving low-light vision. Responsible for "eyeshine" in photographs.</dd></div>
+      <div><dt>Olfactory receptor</dt><dd>A sensory cell in the nasal epithelium that binds odor molecules and sends signals to the brain's olfactory bulb. Dogs have ~300 million; humans ~5–6 million.</dd></div>
+      <div><dt>Appeasement signals</dt><dd>Behavioral displays used to reduce perceived threat: lowered head, averted gaze, tail tucking, yawning, nose-licking. Often misread as "guilt" by owners.</dd></div>
+      <div><dt>Socialization window</dt><dd>The critical developmental period (roughly 3–12 weeks in dogs) during which new experiences establish lifelong behavioral baselines. Under-socialization during this window significantly raises adult fear and aggression risk.</dd></div>
+      <div><dt>Bimodal activity pattern</dt><dd>A daily rhythm with two distinct activity peaks separated by a rest trough — in dogs, morning (8–10 a.m.) and evening (5–11 p.m.) peaks flanking a midday lull.</dd></div>
+      <div><dt>Referential gesture</dt><dd>A communicative gesture that directs attention toward an object or location (e.g., pointing, alternating gaze). Dogs use 19 distinct referential gestures specifically with humans.</dd></div>
+      <div><dt>Inhibitory control</dt><dd>The cognitive ability to suppress an impulse — e.g., resisting the urge to grab a treat on command, or suppressing a predatory lunge. Varies significantly by breed.</dd></div>
+      <div><dt>Separation-related behavior (SRB)</dt><dd>Umbrella term for problem behaviors when alone: destructive behavior, vocalization, indoor elimination, self-harm. Affects up to 56% of domestic dogs. Stems from fear, frustration, or panic — not just "anxiety."</dd></div>
+      <div><dt>Oxytocin</dt><dd>A neuropeptide associated with social bonding and trust. Released during mutual gaze in both dogs and humans — the neurochemical foundation of the human-dog bond.</dd></div>
+      <div><dt>Crepuscular</dt><dd>Naturally most active at dawn and dusk. Dogs are biologically crepuscular but behaviorally flexible, adjusting readily to human schedules.</dd></div>
+      <div><dt>Episodic memory</dt><dd>Memory of specific past events with temporal context. Dogs show strong working memory but limited evidence of true episodic memory as humans experience it.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ SOURCES ═══════════════════════════ -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm fade-up">
+    <ol class="space-y-3" style="padding-left:1.25rem;">
+      <li id="src-1">McConnell, P. (2011). "Do Dogs 'Know' How Long We've Been Gone?" — <em>Patricia McConnell / The Other End of the Leash</em>. <a href="https://www.patriciamcconnell.com/theotherendoftheleash/do-dogs-know-how-long-weve-been-gone/" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-2">NC State University (2020, Dec). "Study Sets Baseline for Sleep Patterns in Healthy Adult Dogs." — <em>NC State University News</em>. <a href="https://news.ncsu.edu/2020/12/study-adult-dogs-sleep/" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-3">Jezierski T et al. (2021). "Canine Olfaction: Physiology, Behavior, and Possibilities for Applied Working Animal Programs." — <em>Frontiers in Veterinary Science / PubMed Central</em>. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8388720/" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-4">Albuquerque N et al. (2018). "Communication in Dogs." — <em>Animals (MDPI) / PubMed Central</em>. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6116041/" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-5">Espinosa J et al. (2022). "Breed differences in social cognition, inhibitory control, and spatial problem-solving ability in the domestic dog." — <em>Scientific Reports / PubMed Central</em>. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9800387/" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-6">VCA Veterinary Staff (2023). "Canine Communication — Interpreting Dog Language." — <em>VCA Animal Hospitals</em>. <a href="https://vcahospitals.com/know-your-pet/canine-communication---interpreting-dog-language" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-7">University of Lincoln (2020, Mar 18). "New Research Unpicks Root Causes of Separation Anxiety in Dogs." — <em>ScienceDaily</em>. <a href="https://www.sciencedaily.com/releases/2020/03/200318104429.htm" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-8">Mendes de Carvalho AC et al. (2021). "Separation-related behavior of dogs shows association with their reactions to everyday situations…" — <em>Scientific Reports / PubMed Central</em>. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8479053/" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-9">Wikipedia contributors (2024). "Dog Sense of Smell." — <em>Wikipedia</em>. <a href="https://en.wikipedia.org/wiki/Dog_sense_of_smell" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-10">Coren, S. (2017, Dec). "Compared to Humans, How Good Is a Dog's Visual Acuity?" — <em>Psychology Today</em>. <a href="https://www.psychologytoday.com/us/blog/canine-corner/201712/compared-humans-how-good-is-dogs-visual-acuity" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-11">Pet Wellbeing Editorial Team (2023). "Understanding Your Dog's Four Major Life Stages." — <em>Pet Wellbeing</em>. <a href="https://petwellbeing.com/blogs/news/understanding-your-dogs-four-major-life-stages" target="_blank" rel="noopener">Link</a></li>
+      <li id="src-12">Zager A et al. (2020, Dec 21). "A functional linear modeling approach to sleep–wake cycles in dogs." — <em>Scientific Reports / Nature</em>. <a href="https://www.nature.com/articles/s41598-020-79274-2" target="_blank" rel="noopener">Link</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-08</div>
+    <div class="flex items-center gap-4">
+      <button onclick="window.print()" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="printer" class="w-4 h-4"></i> Print
+      </button>
+      <a href="../../" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="home" class="w-4 h-4"></i> Office
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Lucide icons ─────────────────────────────────────────────────────────────
+lucide.createIcons();
+
+// ── Scroll progress bar ───────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── Animated counter ─────────────────────────────────────────────────────────
+function animateCounter(el, target, duration, suffix) {
+  duration = duration || 1200;
+  suffix = suffix || '';
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(e.target, Number(e.target.dataset.target), 1200, e.target.dataset.suffix || '');
+      counterObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+// ── Entrance animations ───────────────────────────────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.07 });
+
+// ── Insight reel data ─────────────────────────────────────────────────────────
+const insights = [
+  {
+    icon: 'wind',
+    stat: '300M',
+    statNum: 300,
+    statSuffix: 'M',
+    statLabel: 'olfactory receptors',
+    headline: 'A nose 100,000× more powerful than yours',
+    body: 'Dogs have 300 million olfactory receptors vs. 5–6 million in humans. Their brain devotes 33% of volume to smell processing — over 6× the proportion in humans.',
+    color: '#6366F1'
+  },
+  {
+    icon: 'moon',
+    stat: '14hrs',
+    statNum: 14,
+    statSuffix: 'hrs',
+    statLabel: 'of sleep per day',
+    headline: 'Dogs sleep across 20+ brief daily cycles',
+    body: 'Adult dogs average 12–14 hours of sleep per day, cycling through 20+ short sleep-wake transitions — far more than humans\' 4–5 nightly cycles.',
+    color: '#8B5CF6'
+  },
+  {
+    icon: 'heart',
+    stat: '56%',
+    statNum: 56,
+    statSuffix: '%',
+    statLabel: 'experience separation issues',
+    headline: 'More than half of dogs struggle with separation',
+    body: 'Up to 56% of domestic dogs experience clinically significant separation-related distress — destructive behavior, howling, or indoor elimination when left alone.',
+    color: '#EF4444'
+  },
+  {
+    icon: 'users',
+    stat: '19',
+    statNum: 19,
+    statSuffix: '',
+    statLabel: 'referential gestures',
+    headline: 'Dogs evolved 19 unique human-directed gestures',
+    body: 'Dogs use 19 distinct referential gestures specifically to communicate with humans — pointing their gaze between a person and an object — not used with other dogs.',
+    color: '#10B981'
+  },
+  {
+    icon: 'zap',
+    stat: '94%',
+    statNum: 94,
+    statSuffix: '%',
+    statLabel: 'COVID detection accuracy',
+    headline: 'A dog\'s nose can detect disease at near-PCR accuracy',
+    body: 'In controlled COVID-19 detection trials, trained dogs achieved ~94% accuracy. Dogs can also detect individual fingerprints on glass after 24 hours of outdoor weathering.',
+    color: '#F59E0B'
+  },
+  {
+    icon: 'bar-chart-2',
+    stat: '1002',
+    statNum: 1002,
+    statSuffix: '',
+    statLabel: 'dogs studied',
+    headline: 'Breed shapes how a dog thinks, not just how it looks',
+    body: 'A study of 1,002 dogs across 13 breeds found significant breed differences in inhibitory control, problem-solving, and human-directed behavior — but no breed differences in memory or logical reasoning.',
+    color: '#6366F1'
+  }
+];
+
+let reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function buildSlide(ins) {
+  return `
+    <div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">
+      <div style="text-align:center;min-width:110px;flex-shrink:0;">
+        <div class="reel-stat" style="font-size:2.6rem;font-weight:800;color:${ins.color};line-height:1;">${ins.stat}</div>
+        <div style="font-size:0.68rem;color:#71717a;margin-top:4px;">${ins.statLabel}</div>
+      </div>
+      <div style="flex:1;min-width:200px;">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">${ins.headline}</div>
+        <div style="font-size:0.88rem;color:#71717a;line-height:1.65;">${ins.body}</div>
+      </div>
+    </div>`;
+}
+
+function showSlide(idx, animate) {
+  if (reelAnimating) return;
+  animate = animate !== false;
+  reelAnimating = true;
+  reelIdx = ((idx % insights.length) + insights.length) % insights.length;
+
+  const wrap = document.getElementById('reelSlides');
+  if (animate) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+  setTimeout(() => {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'none';
+    reelAnimating = false;
+  }, animate ? 350 : 0);
+
+  document.querySelectorAll('.reel-dot').forEach((d, i) => {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    bar.style.transition = 'width 4s linear';
+    bar.style.width = '100%';
+  });
+}
+
+function startReel() { reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000); }
+function stopReel()  { clearInterval(reelTimer); }
+
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;';
+  d.style.background = i === 0 ? 'var(--accent)' : '#d4d4d8';
+  d.onclick = () => { stopReel(); showSlide(i); startReel(); };
+  dotsWrap.appendChild(d);
+});
+
+document.getElementById('reel').addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1); startReel(); }
+  if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1); startReel(); }
+});
+document.getElementById('reel').addEventListener('mouseenter', stopReel);
+document.getElementById('reel').addEventListener('mouseleave', startReel);
+showSlide(0, false);
+startReel();
+
+// ── Stat badges ───────────────────────────────────────────────────────────────
+const statData = [
+  { label: 'Olfactory receptors', value: 300, suffix: 'M', sub: 'vs 5–6M human' },
+  { label: 'Daily sleep hours', value: 14, suffix: 'hrs', sub: 'avg adult dog' },
+  { label: 'Sleep cycles/day', value: 20, suffix: '+', sub: 'vs 4–5 human nightly' },
+  { label: 'Separation issues', value: 56, suffix: '%', sub: 'of domestic dogs' },
+  { label: 'Hearing range', value: 60, suffix: 'kHz', sub: 'vs 20 kHz human max' }
+];
+
+const badgeWrap = document.getElementById('statBadges');
+statData.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'stat-badge scale-in card-hover';
+  el.style.transitionDelay = `${Math.min(i * 60, 300)}ms`;
+  const num = document.createElement('div');
+  num.style.cssText = 'font-size:1.8rem;font-weight:800;color:var(--accent);line-height:1;';
+  num.dataset.target = s.value;
+  num.dataset.suffix = s.suffix;
+  num.textContent = s.value + s.suffix;
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-size:0.65rem;font-weight:600;margin-top:4px;text-align:center;';
+  lbl.textContent = s.label;
+  const sub = document.createElement('div');
+  sub.style.cssText = 'font-size:0.6rem;color:#71717a;margin-top:2px;text-align:center;';
+  sub.textContent = s.sub;
+  el.appendChild(num);
+  el.appendChild(lbl);
+  el.appendChild(sub);
+  badgeWrap.appendChild(el);
+  counterObserver.observe(num);
+  io.observe(el);
+});
+
+// ── Senses table ──────────────────────────────────────────────────────────────
+const senses = [
+  { sense: 'Smell', dog: '300M receptors, 1 ppt detection', human: '5–6M receptors, ~1 ppb detection', adv: true },
+  { sense: 'Hearing range', dog: '40–60,000 Hz', human: '20–20,000 Hz', adv: true },
+  { sense: 'Ear direction', dog: '18 muscles, rotatable', human: '6 muscles, minimal rotation', adv: true },
+  { sense: 'Vision acuity', dog: '20/75', human: '20/20', adv: false },
+  { sense: 'Color range', dog: '2 colors (dichromat)', human: '3 colors (trichromat)', adv: false },
+  { sense: 'Night vision', dog: 'Tapetum lucidum enhances', human: 'No reflective layer', adv: true },
+  { sense: 'Motion detection', dog: 'Double the distance vs. static', human: 'Less sensitive', adv: true }
+];
+
+const tbody = document.getElementById('senseTable');
+senses.forEach((row, i) => {
+  const tr = document.createElement('tr');
+  tr.className = 'sense-row border-b border-soft';
+  tr.innerHTML = `
+    <td class="px-6 py-3 font-medium">${row.sense}</td>
+    <td class="px-6 py-3">${row.dog}</td>
+    <td class="px-6 py-3 muted">${row.human}</td>
+    <td class="px-6 py-3">
+      <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.78rem;font-weight:600;padding:2px 8px;border-radius:999px;
+        background:${row.adv ? '#dcfce7' : '#fee2e2'};color:${row.adv ? '#16a34a' : '#dc2626'};">
+        ${row.adv ? '✓ Dog wins' : '✗ Human wins'}
+      </span>
+    </td>`;
+  tbody.appendChild(tr);
+});
+
+// ── Activity chart ────────────────────────────────────────────────────────────
+const dayCtx = document.getElementById('dayChart').getContext('2d');
+const hours = ['12a','2a','4a','6a','8a','10a','12p','2p','4p','6p','8p','10p'];
+const activity = [5, 3, 2, 8, 72, 68, 20, 18, 22, 65, 80, 55];
+let dayChart = null;
+
+const chartObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !dayChart) {
+      dayChart = new Chart(dayCtx, {
+        type: 'bar',
+        data: {
+          labels: hours,
+          datasets: [{
+            label: 'Activity level',
+            data: activity,
+            backgroundColor: activity.map(v => v > 50 ? '#6366F1' : '#6366F144'),
+            borderRadius: 6,
+            borderSkipped: false
+          }]
+        },
+        options: {
+          animation: { duration: 900, easing: 'easeOutQuart' },
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { display: false, beginAtZero: true },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+          }
+        }
+      });
+      chartObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+chartObserver.observe(document.getElementById('dayChart'));
+
+// ── Life stages timeline ──────────────────────────────────────────────────────
+const stages = [
+  { age: '0–2 wks', label: 'Neonatal', icon: '🐾', color: '#8B5CF6',
+    desc: 'Born blind, deaf, entirely dependent on mother. Only touch and taste active.' },
+  { age: '2–3 wks', label: 'Transitional', icon: '👀', color: '#6366F1',
+    desc: 'Eyes and ears open. First wobbly steps. First social interactions begin.' },
+  { age: '3–12 wks', label: 'Socialization Window', icon: '🌍', color: '#10B981',
+    desc: 'Critical period — positive exposures now shape lifelong fear thresholds. Window closes at ~12 weeks. Under-socialized puppies are significantly more prone to fear and aggression as adults.' },
+  { age: '3–6 mo', label: 'Juvenile', icon: '⚡', color: '#F59E0B',
+    desc: 'Rapid growth, intense curiosity, baby teeth erupting. Learning is fast but attention spans are short.' },
+  { age: '6–18 mo', label: 'Adolescence', icon: '🔥', color: '#EF4444',
+    desc: 'Most misunderstood stage. Impulse control still developing (like human teenagers). Second fear period. Sexual maturity arrives. Many dogs are surrendered to shelters during this stage.' },
+  { age: '2–7 yrs', label: 'Prime Adulthood', icon: '💪', color: '#6366F1',
+    desc: 'Behavior stabilizes. Routines solidify. Peak physical capability and most predictable temperament.' },
+  { age: '7–9 yrs', label: 'Mature / Early Senior', icon: '🌤', color: '#8B5CF6',
+    desc: 'Slowing evident in large breeds. Small breeds (e.g. Chihuahuas) may still be mid-life.' },
+  { age: '9+ yrs', label: 'Senior', icon: '🌙', color: '#71717a',
+    desc: 'Increased sleep, reduced activity. Cognitive dysfunction (canine dementia) and sensory decline possible. Note: giant breeds (Great Danes) can reach senior status at age 5–6.' }
+];
+
+const tlWrap = document.getElementById('timeline');
+stages.forEach((s, i) => {
+  const div = document.createElement('div');
+  div.className = 'tl-item fade-left';
+  div.style.transitionDelay = `${Math.min(i * 70, 420)}ms`;
+  div.innerHTML = `
+    <div class="tl-dot" style="background:${s.color}22;color:${s.color};">${s.icon}</div>
+    <div style="padding-top:4px;flex:1;">
+      <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;">
+        <span style="font-weight:700;font-size:0.9rem;">${s.label}</span>
+        <span class="muted" style="font-size:0.75rem;">${s.age}</span>
+      </div>
+      <p style="margin:0;font-size:0.88rem;line-height:1.65;color:#52525b;">${s.desc}</p>
+    </div>`;
+  tlWrap.appendChild(div);
+  io.observe(div);
+});
+
+// ── Social cards ──────────────────────────────────────────────────────────────
+const socialItems = [
+  { icon: 'activity', val: 56, suf: '%', label: 'Separation distress', desc: 'Up to 56% of domestic dogs experience clinically significant separation-related problems. Destructive behavior, howling, and elimination are the main manifestations.', cite: '[7]', citeId: 'src-7' },
+  { icon: 'eye', val: 19, suf: '', label: 'Referential gestures', desc: 'Dogs have evolved 19 distinct gestures used specifically with humans — a unique evolutionary adaptation not seen in any other domesticated animal.', cite: '[4]', citeId: 'src-4' },
+  { icon: 'heart', val: 94, suf: '%', label: 'COVID detection accuracy', desc: 'Dogs\' olfactory abilities extend to medical detection. Trained dogs detect COVID-19 at ~94% accuracy — competitive with lab testing in some protocols.', cite: '[3]', citeId: 'src-3' }
+];
+
+const socialWrap = document.getElementById('socialCards');
+socialItems.forEach((item, i) => {
+  const el = document.createElement('div');
+  el.className = 'card card-hover scale-in';
+  el.style.transitionDelay = `${Math.min(i * 60, 300)}ms`;
+  const numEl = document.createElement('div');
+  numEl.style.cssText = 'font-size:2.2rem;font-weight:800;color:var(--accent);line-height:1;margin-bottom:8px;';
+  numEl.dataset.target = item.val;
+  numEl.dataset.suffix = item.suf;
+  numEl.textContent = item.val + item.suf;
+  el.innerHTML = `
+    <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#a1a1aa;margin-bottom:6px;">${item.label}</div>`;
+  el.insertBefore(numEl, el.firstChild);
+  el.insertAdjacentHTML('beforeend', `
+    <p style="font-size:0.85rem;line-height:1.6;color:#71717a;margin:0 0 8px;">${item.desc}</p>
+    <sup><a href="#${item.citeId}">${item.cite}</a></sup>`);
+  socialWrap.appendChild(el);
+  counterObserver.observe(numEl);
+  io.observe(el);
+});
+
+// ── Breed chart ───────────────────────────────────────────────────────────────
+const breeds = [
+  { name: 'Border Collie / Aussie Shepherd', inhibitory: 9, human: 8, independent: 2 },
+  { name: 'Golden Retriever / Kelpie',       inhibitory: 6, human: 10, independent: 2 },
+  { name: 'German Shepherd / Malinois',      inhibitory: 6, human: 5, independent: 9 },
+  { name: 'Small / Toy Breeds',             inhibitory: 4, human: 8, independent: 3 }
+];
+
+const breedWrap = document.getElementById('breedChart');
+const dims = [
+  { key: 'inhibitory', label: 'Inhibitory Control', color: '#6366F1' },
+  { key: 'human',      label: 'Human-Directed Behavior', color: '#10B981' },
+  { key: 'independent', label: 'Independent Work', color: '#F59E0B' }
+];
+
+breeds.forEach((b, bi) => {
+  const row = document.createElement('div');
+  row.className = 'mb-5 fade-up';
+  row.style.transitionDelay = `${bi * 80}ms`;
+  row.innerHTML = `<div style="font-weight:600;font-size:0.88rem;margin-bottom:8px;">${b.name}</div>`;
+  dims.forEach(d => {
+    const pct = (b[d.key] / 10) * 100;
+    row.insertAdjacentHTML('beforeend', `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px;">
+        <div style="width:140px;font-size:0.72rem;color:#71717a;flex-shrink:0;">${d.label}</div>
+        <div style="flex:1;background:#e4e4e7;border-radius:999px;height:8px;">
+          <div class="breed-bar" style="width:0%;background:${d.color};" data-pct="${pct}"></div>
+        </div>
+        <div style="width:28px;font-size:0.75rem;font-weight:600;color:${d.color};text-align:right;">${b[d.key]}/10</div>
+      </div>`);
+  });
+  breedWrap.appendChild(row);
+  io.observe(row);
+});
+
+// Animate breed bars on scroll
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.breed-bar').forEach(bar => {
+        setTimeout(() => {
+          bar.style.transition = 'width .8s ease';
+          bar.style.width = bar.dataset.pct + '%';
+        }, 100);
+      });
+      barObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('#breedChart > div').forEach(el => barObserver.observe(el));
+
+// ── Myth-buster / example cards ───────────────────────────────────────────────
+const examples = [
+  {
+    icon: '🏠',
+    title: 'The Returning Owner',
+    myth: 'Your dog greets you with frenetic energy after 8 hours — the same as after 2 hours. Not because both durations feel identical.',
+    reality: 'Both exceeded the "a while away" threshold. Your scent has faded, hunger has cycled, daylight has shifted. The reunion behavior is a social bonding ritual, not a calibrated response to duration.',
+    cite: '[1]', citeId: 'src-1'
+  },
+  {
+    icon: '👃',
+    title: 'The Sniff Stop',
+    myth: 'Your dog pauses 90 seconds to sniff one patch of sidewalk. You tug the leash, thinking it\'s laziness.',
+    reality: 'In those 90 seconds your dog may be reading which neighborhood dogs passed, when (scent decay), their health status, whether any females were in heat, and stress signatures. For a nose-first animal, this is reading a community bulletin board.',
+    cite: '[3]', citeId: 'src-3'
+  },
+  {
+    icon: '😔',
+    title: 'The "Guilty Look" Myth',
+    myth: 'You come home to a chewed shoe. Your dog immediately drops its head, averts its eyes. You conclude it "knows it did wrong."',
+    reality: 'Research confirms the dog is reading your body language — tense posture, direct eye contact, changed tone — and producing appeasement signals to reduce perceived threat. The same display appears whether or not the dog chewed the shoe.',
+    cite: '[6]', citeId: 'src-6'
+  },
+  {
+    icon: '🎨',
+    title: 'Color Blind, Not Blind',
+    myth: 'Dogs "see in black and white" — a common myth.',
+    reality: 'Dogs are dichromats: they see blues and yellows vividly. Reds appear yellowish or gray. Think of it as red-green color blindness. Their real visual superpower is motion detection — spotting movement at twice the distance they can see a stationary object.',
+    cite: '[10]', citeId: 'src-10'
+  }
+];
+
+const exWrap = document.getElementById('exampleCards');
+examples.forEach((ex, i) => {
+  const el = document.createElement('div');
+  el.className = 'card card-hover fade-up';
+  el.style.transitionDelay = `${Math.min(i * 60, 240)}ms`;
+  el.innerHTML = `
+    <div style="font-size:2rem;margin-bottom:12px;">${ex.icon}</div>
+    <div style="font-weight:700;font-size:1rem;margin-bottom:10px;">${ex.title}</div>
+    <div style="font-size:0.82rem;color:#71717a;margin-bottom:10px;padding:8px 12px;background:var(--accent-soft);border-radius:6px;line-height:1.6;">
+      <span style="font-weight:600;color:var(--accent);">Common assumption:</span> ${ex.myth}
+    </div>
+    <div style="font-size:0.85rem;line-height:1.65;margin-bottom:8px;">${ex.reality}</div>
+    <sup><a href="#${ex.citeId}">${ex.cite}</a></sup>`;
+  exWrap.appendChild(el);
+  io.observe(el);
+});
+
+// ── Observe all fade-up / fade-left / scale-in in DOM ────────────────────────
+document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(el => io.observe(el));
+
+</script>
+</body>
+</html>

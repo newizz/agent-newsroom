@@ -1,8 +1,8 @@
 {
-  "currentRun": null,
-  "currentSlug": null,
-  "currentMode": null,
-  "lastUpdate": "2026-06-05T05:00:47Z",
+  "currentRun": "dog-life",
+  "currentSlug": "dog-life",
+  "currentMode": "quick",
+  "lastUpdate": "2026-06-08T06:08:48Z",
   "agents": [
     {
       "id": "intake",
@@ -25,7 +25,7 @@
       "name": "Rin",
       "role": "Deep Researcher",
       "emoji": "🧬",
-      "status": "idle",
+      "status": "offline",
       "task": ""
     },
     {
