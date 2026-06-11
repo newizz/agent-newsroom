@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industrial AI with Agentic AI — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --accent: #6366F1;
+    --accent-soft: #6366F11A;
+    --accent-line: #6366F133;
+  }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .kpi { background: #131316 !important; border-color: #27272a !important; }
+    .reel-card { background: #131316 !important; }
+    .vertical-card { background: #131316 !important; border-color: #27272a !important; }
+    .tech-pill { background: #1e1e24 !important; border-color: #27272a !important; }
+    .vendor-chip { background: #1e1e24 !important; }
+    .barrier-item { background: #131316 !important; border-color: #27272a !important; }
+    .deep-synth { background: #0f0f18 !important; border-color: #4338ca !important; }
+  }
+
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Scroll progress */
+  #scroll-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+    background: var(--accent); z-index: 9999; transition: width 0.1s linear;
+  }
+
+  /* KPI */
+  .kpi { padding: 1.25rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .kpi-value { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent); }
+  .kpi-label { font-size: 0.8rem; color: #71717a; margin-bottom: 0.25rem; }
+  .kpi-delta { font-size: 0.75rem; margin-top: 0.5rem; }
+  .kpi-delta.up { color: #059669; }
+  .kpi-delta.down { color: #dc2626; }
+
+  /* Prose */
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.7; }
+
+  /* Deep synthesis callout */
+  .deep-synth {
+    border-left: 4px solid var(--accent);
+    background: #f0f0ff;
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+  }
+  .deep-synth-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+
+  /* Reel */
+  .reel-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: #fff;
+    border: 1px solid #e4e4e7;
+    min-height: 320px;
+  }
+  .reel-card {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 2.5rem;
+    opacity: 0; transform: translateY(12px);
+    transition: opacity 350ms ease, transform 350ms ease;
+    pointer-events: none;
+    background: #fff;
+  }
+  .reel-card.active {
+    opacity: 1; transform: translateY(0);
+    pointer-events: auto;
+  }
+  .reel-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .reel-stat-big { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .reel-stat-label { font-size: 0.85rem; color: #71717a; margin-top: 0.25rem; margin-bottom: 0.75rem; }
+  .reel-headline { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .reel-body { font-size: 0.9rem; color: #71717a; line-height: 1.6; }
+  .reel-progress-bar {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: var(--accent);
+    animation: none;
+  }
+  .reel-progress-bar.running {
+    animation: reelProgress 4s linear forwards;
+  }
+  @keyframes reelProgress { from { width: 0%; } to { width: 100%; } }
+  .reel-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; }
+  .reel-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #d4d4d8; cursor: pointer; transition: background 0.2s;
+  }
+  .reel-dot.active { background: var(--accent); }
+
+  /* Entrance animations */
+  .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .scale-in { opacity: 0; transform: scale(0.95); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-up.visible, .fade-left.visible, .scale-in.visible {
+    opacity: 1; transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up, .fade-left, .scale-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .reel-card { transition: none !important; }
+    .reel-progress-bar { display: none !important; }
+  }
+
+  /* Card hover */
+  .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,0.12); }
+
+  /* Vertical cards */
+  .vertical-card {
+    background: #fff; border: 1px solid #e4e4e7;
+    border-radius: 0.75rem; padding: 1.25rem;
+  }
+  .vertical-icon { font-size: 1.75rem; margin-bottom: 0.5rem; }
+
+  /* Tech pills */
+  .tech-pill {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    background: #f4f4f5; border: 1px solid #e4e4e7;
+    border-radius: 9999px; padding: 0.35rem 0.75rem;
+    font-size: 0.78rem; font-weight: 500;
+    margin: 0.2rem;
+  }
+
+  /* Vendor chips */
+  .vendor-chip {
+    background: #f4f4f5; border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem; font-size: 0.82rem;
+    font-weight: 600; display: inline-flex; align-items: center; gap: 0.4rem;
+  }
+
+  /* Barrier items */
+  .barrier-item {
+    background: #fff; border: 1px solid #e4e4e7;
+    border-radius: 0.75rem; padding: 1rem 1.25rem;
+    display: flex; gap: 1rem; align-items: flex-start;
+  }
+  .barrier-num {
+    width: 2rem; height: 2rem; min-width: 2rem;
+    border-radius: 50%; background: var(--accent-soft);
+    color: var(--accent); font-weight: 700; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Outlook table */
+  .outlook-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  .outlook-table th { text-align: left; padding: 0.6rem 0.75rem; font-size: 0.78rem; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #e4e4e7; }
+  .outlook-table td { padding: 0.65rem 0.75rem; border-bottom: 1px solid #e4e4e7; line-height: 1.5; }
+  .outlook-table tr:last-child td { border-bottom: none; }
+  .outlook-table tr:nth-child(even) td { background: #f9f9fb; }
+  @media (prefers-color-scheme: dark) {
+    .outlook-table th { border-color: #27272a; color: #a1a1aa; }
+    .outlook-table td { border-color: #27272a; }
+    .outlook-table tr:nth-child(even) td { background: #0f0f14; }
+  }
+
+  /* Section divider */
+  .section-label {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;
+  }
+
+  /* Hero gradient */
+  .hero-gradient {
+    background: linear-gradient(135deg, #f0f0ff 0%, #fafafa 50%, #fff 100%);
+  }
+  @media (prefers-color-scheme: dark) {
+    .hero-gradient { background: linear-gradient(135deg, #0d0d1a 0%, #0a0a0b 60%, #0a0a0b 100%); }
+  }
+
+  /* Sources list */
+  .sources-list { list-style: none; padding: 0; margin: 0; }
+  .sources-list li { padding: 0.5rem 0; border-bottom: 1px solid #e4e4e7; font-size: 0.82rem; display: flex; gap: 0.75rem; align-items: baseline; }
+  .sources-list li:last-child { border-bottom: none; }
+  .source-num { min-width: 2rem; font-weight: 600; color: var(--accent); }
+  @media (prefers-color-scheme: dark) {
+    .sources-list li { border-color: #27272a; }
+  }
+
+  /* Safety meter */
+  .safety-level {
+    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;
+  }
+  .safety-bar-track { flex: 1; height: 6px; background: #e4e4e7; border-radius: 9999px; overflow: hidden; }
+  .safety-bar-fill { height: 100%; background: var(--accent); border-radius: 9999px; transition: width 1s ease; width: 0; }
+  @media (prefers-color-scheme: dark) {
+    .safety-bar-track { background: #27272a; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div id="scroll-progress"></div>
+
+<!-- Nav header -->
+<header class="border-b border-soft sticky top-0 z-50" style="background: rgba(250,250,250,0.95); backdrop-filter: blur(8px);">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">industrial-ai-with-agentic-ai &middot; 2026-06-11</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════
+     1. HERO
+═══════════════════════════════════════════════ -->
+<section class="hero-gradient px-6 pt-16 pb-12">
+  <div class="max-w-6xl mx-auto fade-up">
+    <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+      <span class="bg-accent-soft accent px-2 py-1 rounded-md">Data Story</span>
+      <span>&middot;</span>
+      <span>Deep Research</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-5 max-w-4xl leading-tight">
+      Industrial AI with Agentic AI
+    </h1>
+    <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+      Agentic AI is transforming Industrial AI by shifting the technological paradigm from reactive, chat-based copilots to autonomous <strong style="color:var(--accent)">systems of systems</strong> capable of independent perception, reasoning, and multi-step action — enabling a move from reactive maintenance to proactive, self-optimizing industrial operations.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     KPI STRIP
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 -mt-2 mb-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="kpi card-hover fade-up">
+      <div class="kpi-label">SCM Agentic AI by 2030</div>
+      <div class="kpi-value">$<span data-counter="53" data-suffix="B">0</span></div>
+      <div class="kpi-delta up">&#8593; from &lt;$2B in 2025 &middot; Gartner</div>
+    </div>
+    <div class="kpi card-hover fade-up" style="transition-delay:60ms">
+      <div class="kpi-label">Energy/Utilities CAGR</div>
+      <div class="kpi-value"><span data-counter="36" data-suffix="%">0</span></div>
+      <div class="kpi-delta up">&#8593; $0.87B (2026) → $4.11B (2031) &middot; Mordor</div>
+    </div>
+    <div class="kpi card-hover fade-up" style="transition-delay:120ms">
+      <div class="kpi-label">Life Sciences Piloting</div>
+      <div class="kpi-value"><span data-counter="67" data-suffix="%">0</span></div>
+      <div class="kpi-delta up">&#8593; of firms ran pilots Q1 2026</div>
+    </div>
+    <div class="kpi card-hover fade-up" style="transition-delay:180ms">
+      <div class="kpi-label">Agentic Projects Cancelled</div>
+      <div class="kpi-value">&gt;<span data-counter="40" data-suffix="%">0</span></div>
+      <div class="kpi-delta down">&#8595; by end 2027 &middot; Gartner risk signal</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     2. VISUAL OVERVIEW — infographic
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12 fade-left">
+  <div class="surface rounded-xl overflow-hidden">
+    <div class="px-6 pt-6 pb-2">
+      <div class="section-label"><i data-lucide="image" class="w-3.5 h-3.5"></i> Visual Overview</div>
+      <h2 class="text-xl font-semibold">Industrial Agentic AI — At a Glance</h2>
+    </div>
+    <div class="p-4">
+      <img src="infographic.png" alt="Industrial AI with Agentic AI infographic — synthesized from 15 sources via NotebookLM"
+           class="w-full rounded-lg object-contain max-h-[600px]"
+           style="background:#f4f4f5;"
+           loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     3. DEEP SYNTHESIS CALLOUT
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12 fade-up">
+  <div class="deep-synth">
+    <div class="deep-synth-label">
+      <span>&#128300;</span>
+      DEEP RESEARCH &mdash; synthesized from 15 sources via NotebookLM
+    </div>
+    <p class="text-base leading-relaxed" style="margin:0">
+      <strong>Agentic AI</strong> is transforming Industrial AI by shifting the technological paradigm from reactive, chat-based copilots to autonomous "systems of systems" capable of independent <strong>perception, reasoning, and multi-step action</strong>. While traditional AI identifies patterns or generates text based on prompts, agentic systems use a combination of technologies to independently execute complex workflows — such as ordering parts, rerouting production, and updating ERP systems — to achieve high-level industrial goals. This evolution enables a move from reactive maintenance to <strong>proactive, self-optimizing operations</strong>, where AI agents continuously monitor physical environments like factory floors or energy grids to solve problems before they result in costly unplanned downtime.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     4. ANIMATED INSIGHT REEL
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Insight Reel</div>
+  <h2 class="text-2xl font-semibold mb-4 fade-up" style="transition-delay:40ms">Key Numbers at a Glance</h2>
+  <div class="grid md:grid-cols-3 gap-6 items-start">
+    <div class="md:col-span-2">
+      <div class="reel-wrapper scale-in" id="reel-wrapper">
+        <div class="reel-card active" id="reel-0">
+          <div class="reel-icon">&#127981;</div>
+          <div class="reel-stat-big" style="color:#6366F1">$20M+</div>
+          <div class="reel-stat-label">Savings since FY2024</div>
+          <div class="reel-headline">General Mills: 5,000+ Shipments Assessed Daily</div>
+          <div class="reel-body">Supply chain is the furthest-along vertical. General Mills confirmed its agentic supply chain agent assesses over 5,000 daily shipments autonomously — Gartner projects 60% of SCM software users will adopt agentic AI by 2030.</div>
+        </div>
+        <div class="reel-card" id="reel-1">
+          <div class="reel-icon">&#9889;</div>
+          <div class="reel-stat-big" style="color:#0EA5E9">80%</div>
+          <div class="reel-stat-label">Reduction in grid outage duration</div>
+          <div class="reel-headline">Self-Healing Grids Are Already in Production</div>
+          <div class="reel-body">AI grid agents detect faults, isolate segments, reroute power flows, and dispatch inspection drones autonomously. Self-healing grid operations held the largest use-case share (24.6%) in the energy/utilities segment in 2025.</div>
+        </div>
+        <div class="reel-card" id="reel-2">
+          <div class="reel-icon">&#128138;</div>
+          <div class="reel-stat-big" style="color:#8B5CF6">60–75%</div>
+          <div class="reel-stat-label">Compression in batch record review</div>
+          <div class="reel-headline">Pharma Quality in Draft-and-Review Mode</div>
+          <div class="reel-body">67% of life sciences firms ran agentic AI pilots in Q1 2026. AstraZeneca&apos;s AIDA framework orchestrates flows across 26 global manufacturing sites. All production deployments operate in draft-and-review mode — no fully autonomous GMP execution yet.</div>
+        </div>
+        <div class="reel-card" id="reel-3">
+          <div class="reel-icon">&#9881;&#65039;</div>
+          <div class="reel-stat-big" style="color:#F59E0B">25%</div>
+          <div class="reel-stat-label">Reduction in reactive maintenance time</div>
+          <div class="reel-headline">Agentic Maintenance: 11 Minutes, No Human Needed</div>
+          <div class="reel-body">An agentic maintenance system receiving a bearing failure signal can query CMMS history, check MRO stock, find a qualified technician, draft and submit a work order — all in 11 minutes with no human intervention until the technician receives the job.</div>
+        </div>
+        <div class="reel-card" id="reel-4">
+          <div class="reel-icon">&#128203;</div>
+          <div class="reel-stat-big" style="color:#10B981">$53B</div>
+          <div class="reel-stat-label">Projected SCM agentic AI spend by 2030</div>
+          <div class="reel-headline">From Under $2B to $53B in Five Years</div>
+          <div class="reel-body">Gartner (April 2026) forecasts supply chain management software with agentic AI growing from under $2B in 2025 to $53B by 2030. Adoption rising from 5% to 60% of SCM software users over the same period.</div>
+        </div>
+        <div class="reel-card" id="reel-5">
+          <div class="reel-icon">&#128683;</div>
+          <div class="reel-stat-big" style="color:#EF4444">87%</div>
+          <div class="reel-stat-label">YoY increase in OT ransomware attacks</div>
+          <div class="reel-headline">Cybersecurity Is the Underrated Risk</div>
+          <div class="reel-body">OT ransomware attacks surged 87% YoY in 2025. 11% of one million surveyed OT devices carry known exploitable vulnerabilities. Agents with write access to PLCs represent a dramatically expanded attack surface requiring zero-trust identity management.</div>
+        </div>
+        <div id="reel-progress-bar" class="reel-progress-bar running"></div>
+      </div>
+      <div class="reel-dots mt-3" id="reel-dots"></div>
+    </div>
+    <div class="surface rounded-xl p-5 fade-up" style="transition-delay:100ms">
+      <div class="section-label mb-3"><i data-lucide="layers" class="w-3.5 h-3.5"></i> Autonomy Levels</div>
+      <div class="space-y-3 text-sm">
+        <div>
+          <div class="flex justify-between mb-1"><span class="font-medium">Supply Chain / Logistics</span><span class="accent font-bold">Production</span></div>
+          <div class="safety-bar-track"><div class="safety-bar-fill" data-width="90"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="font-medium">Energy &amp; Grid Operations</span><span class="accent font-bold">Production</span></div>
+          <div class="safety-bar-track"><div class="safety-bar-fill" data-width="78"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="font-medium">Oil &amp; Gas Orchestration</span><span class="font-medium" style="color:#F59E0B">Pilot+</span></div>
+          <div class="safety-bar-track"><div class="safety-bar-fill" data-width="60"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="font-medium">Pharma Quality Mgmt</span><span class="font-medium" style="color:#8B5CF6">Draft-Review</span></div>
+          <div class="safety-bar-track"><div class="safety-bar-fill" data-width="45"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-1"><span class="font-medium">Autonomous Process Control</span><span class="muted font-medium">Pilot</span></div>
+          <div class="safety-bar-track"><div class="safety-bar-fill" data-width="20"></div></div>
+        </div>
+        <p class="text-xs muted pt-1">Bar = relative production maturity as of mid-2026</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     5. KEY FINDINGS
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Key Findings</div>
+  <h2 class="text-2xl font-semibold mb-6 fade-up" style="transition-delay:40ms">Seven Critical Findings</h2>
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div class="surface rounded-xl p-5 card-hover fade-up">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 min-w-[2rem] rounded-lg bg-accent-soft flex items-center justify-center accent font-bold text-sm">1</div>
+        <div>
+          <h3 class="font-semibold mb-1">Agentic AI Clears the Multi-Step Autonomy Bar</h3>
+          <p class="text-sm muted leading-relaxed">Traditional predictive maintenance issues a recommendation and waits. An agentic system receives the same signal, cross-checks maintenance history, locates a certified technician, drafts a work order, checks spare-part availability, and schedules the shutdown — all without human intervention. Siemens describes this as a shift from AI that <em>responds to queries</em> to AI that <em>independently executes complete industrial workflows</em>.<sup class="accent">[1][2]</sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:60ms">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 min-w-[2rem] rounded-lg bg-accent-soft flex items-center justify-center accent font-bold text-sm">2</div>
+        <div>
+          <h3 class="font-semibold mb-1">Supply Chain Is Furthest Along in Production</h3>
+          <p class="text-sm muted leading-relaxed">General Mills confirmed its supply chain optimization agent assesses 5,000+ daily shipments autonomously, delivering $20M+ in savings since FY2024.<sup class="accent">[3]</sup> Walmart deployed an agentic end-to-end supply chain workflow.<sup class="accent">[4]</sup> Gartner projects 60% SCM adoption by 2030, up from 5% in 2025.<sup class="accent">[5]</sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:120ms">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 min-w-[2rem] rounded-lg bg-accent-soft flex items-center justify-center accent font-bold text-sm">3</div>
+        <div>
+          <h3 class="font-semibold mb-1">Oil &amp; Gas Reached First Agent-to-Agent Production</h3>
+          <p class="text-sm muted leading-relaxed">Cognite and ABB (May 2026) signed Aker BP as the first customer for agent-to-agent orchestration between ABB Ability SafetyInsight and Cognite Data Fusion, targeting 525,000 boe/day production efficiency.<sup class="accent">[6][37]</sup> The energy/utilities agentic AI market is valued at $0.87B in 2026, growing to $4.11B by 2031 at a 36.35% CAGR.<sup class="accent">[7]</sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:180ms">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 min-w-[2rem] rounded-lg bg-accent-soft flex items-center justify-center accent font-bold text-sm">4</div>
+        <div>
+          <h3 class="font-semibold mb-1">Pharma Quality Moves to Draft-and-Review</h3>
+          <p class="text-sm muted leading-relaxed">67% of life sciences firms ran agentic pilots in Q1 2026.<sup class="accent">[8]</sup> Early adopters report 40–50% reductions in deviation investigation cycle times and 60–75% compression in batch record review. AstraZeneca&apos;s AIDA framework orchestrates flows from API to coated tablet across 26 sites.<sup class="accent">[9]</sup> No fully autonomous GMP execution confirmed as of mid-2026.<sup class="accent">[8]</sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:240ms">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 min-w-[2rem] rounded-lg bg-accent-soft flex items-center justify-center accent font-bold text-sm">5</div>
+        <div>
+          <h3 class="font-semibold mb-1">Dominant Stack: LLMs + Data Fabrics + Digital Twins</h3>
+          <p class="text-sm muted leading-relaxed">Orchestration layers consume OPC UA and MQTT streams, feed semantic data fabrics (Cognite Data Fusion, Palantir Foundry Ontology), and route tasks to LLM-backed specialized agents. The Siemens-NVIDIA Industrial AI Operating System partnership — with its Erlangen factory live in 2026 — aims to be the reference architecture for AI-driven adaptive manufacturing.<sup class="accent">[10][11]</sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:300ms">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 min-w-[2rem] rounded-lg bg-accent-soft flex items-center justify-center accent font-bold text-sm">6</div>
+        <div>
+          <h3 class="font-semibold mb-1">Gartner Counter-Signal: &gt;40% of Projects Will Be Cancelled</h3>
+          <p class="text-sm muted leading-relaxed">Over 40% of agentic AI projects are predicted to be cancelled by end of 2027, with primary causes being escalating costs, unclear business value, and inadequate risk controls.<sup class="accent">[12]</sup> An academic study of 12 industrial companies found only one operating at multi-agent orchestration level — a "capability-deployment verification gap."<sup class="accent">[13]</sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up md:col-span-2" style="transition-delay:360ms">
+      <div class="flex gap-3 items-start">
+        <div class="w-8 h-8 min-w-[2rem] rounded-lg bg-accent-soft flex items-center justify-center accent font-bold text-sm">7</div>
+        <div>
+          <h3 class="font-semibold mb-1">Safety Standards Are 1–2 Years Behind Deployment Pace</h3>
+          <p class="text-sm muted leading-relaxed">IEC 61508:2025 updated to explicitly address AI scope and human factors.<sup class="accent">[14]</sup> ISO/IEC TS 22440 (Parts 1–3, currently in Committee Draft stage) is the first standard specifically designed to qualify AI functional safety requirements.<sup class="accent">[15]</sup> Until TS 22440 is ratified, human-in-the-loop review remains the only trusted verification mechanism accepted by safety regulators. Non-deterministic LLM outputs conflict directly with IEC 61508 Safety Integrity Level requirements.<sup class="accent">[13]</sup></p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     6. INDUSTRIAL VERTICALS & USE CASES
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="factory" class="w-3.5 h-3.5"></i> Industrial Verticals</div>
+  <h2 class="text-2xl font-semibold mb-2 fade-up" style="transition-delay:40ms">Use Cases Across Five Verticals</h2>
+  <p class="muted text-sm mb-6 fade-up" style="transition-delay:80ms">Deployment maturity and representative examples as of mid-2026</p>
+
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <div class="vertical-card card-hover fade-up">
+      <div class="vertical-icon">&#127981;</div>
+      <h3 class="font-bold text-base mb-1">Manufacturing</h3>
+      <div class="text-xs font-semibold mb-2" style="color:#F59E0B">Mixed — Pilot to Production</div>
+      <ul class="text-sm muted space-y-1.5">
+        <li>&#8226; <strong style="color:inherit">Agentic maintenance:</strong> Siemens Senseye — 25% reduction in reactive maintenance time<sup class="accent text-xs">[1]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Order processing:</strong> Danfoss automated 80% of order-processing decisions; Suzano 95% SAP query time reduction<sup class="accent text-xs">[17]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Shop floor:</strong> Rockwell Automation FactoryTalk Plex — 6 initial AI agents, 11B+ daily transactions<sup class="accent text-xs">[18]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Semiconductor:</strong> Samsung + Synopsys moving toward Level 4 agents for chip design — up to 50% lead time reduction<sup class="accent text-xs">[25]</sup></li>
+      </ul>
+    </div>
+
+    <div class="vertical-card card-hover fade-up" style="transition-delay:60ms">
+      <div class="vertical-icon">&#9889;</div>
+      <h3 class="font-bold text-base mb-1">Energy &amp; Utilities</h3>
+      <div class="text-xs font-semibold mb-2" style="color:#10B981">Production — Fastest Growing</div>
+      <ul class="text-sm muted space-y-1.5">
+        <li>&#8226; <strong style="color:inherit">Self-healing grids:</strong> Up to 80% reduction in outage duration; 24.6% largest use-case share in 2025<sup class="accent text-xs">[7][19]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Demand response:</strong> 40.73% CAGR (2026–2031) — fastest-growing energy segment<sup class="accent text-xs">[7]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Renewables:</strong> Tata Power partnered with Salesforce Agentforce for renewable energy operations (March 2026)<sup class="accent text-xs">[20]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Market:</strong> $0.87B in 2026 → $4.11B by 2031<sup class="accent text-xs">[7]</sup></li>
+      </ul>
+    </div>
+
+    <div class="vertical-card card-hover fade-up" style="transition-delay:120ms">
+      <div class="vertical-icon">&#128666;</div>
+      <h3 class="font-bold text-base mb-1">Logistics &amp; Supply Chain</h3>
+      <div class="text-xs font-semibold mb-2" style="color:#10B981">Most Advanced by Volume</div>
+      <ul class="text-sm muted space-y-1.5">
+        <li>&#8226; <strong style="color:inherit">General Mills:</strong> 5,000+ daily shipments assessed; $20M+ savings since FY2024<sup class="accent text-xs">[3]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Walmart:</strong> End-to-end agentic supply chain workflow confirmed in production<sup class="accent text-xs">[4]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Palantir + NVIDIA:</strong> Lowe&apos;s digital twin of global logistics network with continuous route and inventory agents<sup class="accent text-xs">[22]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Market:</strong> $8.67B (2025) → $16.84B by 2030<sup class="accent text-xs">[23]</sup></li>
+      </ul>
+    </div>
+
+    <div class="vertical-card card-hover fade-up" style="transition-delay:180ms">
+      <div class="vertical-icon">&#128167;</div>
+      <h3 class="font-bold text-base mb-1">Oil &amp; Gas</h3>
+      <div class="text-xs font-semibold mb-2" style="color:#F59E0B">First Production Agent-to-Agent</div>
+      <ul class="text-sm muted space-y-1.5">
+        <li>&#8226; <strong style="color:inherit">Aker BP / ABB / Cognite:</strong> First confirmed production instance of agent-to-agent orchestration (May 2026) — 525K boe/day efficiency target<sup class="accent text-xs">[6][37]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Seismic analysis:</strong> Processing time reduced from 6–12 months to 8–12 weeks via agentic AI<sup class="accent text-xs">[16]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Drilling:</strong> 25–35% efficiency improvements reported<sup class="accent text-xs">[16]</sup></li>
+        <li>&#8226; <strong style="color:inherit">BCG estimate:</strong> 30–70% incremental EBIT uplift potential from full integration<sup class="accent text-xs">[21]</sup></li>
+      </ul>
+    </div>
+
+    <div class="vertical-card card-hover fade-up" style="transition-delay:240ms">
+      <div class="vertical-icon">&#128138;</div>
+      <h3 class="font-bold text-base mb-1">Pharmaceuticals</h3>
+      <div class="text-xs font-semibold mb-2" style="color:#8B5CF6">Pilot → Draft-Review Production</div>
+      <ul class="text-sm muted space-y-1.5">
+        <li>&#8226; <strong style="color:inherit">AstraZeneca AIDA:</strong> Orchestrates flows from API to coated tablet; 26 global sites; edge computing for real-time production decisions<sup class="accent text-xs">[9]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Deviation investigations:</strong> 40–50% cycle time reduction; batch records: 60–75% compression<sup class="accent text-xs">[8]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Change control:</strong> 3–5 days → 4–8 hours<sup class="accent text-xs">[8]</sup></li>
+        <li>&#8226; <strong style="color:inherit">Constraint:</strong> All GMP-regulated deployments remain in draft-and-review mode<sup class="accent text-xs">[8]</sup></li>
+      </ul>
+    </div>
+
+    <div class="vertical-card card-hover fade-up" style="transition-delay:300ms" style="border-color: var(--accent-line);">
+      <div class="vertical-icon">&#128302;</div>
+      <h3 class="font-bold text-base mb-1">Worked Example: O&amp;G Alarm Orchestration</h3>
+      <div class="text-xs font-semibold mb-2 accent">Aker BP Production Deployment</div>
+      <p class="text-sm muted leading-relaxed">ABB Ability AlarmInsight identifies 47 correlated alarms on an offshore platform. Rather than presenting all 47, the ABB agent queries Cognite Data Fusion, which passes enriched context to a risk-assessment agent cross-referencing ABB Ability SafetyInsight. Output: a prioritized &quot;Top 3 actions&quot; for the operator. Time-to-decision: under 5 minutes vs. 30+ previously.<sup class="accent text-xs">[6]</sup></p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     CHART SECTION — Market Growth
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="surface rounded-xl p-6 scale-in">
+      <div class="section-label mb-1"><i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Market Data</div>
+      <h3 class="text-base font-semibold mb-4">Energy &amp; Utilities Agentic AI Market ($B)</h3>
+      <div class="h-64"><canvas id="chart-energy"></canvas></div>
+      <p class="text-xs muted mt-2">Sources: Mordor Intelligence<sup class="accent">[7]</sup> &amp; Precedence Research<sup class="accent">[38]</sup>. Figures are directional estimates.</p>
+    </div>
+    <div class="surface rounded-xl p-6 scale-in" style="transition-delay:80ms">
+      <div class="section-label mb-1"><i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> Adoption</div>
+      <h3 class="text-base font-semibold mb-4">SCM Agentic AI Adoption &amp; Spend Outlook</h3>
+      <div class="h-64"><canvas id="chart-scm"></canvas></div>
+      <p class="text-xs muted mt-2">Source: Gartner April 2026<sup class="accent">[5]</sup>. Spend in $B; adoption % of SCM software users.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     7. TECHNOLOGY STACK
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="cpu" class="w-3.5 h-3.5"></i> Technology Stack</div>
+  <h2 class="text-2xl font-semibold mb-6 fade-up" style="transition-delay:40ms">Four-Layer Industrial Agentic AI Architecture</h2>
+
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div class="surface rounded-xl p-5 card-hover fade-left">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+          <i data-lucide="radio" class="w-4 h-4 accent"></i>
+        </div>
+        <h3 class="font-semibold">Layer 1 — Edge &amp; OT</h3>
+      </div>
+      <p class="text-sm muted mb-3">Real-time sensor data and control signals; sub-100ms response requirements.</p>
+      <div class="flex flex-wrap">
+        <span class="tech-pill"><i data-lucide="network" class="w-3 h-3 accent"></i> OPC UA</span>
+        <span class="tech-pill"><i data-lucide="network" class="w-3 h-3 accent"></i> MQTT</span>
+        <span class="tech-pill"><i data-lucide="network" class="w-3 h-3 accent"></i> DDS</span>
+        <span class="tech-pill">NVIDIA Jetson</span>
+        <span class="tech-pill">Intel OpenVINO</span>
+        <span class="tech-pill">ISA-95</span>
+        <span class="tech-pill">IEC 62443</span>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-left" style="transition-delay:60ms">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+          <i data-lucide="database" class="w-4 h-4 accent"></i>
+        </div>
+        <h3 class="font-semibold">Layer 2 — Data Fabric / Knowledge</h3>
+      </div>
+      <p class="text-sm muted mb-3">The primary bottleneck for agentic readiness — agents require event-driven, semantically coherent data streams.<sup class="accent text-xs">[24]</sup> 80% of companies cite data limitations as roadblock.<sup class="accent text-xs">[24]</sup></p>
+      <div class="flex flex-wrap">
+        <span class="tech-pill">Cognite Data Fusion</span>
+        <span class="tech-pill">Palantir Foundry Ontology</span>
+        <span class="tech-pill">OSIsoft PI / AVEVA</span>
+        <span class="tech-pill">Unified Namespace</span>
+        <span class="tech-pill">Vector DBs (Chroma)</span>
+        <span class="tech-pill">Data Lakehouses</span>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-left" style="transition-delay:120ms">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+          <i data-lucide="brain" class="w-4 h-4 accent"></i>
+        </div>
+        <h3 class="font-semibold">Layer 3 — Orchestration &amp; Agents</h3>
+      </div>
+      <p class="text-sm muted mb-3">LLMs serve as orchestrators and reasoning engines; multi-agent frameworks coordinate domain and task agents.</p>
+      <div class="flex flex-wrap">
+        <span class="tech-pill">A2A Protocol (Google)</span>
+        <span class="tech-pill">MCP (Anthropic)</span>
+        <span class="tech-pill">Cognite Atlas AI</span>
+        <span class="tech-pill">XMPro MAGS</span>
+        <span class="tech-pill">Siemens Xcelerator</span>
+        <span class="tech-pill">Strands SDK</span>
+        <span class="tech-pill">NVIDIA NeMo Agent Kit</span>
+        <span class="tech-pill">MS Copilot Studio</span>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-left" style="transition-delay:180ms">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg bg-accent-soft flex items-center justify-center">
+          <i data-lucide="box" class="w-4 h-4 accent"></i>
+        </div>
+        <h3 class="font-semibold">Layer 4 — Simulation &amp; Digital Twins</h3>
+      </div>
+      <p class="text-sm muted mb-3">Physically accurate digital twins for pre-deployment validation — test and fail safely before touching live production. Early adopters demonstrate 10–20% plant productivity gains.<sup class="accent text-xs">[Deep-Research]</sup></p>
+      <div class="flex flex-wrap">
+        <span class="tech-pill">NVIDIA Omniverse</span>
+        <span class="tech-pill">OpenUSD</span>
+        <span class="tech-pill">PhysicsNeMo</span>
+        <span class="tech-pill">Azure IoT + ARC</span>
+        <span class="tech-pill">AWS Outpost + EKS</span>
+        <span class="tech-pill">Siemens Industrial Edge</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     8. VENDOR LANDSCAPE
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="building-2" class="w-3.5 h-3.5"></i> Vendor Landscape</div>
+  <h2 class="text-2xl font-semibold mb-6 fade-up" style="transition-delay:40ms">Key Vendors &amp; Differentiated Approaches</h2>
+
+  <div class="grid md:grid-cols-3 gap-4 mb-6">
+    <div class="surface rounded-xl p-5 card-hover fade-up">
+      <div class="text-xs font-bold uppercase tracking-widest muted mb-3">Automation Incumbents</div>
+      <div class="space-y-3">
+        <div><span class="vendor-chip font-bold" style="color:var(--accent)">Siemens</span>
+          <p class="text-xs muted mt-1">Most complete agentic portfolio: Industrial Copilot ecosystem + NVIDIA OS partnership + Erlangen factory blueprint; up to 50% productivity target (vendor claim).<sup class="accent">[1][10]</sup></p></div>
+        <div><span class="vendor-chip">Rockwell Automation</span>
+          <p class="text-xs muted mt-1">FactoryTalk Plex (6 agents, 11B+ daily transactions); Elastic MES; roadmap for user-defined goal-driven agents.<sup class="accent">[18]</sup></p></div>
+        <div><span class="vendor-chip">ABB</span>
+          <p class="text-xs muted mt-1">Strategic Cognite partnership (May 2026) for agent-to-agent O&amp;G orchestration; ABB Ability platform.<sup class="accent">[6]</sup></p></div>
+        <div><span class="vendor-chip">Honeywell</span>
+          <p class="text-xs muted mt-1">Google Cloud (Gemini on Vertex AI) + Honeywell Forge IoT for industrial sector AI agents, solutions available 2025.<sup class="accent">[26]</sup></p></div>
+        <div><span class="vendor-chip">GE Vernova</span>
+          <p class="text-xs muted mt-1">CSense platform + ANYbotics legged robotics inspection partnership (2025).<sup class="accent">[27]</sup></p></div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:60ms">
+      <div class="text-xs font-bold uppercase tracking-widest muted mb-3">Data &amp; AI Platforms</div>
+      <div class="space-y-3">
+        <div><span class="vendor-chip font-bold" style="color:var(--accent)">Cognite</span>
+          <p class="text-xs muted mt-1">Atlas AI workbench for industrial agents; Cognite Data Fusion semantic layer; customers include ExxonMobil, Aker BP, Koch, Idemitsu.<sup class="accent">[28]</sup></p></div>
+        <div><span class="vendor-chip">Palantir</span>
+          <p class="text-xs muted mt-1">AIP platform with industrial ontology; MES-connected agents; Lowe&apos;s digital twin logistics with NVIDIA.<sup class="accent">[22]</sup></p></div>
+        <div><span class="vendor-chip">C3.ai</span>
+          <p class="text-xs muted mt-1">C3 Agentic AI Platform (GA April 2026); C3 Code for autonomous engineering; industry-specific SaaS applications.<sup class="accent">[29]</sup></p></div>
+        <div><span class="vendor-chip">XMPro</span>
+          <p class="text-xs muted mt-1">Purpose-built MAGS (Type 4–5 multi-agent generative systems) for mining, O&amp;G, utilities; 50M+ monitoring events daily (vendor).<sup class="accent">[16]</sup></p></div>
+        <div><span class="vendor-chip">Symphony AI / Site Machine</span>
+          <p class="text-xs muted mt-1">Verticalized platforms with pre-built industrial agents and 3D immersive visualization for unified enterprise view.</p></div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:120ms">
+      <div class="text-xs font-bold uppercase tracking-widest muted mb-3">Hyperscalers</div>
+      <div class="space-y-3">
+        <div><span class="vendor-chip font-bold" style="color:var(--accent)">NVIDIA</span>
+          <p class="text-xs muted mt-1">Omniverse simulation; CUDA-X AI; partnerships with virtually every major industrial vendor; &quot;Physical AI&quot; via Cosmos world foundation models; Hannover Messe 2026 showcase.<sup class="accent">[11]</sup></p></div>
+        <div><span class="vendor-chip">Microsoft</span>
+          <p class="text-xs muted mt-1">Azure OpenAI integration; Copilot Studio (entry-level industrial agents); Azure Fabric for real-time intelligence; Siemens Industrial Copilot co-development.<sup class="accent">[28]</sup></p></div>
+        <div><span class="vendor-chip">Google Cloud</span>
+          <p class="text-xs muted mt-1">Vertex AI / Gemini backing for Honeywell &amp; others; A2A Protocol for cross-vendor agent communication.<sup class="accent">[26]</sup></p></div>
+        <div><span class="vendor-chip">AWS</span>
+          <p class="text-xs muted mt-1">Edge-first strategy: AWS Outpost + EKS for &quot;always-on&quot; factory AI even without cloud connectivity; SLMs on Outpost infrastructure.<sup class="accent">[Deep-Research]</sup></p></div>
+        <div><span class="vendor-chip">Samsung + Synopsys</span>
+          <p class="text-xs muted mt-1">Level 4+ agents for semiconductor design; HBM4 memory + enterprise SSDs; 2030 AI-driven factory transition strategy.<sup class="accent">[25]</sup></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     9. ADOPTION BARRIERS
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="shield-alert" class="w-3.5 h-3.5"></i> Adoption Barriers</div>
+  <h2 class="text-2xl font-semibold mb-2 fade-up" style="transition-delay:40ms">Five Primary Barriers to Production Deployment</h2>
+  <p class="muted text-sm mb-6 fade-up" style="transition-delay:80ms">Ranked by reported frequency across McKinsey, arXiv, and practitioner sources</p>
+
+  <div class="space-y-3">
+
+    <div class="barrier-item card-hover fade-left">
+      <div class="barrier-num">1</div>
+      <div>
+        <h3 class="font-semibold mb-1">Data Architecture Gaps <span class="text-xs font-normal muted">(~80% of companies — McKinsey<sup class="accent">[24]</sup>)</span></h3>
+        <p class="text-sm muted leading-relaxed">Industrial data lives in fragmented, batch-oriented ERP, MES, LIMS, DCS, and SCADA systems. Agentic AI requires event-driven, semantically coherent data streams — an infrastructure investment that precedes agent deployment by 12–24 months. This is the primary bottleneck at the data fabric layer.</p>
+      </div>
+    </div>
+
+    <div class="barrier-item card-hover fade-left" style="transition-delay:60ms">
+      <div class="barrier-num">2</div>
+      <div>
+        <h3 class="font-semibold mb-1">Verification &amp; Validation Absence <span class="text-xs font-normal muted">(arXiv industrial study<sup class="accent">[13]</sup>)</span></h3>
+        <p class="text-sm muted leading-relaxed">No standardized method exists to verify that an agent&apos;s outputs are semantically correct, regulatory-compliant, and safe to act on. Human-in-the-loop is currently the only trusted mechanism, but it does not scale with output volume. ISO/IEC TS 22440 aims to close this gap but remains in Committee Draft stage.<sup class="accent">[15]</sup></p>
+      </div>
+    </div>
+
+    <div class="barrier-item card-hover fade-left" style="transition-delay:120ms">
+      <div class="barrier-num">3</div>
+      <div>
+        <h3 class="font-semibold mb-1">Non-Determinism Incompatibility with Safety-Critical Environments</h3>
+        <p class="text-sm muted leading-relaxed">LLM-based agents produce probabilistic outputs that cannot be guaranteed deterministic across identical inputs — a direct conflict with IEC 61508 Safety Integrity Level requirements. &quot;If you want to use a tool you need to know what are the bugs&quot; — practitioner quote from arXiv study.<sup class="accent">[13]</sup></p>
+      </div>
+    </div>
+
+    <div class="barrier-item card-hover fade-left" style="transition-delay:180ms">
+      <div class="barrier-num">4</div>
+      <div>
+        <h3 class="font-semibold mb-1">OT/IT Integration Complexity</h3>
+        <p class="text-sm muted leading-relaxed">Legacy OT systems predate modern API paradigms; proprietary industrial protocols (Modbus, PROFINET, EtherNet/IP) are not natively accessible to LLM agents. Industrial codebases with millions of lines exceed current model context windows; RAG partially mitigates but remains difficult to scale.<sup class="accent">[13]</sup></p>
+      </div>
+    </div>
+
+    <div class="barrier-item card-hover fade-left" style="transition-delay:240ms">
+      <div class="barrier-num">5</div>
+      <div>
+        <h3 class="font-semibold mb-1">Organizational &amp; Cultural Resistance <span class="text-xs font-normal muted">(Deloitte 2026<sup class="accent">[30]</sup>)</span></h3>
+        <p class="text-sm muted leading-relaxed">Workers in process industries frequently perceive autonomous agents as surveillance tools or threats to skilled positions. Deloitte identified delegating decisions to autonomous systems as &quot;unfamiliar in traditionally conservative industries.&quot; Gartner predicts &gt;40% of agentic AI projects cancelled by end of 2027 due to unclear business value.<sup class="accent">[12]</sup> Secondary barriers include EU AI Act high-risk classification (up to €35M penalties) and OT cybersecurity: OT ransomware surged 87% YoY in 2025.<sup class="accent">[31]</sup></p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     10. SAFETY & HUMAN-IN-THE-LOOP
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Safety &amp; Oversight</div>
+  <h2 class="text-2xl font-semibold mb-6 fade-up" style="transition-delay:40ms">Safety &amp; Human-in-the-Loop Architecture</h2>
+
+  <div class="grid md:grid-cols-3 gap-4">
+
+    <div class="surface rounded-xl p-5 card-hover scale-in">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg" style="background:#10B98120;"><i data-lucide="sliders" class="w-4 h-4 m-2" style="color:#10B981"></i></div>
+        <h3 class="font-semibold">Graduated Autonomy</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed mb-3">Production deployments implement progressive autonomy: observe-only → recommendation → supervised autonomous → fully autonomous. A large-scale study of 306 practitioners (26 domains) found production agents typically execute at most 10 steps before requiring human intervention.<sup class="accent">[3]</sup></p>
+      <div class="text-xs space-y-1">
+        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#e4e4e7;min-width:8px"></span>Level 0: Observe-only</div>
+        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#a78bfa;min-width:8px"></span>Level 1: Recommend + approve</div>
+        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#6366F1;min-width:8px"></span>Level 2: Supervised autonomous</div>
+        <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full" style="background:#10B981;min-width:8px"></span>Level 3: Bounded autonomous (rare)</div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover scale-in" style="transition-delay:60ms">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg" style="background:#6366F120;"><i data-lucide="eye" class="w-4 h-4 m-2 accent"></i></div>
+        <h3 class="font-semibold">Human-on-the-Loop Design</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed mb-3">Industrial operators moving to human-on-the-loop (HOTL) vs. human-in-the-loop (HITL): agents operate autonomously within defined guardrails, with exception escalation and real-time monitoring dashboards. HITL does not scale with output volume — HOTL preserves efficiency gains while maintaining accountability.<sup class="accent">[Deep-Research]</sup></p>
+      <div class="deep-synth" style="padding:0.75rem 1rem; margin:0; font-size:0.8rem;">
+        <strong>Digital twins as sandboxes</strong> — agents &quot;experiment, learn, and fail&quot; in virtual environments before physical deployment. Physics-based simulation validates planned motions are physically viable.<sup class="accent">[Deep-Research]</sup>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover scale-in" style="transition-delay:120ms">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg" style="background:#F59E0B20;"><i data-lucide="file-check" class="w-4 h-4 m-2" style="color:#F59E0B"></i></div>
+        <h3 class="font-semibold">Standards &amp; Regulatory Alignment</h3>
+      </div>
+      <div class="space-y-2 text-sm muted">
+        <div><strong style="color:inherit">IEC 61508:2025</strong> — Updated to clarify AI scope and extend human factors requirements.<sup class="accent">[14]</sup></div>
+        <div><strong style="color:inherit">ISO/IEC TS 22440</strong> — First standard for AI functional safety: reliability, robustness, explainability, V&amp;V lifecycle. Currently Committee Draft. 1–2 years from ratification.<sup class="accent">[15]</sup></div>
+        <div><strong style="color:inherit">EU AI Act</strong> — Classifies AI in safety-critical industrial control as high-risk; conformity assessments required; up to €35M penalties.<sup class="accent">[31]</sup></div>
+        <div><strong style="color:inherit">Pharma (FDA/GMP)</strong> — No AI-specific FDA guidance yet; industry adopting GAMP 5 risk-based approach adapted for agentic systems.<sup class="accent">[8]</sup></div>
+        <div class="mt-2 text-xs"><strong style="color:#EF4444">OT Cybersecurity:</strong> 11% of 1M OT devices carry exploitable vulnerabilities; 87% YoY ransomware surge. Agents with write access to PLCs require zero-trust identity management.<sup class="accent">[31][45]</sup></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     11. 2025–2028 OUTLOOK + MARKET DATA TABLE
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> Forward Outlook</div>
+  <h2 class="text-2xl font-semibold mb-2 fade-up" style="transition-delay:40ms">2026–2028 Trajectory</h2>
+  <p class="muted text-sm mb-6 fade-up" style="transition-delay:80ms">Key swing variable: If ISO/IEC TS 22440 ratifies by 2027 and regulators provide clear compliance pathways, production-ready use cases could expand rapidly.</p>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <div class="surface rounded-xl p-5 fade-left">
+      <h3 class="font-semibold mb-3 flex items-center gap-2 text-base">
+        <i data-lucide="check-circle" class="w-4 h-4" style="color:#10B981"></i>
+        Crossing Pilot → Production (2026–2027)
+      </h3>
+      <ul class="text-sm space-y-2">
+        <li class="flex gap-2"><span style="color:#10B981">&#8594;</span><div><strong>Supply chain orchestration</strong> — Already in production at General Mills, Walmart; Gartner projects 50% SCM adoption by 2030.<sup class="accent">[3][4][5]</sup></div></li>
+        <li class="flex gap-2"><span style="color:#10B981">&#8594;</span><div><strong>Predictive maintenance orchestration in energy/utilities</strong> — Energy/utilities market to $4.11B by 2031.<sup class="accent">[7]</sup></div></li>
+        <li class="flex gap-2"><span style="color:#10B981">&#8594;</span><div><strong>Pharma quality/deviation management</strong> in draft-and-review mode — EU AI Act enforcement accelerating formalization.<sup class="accent">[8]</sup></div></li>
+        <li class="flex gap-2"><span style="color:#10B981">&#8594;</span><div><strong>O&amp;G AI-assisted process optimization</strong> — Aker BP/ABB/Cognite now in production.<sup class="accent">[6]</sup></div></li>
+        <li class="flex gap-2"><span style="color:#10B981">&#8594;</span><div><strong>Warehouse/fleet orchestration</strong> — $1T warehouse market; AMR route optimization moving to production.<sup class="accent">[Deep-Research]</sup></div></li>
+      </ul>
+    </div>
+    <div class="surface rounded-xl p-5 fade-left" style="transition-delay:60ms">
+      <h3 class="font-semibold mb-3 flex items-center gap-2 text-base">
+        <i data-lucide="clock" class="w-4 h-4" style="color:#F59E0B"></i>
+        Likely Remaining Pilot-Stage Through 2028
+      </h3>
+      <ul class="text-sm space-y-2">
+        <li class="flex gap-2"><span style="color:#F59E0B">&#8594;</span><div><strong>Fully autonomous process control</strong> of physical assets (e.g., autonomous DCS setpoint adjustment without human override) — blocked by missing IEC 61508-compatible verification frameworks for non-deterministic agents.<sup class="accent">[13]</sup></div></li>
+        <li class="flex gap-2"><span style="color:#F59E0B">&#8594;</span><div><strong>&quot;Lights-out&quot; manufacturing</strong> — Samsung&apos;s 2030 target; Siemens Erlangen factory is the leading reference (launching 2026), but full lights-out requires robotics maturity beyond current AI agent scope.<sup class="accent">[25][10]</sup></div></li>
+        <li class="flex gap-2"><span style="color:#F59E0B">&#8594;</span><div><strong>Safety-critical autonomous control</strong> in nuclear, chemical, or aerospace — near-zero public deployments, evidence thin.</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="surface rounded-xl p-5 fade-up">
+    <h3 class="font-semibold mb-4 flex items-center gap-2">
+      <i data-lucide="table" class="w-4 h-4 accent"></i>
+      Market Size Estimates (as of mid-2026)
+    </h3>
+    <div class="overflow-x-auto">
+      <table class="outlook-table">
+        <thead>
+          <tr>
+            <th>Segment</th>
+            <th>Current ($)</th>
+            <th>Forecast ($)</th>
+            <th>CAGR / Notes</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Agentic AI overall (all industries)</strong></td>
+            <td>$7.3–10.8B (2025/26)</td>
+            <td>$139–156B by 2034</td>
+            <td>~40% CAGR</td>
+            <td><sup class="accent">[32]</sup></td>
+          </tr>
+          <tr>
+            <td><strong>SCM software with agentic AI</strong></td>
+            <td>&lt;$2B (2025)</td>
+            <td>$53B by 2030</td>
+            <td>5% → 60% adoption</td>
+            <td><sup class="accent">[5]</sup></td>
+          </tr>
+          <tr>
+            <td><strong>Logistics/supply chain agents</strong></td>
+            <td>$8.67B (2025)</td>
+            <td>$16.84B by 2030</td>
+            <td>+94% in 5 years</td>
+            <td><sup class="accent">[23]</sup></td>
+          </tr>
+          <tr>
+            <td><strong>Energy &amp; utilities agentic AI</strong></td>
+            <td>$0.87B (2026)</td>
+            <td>$4.11B by 2031</td>
+            <td>36.35% CAGR</td>
+            <td><sup class="accent">[7]</sup></td>
+          </tr>
+          <tr>
+            <td><strong>Energy &amp; utilities (alt. scope)</strong></td>
+            <td>$0.66B (2025)</td>
+            <td>$14.9B by 2035</td>
+            <td>36.65% CAGR</td>
+            <td><sup class="accent">[38]</sup></td>
+          </tr>
+          <tr>
+            <td><strong>Advanced industries AI revenue uplift</strong></td>
+            <td>—</td>
+            <td>$450–650B/yr by 2030</td>
+            <td>Automotive, mfg, aerospace</td>
+            <td><sup class="accent">[44]</sup></td>
+          </tr>
+          <tr>
+            <td><strong>Total industrial AI sector</strong></td>
+            <td colspan="2">~$10 trillion addressable industry (factories + warehouses globally)</td>
+            <td>Long-term</td>
+            <td><sup class="accent">[Deep-Research]</sup></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs muted mt-3">Disclaimer: Market size estimates from different firms use divergent scope definitions and methodologies. Figures should be read as directional indicators, not precise forecasts.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     12. SOURCES
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label fade-up"><i data-lucide="link" class="w-3.5 h-3.5"></i> Sources</div>
+  <h2 class="text-2xl font-semibold mb-6 fade-up" style="transition-delay:40ms">54 Sources — 39 Research + 15 Video</h2>
+  <div class="surface rounded-xl p-6">
+    <p class="text-sm muted mb-4">References [1]–[45] are from Ravi&apos;s primary research. Video sources [V1]–[V15] are from Rin&apos;s deep research via NotebookLM.</p>
+    <ul class="sources-list">
+      <li><span class="source-num">[1]</span><div><a href="https://press.siemens.com/global/en/pressrelease/siemens-introduces-ai-agents-industrial-automation" target="_blank" rel="noopener">Siemens introduces AI agents for industrial automation</a> — Siemens Press, 2025-05-13</div></li>
+      <li><span class="source-num">[2]</span><div><a href="https://www.fullstack.com/labs/resources/blog/agentic-ai-vs-traditional-ai-what-sets-ai-agents-apart" target="_blank" rel="noopener">Agentic AI vs. Traditional AI: Key Differences</a> — FullStack Labs, 2025</div></li>
+      <li><span class="source-num">[3]</span><div><a href="https://aimonk.com/agentic-ai-examples-enterprise-roi-case-studies/" target="_blank" rel="noopener">12 Agentic AI Examples With Measurable ROI: Enterprise Case Studies From 2025-2026</a> — AI Monk, 2026</div></li>
+      <li><span class="source-num">[4]</span><div><a href="https://www.deloitte.com/us/en/insights/industry/manufacturing-industrial-products/agentic-supply-chain-artificial-intelligence-manufacturing.html" target="_blank" rel="noopener">The agentic supply chain in manufacturing</a> — Deloitte Insights, 2026</div></li>
+      <li><span class="source-num">[5]</span><div><a href="https://www.gartner.com/en/newsroom/press-releases/2026-04-07-gartner-forecasts-supply-chain-management-software-with-agentic-ai-will-grow-to-53-billion-in-spend-by-2030" target="_blank" rel="noopener">Gartner Forecasts Supply Chain Management Software with Agentic AI Will Grow to $53 Billion by 2030</a> — Gartner, 2026-04-07</div></li>
+      <li><span class="source-num">[6]</span><div><a href="https://www.businesswire.com/news/home/20260521650379/en/Cognite-and-ABB-Collaborate-to-Integrate-Agentic-AI-into-Industrial-Applications-to-Deliver-Faster-Workflows" target="_blank" rel="noopener">Cognite and ABB Collaborate to Integrate Agentic AI into Industrial Applications</a> — BusinessWire/Cognite, 2026-05-21</div></li>
+      <li><span class="source-num">[7]</span><div><a href="https://www.mordorintelligence.com/industry-reports/agentic-artificial-intelligence-in-energy-and-utilities-market" target="_blank" rel="noopener">Agentic AI in Energy and Utilities Market Size, Share &amp; 2030 Growth Trends Report</a> — Mordor Intelligence, 2026</div></li>
+      <li><span class="source-num">[8]</span><div><a href="https://sakaradigital.com/blog/agentic-ai-life-sciences-pharma-biotech-pilots-production-2026/" target="_blank" rel="noopener">Agentic AI in Life Sciences: How Pharma and Biotech Are Moving from Pilots to Production in 2026</a> — Sakara Digital, 2026</div></li>
+      <li><span class="source-num">[9]</span><div><a href="https://claritypoints.com/ai-powered-pharmaceutical-manufacturing/" target="_blank" rel="noopener">AstraZeneca: AI-Powered Pharmaceutical Manufacturing</a> — Clarity Points (ARC Forum coverage), 2026-02</div></li>
+      <li><span class="source-num">[10]</span><div><a href="https://nvidianews.nvidia.com/news/siemens-and-nvidia-expand-partnership-industrial-ai-operating-system" target="_blank" rel="noopener">Siemens and NVIDIA Expand Partnership to Build the Industrial AI Operating System</a> — NVIDIA Newsroom, 2025-11</div></li>
+      <li><span class="source-num">[11]</span><div><a href="https://blogs.nvidia.com/blog/ai-manufacturing-hannover-messe/" target="_blank" rel="noopener">NVIDIA and Partners Showcase the Future of AI-Driven Manufacturing at Hannover Messe 2026</a> — NVIDIA Blog, 2026-04-20</div></li>
+      <li><span class="source-num">[12]</span><div><a href="https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027" target="_blank" rel="noopener">Gartner Predicts Over 40% of Agentic AI Projects Will Be Canceled by End of 2027</a> — Gartner, 2025-06-25</div></li>
+      <li><span class="source-num">[13]</span><div><a href="https://arxiv.org/abs/2605.14675" target="_blank" rel="noopener">Agentic AI in Industry: Adoption Level and Deployment Barriers</a> — arXiv, 2026-05</div></li>
+      <li><span class="source-num">[14]</span><div><a href="https://standards.iteh.ai/catalog/standards/clc/5551098d-3386-4248-903c-55ac84c3a837/pren-iec-61508-1-2025" target="_blank" rel="noopener">prEN IEC 61508-1:2025 — Functional Safety General Requirements Standard</a> — CENELEC/IEC, 2025</div></li>
+      <li><span class="source-num">[15]</span><div><a href="https://www.iso.org/standard/89535.html" target="_blank" rel="noopener">ISO/IEC CD TS 22440-1 — Artificial intelligence — Functional safety and AI systems</a> — ISO, 2025</div></li>
+      <li><span class="source-num">[16]</span><div><a href="https://xmpro.com/the-complete-guide-to-agentic-ai-in-industrial-operations-how-ai-agents-are-transforming-manufacturing-mining-and-asset-intensive-industries-in-2025/" target="_blank" rel="noopener">The Complete Guide to Agentic AI in Industrial Operations</a> — XMPro, 2025</div></li>
+      <li><span class="source-num">[17]</span><div><a href="https://www.iiot-world.com/artificial-intelligence-ml/2026-industrial-ai-trends-driving-global-manufacturing-with-agentic-systems/" target="_blank" rel="noopener">2026 Industrial AI Trends: Agentic Systems in Manufacturing</a> — IIoT World, 2026</div></li>
+      <li><span class="source-num">[18]</span><div><a href="https://www.verdantix.com/client-portal/blog/rockwell-automation-fair-2025-shows-how-autonomous-operations-can-truly-scale" target="_blank" rel="noopener">Rockwell Automation Fair 2025 Shows How Autonomous Operations Can Truly Scale</a> — Verdantix, 2025-11</div></li>
+      <li><span class="source-num">[19]</span><div><a href="https://advaiya.com/ai-agents-smart-grid-fault-detection-power-distribution/" target="_blank" rel="noopener">Smart grid fault detection: how AI agents are shifting power distribution from reactive to proactive</a> — Advaiya, 2025</div></li>
+      <li><span class="source-num">[20]</span><div><a href="https://retailtechinnovationhub.com/home/2026/3/26/agentic-ais-in-energy-systems-in-2026-whats-new" target="_blank" rel="noopener">Agentic AIs in energy systems In 2026: what&apos;s new?</a> — Retail Tech Innovation Hub, 2026-03-26</div></li>
+      <li><span class="source-num">[21]</span><div><a href="https://www.pwc.in/research-and-insights-hub/catalysing-new-value-streams-in-oil-and-gas-with-agentic-ai.html" target="_blank" rel="noopener">Catalysing new value streams in oil and gas with agentic AI</a> — PwC India, 2025</div></li>
+      <li><span class="source-num">[22]</span><div><a href="https://logisticsviewpoints.com/2025/10/29/operational-ai-arrives-what-the-palantir-nvidia-partnership-means-for-supply-chain-leaders/" target="_blank" rel="noopener">Operational AI Arrives: What the Palantir-NVIDIA Partnership Means for Supply Chain Leaders</a> — Logistics Viewpoints, 2025-10-29</div></li>
+      <li><span class="source-num">[23]</span><div><a href="https://www.ampcome.com/post/ai-agents-in-logistics-and-supply-chain" target="_blank" rel="noopener">AI Agents in Logistics &amp; Supply Chain: Use Cases &amp; ROI 2026</a> — Ampcome, 2026</div></li>
+      <li><span class="source-num">[24]</span><div><a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai" target="_blank" rel="noopener">The state of AI in 2025: Agents, innovation, and transformation</a> — McKinsey/QuantumBlack, 2025-07</div></li>
+      <li><span class="source-num">[25]</span><div><a href="https://news.samsung.com/global/samsung-electronics-announces-strategy-to-transition-global-manufacturing-into-ai-driven-factories-by-2030" target="_blank" rel="noopener">Samsung Electronics Announces Strategy To Transition Global Manufacturing Into AI-Driven Factories by 2030</a> — Samsung Newsroom, 2025</div></li>
+      <li><span class="source-num">[26]</span><div><a href="https://www.honeywell.com/us/en/press/2024/10/honeywell-and-google-cloud-to-accelerate-autonomous-operations-with-ai-agents-for-the-industrial-sector" target="_blank" rel="noopener">Honeywell and Google Cloud to Accelerate Autonomous Operations with AI Agents</a> — Honeywell, 2024-10-21</div></li>
+      <li><span class="source-num">[27]</span><div><a href="https://www.gevernova.com/software/blog/future-ai-powered-asset-inspections-energy-organizations" target="_blank" rel="noopener">AI-Powered Robotic Asset Inspections with ANYbotics</a> — GE Vernova, 2025</div></li>
+      <li><span class="source-num">[28]</span><div><a href="https://www.cognite.com/en/company/newsroom/agentic-ai-takes-center-stage-at-cognite-s-global-impact-2025-conference-to-showcase-industrial" target="_blank" rel="noopener">Impact 2025: Cognite Brings Global Industrial Leaders Together to Accelerate Agentic AI Adoption</a> — Cognite, 2025-10</div></li>
+      <li><span class="source-num">[29]</span><div><a href="https://c3.ai/c3-ai-announces-c3-code/" target="_blank" rel="noopener">C3 AI Launches C3 Code</a> — C3.ai, 2026-04-08</div></li>
+      <li><span class="source-num">[30]</span><div><a href="https://www.manufacturingdive.com/spons/2026-the-year-agentic-ai-transforms-industrial-manufacturing/812536/" target="_blank" rel="noopener">2026: The year agentic AI transforms industrial manufacturing</a> — Manufacturing Dive (sponsored by Infor), 2026</div></li>
+      <li><span class="source-num">[31]</span><div><a href="https://shieldworkz.com/reports/americas-ot-ics-scada-cyber-threat-analysis" target="_blank" rel="noopener">Americas OT Cybersecurity Threat Landscape: ICS, SCADA &amp; Critical Infrastructure Attack Trends</a> — ShieldWorkz, 2025</div></li>
+      <li><span class="source-num">[32]</span><div><a href="https://www.fortunebusinessinsights.com/agentic-ai-market-114233" target="_blank" rel="noopener">Agentic AI Market Size, Share &amp; Forecast Report, 2034</a> — Fortune Business Insights, 2025</div></li>
+      <li><span class="source-num">[33]</span><div><a href="https://www.digitalapplied.com/blog/agentic-ai-statistics-2026-definitive-collection-150-data-points" target="_blank" rel="noopener">Agentic AI Statistics 2026: 150+ Data Points Collection</a> — Digital Applied, 2026</div></li>
+      <li><span class="source-num">[34]</span><div><a href="https://www.gartner.com/en/newsroom/press-releases/2025-08-26-gartner-predicts-40-percent-of-enterprise-apps-will-feature-task-specific-ai-agents-by-2026-up-from-less-than-5-percent-in-2025" target="_blank" rel="noopener">Gartner Predicts 40% of Enterprise Apps Will Feature Task-Specific AI Agents by 2026</a> — Gartner, 2025-08-26</div></li>
+      <li><span class="source-num">[35]</span><div><a href="https://www.dataiku.com/stories/blog/manufacturing-ai-trends-2026" target="_blank" rel="noopener">Manufacturing&apos;s 2026 Mandate: From AI Pilot to Agentic Profit</a> — Dataiku, 2026</div></li>
+      <li><span class="source-num">[37]</span><div><a href="https://www.verdict.co.uk/abb-cognite-agentic-ai/" target="_blank" rel="noopener">ABB, Cognite partner to enhance industrial workflows with agentic AI</a> — Verdict, 2026-05-21</div></li>
+      <li><span class="source-num">[38]</span><div><a href="https://www.precedenceresearch.com/press-release/agentic-ai-in-energy-market" target="_blank" rel="noopener">Agentic AI in Energy Market Growth and Forecast</a> — Precedence Research, 2026</div></li>
+      <li><span class="source-num">[44]</span><div><a href="https://www.mckinsey.com/industries/automotive-and-assembly/our-insights/empowering-advanced-industries-with-agentic-ai" target="_blank" rel="noopener">McKinsey: Agentic AI implementations in advanced industries</a> — McKinsey, 2025</div></li>
+      <li><span class="source-num">[45]</span><div><a href="https://www.smartindustry.com/benefits-of-transformation/cybersecurity/blog/55310528/how-agentic-ai-can-be-a-force-multiplier-in-it-and-ot-cybersecurity" target="_blank" rel="noopener">How agentic AI can be a &apos;force multiplier&apos; in IT and OT cybersecurity</a> — Smart Industry, 2025</div></li>
+    </ul>
+
+    <div class="mt-6 pt-4 border-t border-soft">
+      <p class="text-xs font-bold uppercase tracking-widest muted mb-3">Video Sources — Rin&apos;s Deep Research (NotebookLM)</p>
+      <ul class="sources-list">
+        <li><span class="source-num">[V1]</span><div><a href="https://www.youtube.com/watch?v=ln-Iu1o7TME" target="_blank" rel="noopener">AWS re:Invent 2025 - Implement Agentic AI at the edge for industrial automation (HMC317)</a></div></li>
+        <li><span class="source-num">[V2]</span><div><a href="https://www.youtube.com/watch?v=WmnbPFCiYMs" target="_blank" rel="noopener">Agentic AI Harnessing AI to Revolutionize Manufacturing - Mark Sen Gupta of ARC - ARC Forum 2025</a></div></li>
+        <li><span class="source-num">[V3]</span><div><a href="https://www.youtube.com/watch?v=ThDPOlVk8F8" target="_blank" rel="noopener">Agentic AI Harnessing AI to Revolutionize Manufacturing - Panel Discussion - ARC Forum 2025</a></div></li>
+        <li><span class="source-num">[V4]</span><div><a href="https://www.youtube.com/watch?v=Q6lqxjkHoTI" target="_blank" rel="noopener">Agentic AI in Manufacturing | Impacts, ROI, and the Playbook for 2026–2030</a></div></li>
+        <li><span class="source-num">[V5]</span><div><a href="https://www.youtube.com/watch?v=K_F1rRCyM2A" target="_blank" rel="noopener">Agentic AI in Manufacturing: From Copilots to Autonomous Systems</a></div></li>
+        <li><span class="source-num">[V6]</span><div><a href="https://www.youtube.com/watch?v=8KZiwhWUMa8" target="_blank" rel="noopener">Building Agentic AI-Powered Digital Twins for Manufacturing Operations</a></div></li>
+        <li><span class="source-num">[V7]</span><div><a href="https://www.youtube.com/watch?v=9J_2bzmYGf8" target="_blank" rel="noopener">Digital Twins for Industrial AI and Warehouse Automation</a></div></li>
+        <li><span class="source-num">[V8]</span><div><a href="https://www.youtube.com/watch?v=l5M4sqaRd6w" target="_blank" rel="noopener">Fusing Real-Time AI With Digital Twins</a></div></li>
+        <li><span class="source-num">[V9]</span><div><a href="https://www.youtube.com/watch?v=Z9HxfeKV_XY" target="_blank" rel="noopener">How AI and Digital Twins Are Transforming Manufacturing | Automate 2025</a></div></li>
+        <li><span class="source-num">[V10]</span><div><a href="https://www.youtube.com/watch?v=jExIw0gaOEY" target="_blank" rel="noopener">Industrial AI for Automotive: Digital Twins, Simulation, and Robotics</a></div></li>
+        <li><span class="source-num">[V11]</span><div><a href="https://www.youtube.com/watch?v=bl_35QzVsGU" target="_blank" rel="noopener">Siemens unveils breakthrough innovations in industrial AI and digital twin technologies at CES 2025</a></div></li>
+        <li><span class="source-num">[V12]</span><div><a href="https://www.youtube.com/watch?v=zaHK3N3UE3U" target="_blank" rel="noopener">Smart Manufacturing – The Future of Industry 4.0 &amp; 5.0 | AI, Robotics &amp; Digital Twins</a></div></li>
+        <li><span class="source-num">[V13]</span><div><a href="https://www.youtube.com/watch?v=9drV0aAKSh0" target="_blank" rel="noopener">The New Industrialists | AI Revolution in Manufacturing: Real Change, Real Results</a></div></li>
+        <li><span class="source-num">[V14]</span><div><a href="https://www.youtube.com/watch?v=ktM9biZ8Azg" target="_blank" rel="noopener">The Next Generation of Industrial AI With Siemens and NVIDIA</a></div></li>
+        <li><span class="source-num">[V15]</span><div><a href="https://www.youtube.com/watch?v=Wq1ICuhN3R0" target="_blank" rel="noopener">Transforming Semiconductor Manufacturing With Agentic AI from Design and Engineering to Production</a></div></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     13. FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="border-t border-soft mt-12 py-8">
+  <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-11</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+  // ── Lucide icons ──────────────────────────────
+  lucide.createIcons();
+
+  // ── Reduced motion guard ──────────────────────
+  const prefersReduced = window.matchMedia(`(prefers-reduced-motion: reduce)`).matches;
+  if (prefersReduced) {
+    document.querySelectorAll(`.fade-up, .fade-left, .scale-in`).forEach(el => {
+      el.classList.add(`visible`);
+    });
+  }
+
+  // ── Scroll progress bar ───────────────────────
+  window.addEventListener(`scroll`, () => {
+    const doc = document.documentElement;
+    const scrollTop = doc.scrollTop || document.body.scrollTop;
+    const scrollHeight = doc.scrollHeight - doc.clientHeight;
+    const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    document.getElementById(`scroll-progress`).style.width = pct + `%`;
+  }, { passive: true });
+
+  // ── IntersectionObserver for entrance animations ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, idx) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add(`visible`);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: `0px 0px -40px 0px` });
+
+  document.querySelectorAll(`.fade-up, .fade-left, .scale-in`).forEach((el, i) => {
+    if (!prefersReduced) observer.observe(el);
+  });
+
+  // ── Animated counters ─────────────────────────
+  function animateCounter(el, target, duration, suffix) {
+    const start = performance.now();
+    const update = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  }
+
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.counter, 10);
+        const suffix = el.dataset.suffix || ``;
+        animateCounter(el, target, 1200, suffix);
+        counterObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll(`[data-counter]`).forEach(el => {
+    if (!prefersReduced) counterObserver.observe(el);
+    else {
+      el.textContent = el.dataset.counter + (el.dataset.suffix || ``);
+    }
+  });
+
+  // ── Safety bar fills (on scroll) ─────────────
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll(`.safety-bar-fill`).forEach(bar => {
+          bar.style.width = (bar.dataset.width || 0) + `%`;
+        });
+        barObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll(`.safety-bar-track`).forEach(track => {
+    barObserver.observe(track.closest(`div`) || track);
+  });
+  // Also trigger on parent section visibility
+  document.querySelectorAll(`.safety-level, .safety-bar-track`).forEach(el => {
+    const fills = el.querySelectorAll ? el.querySelectorAll(`.safety-bar-fill`) : [];
+    if (!fills.length && el.classList.contains(`safety-bar-track`)) {
+      const fill = el.querySelector(`.safety-bar-fill`);
+      if (fill) {
+        const io = new IntersectionObserver(([e]) => {
+          if (e.isIntersecting) { fill.style.width = (fill.dataset.width || 0) + `%`; io.disconnect(); }
+        }, { threshold: 0.5 });
+        io.observe(el);
+      }
+    }
+  });
+
+  // ── Insight Reel ──────────────────────────────
+  const TOTAL_SLIDES = 6;
+  let currentSlide = 0;
+  let reelPaused = false;
+  let reelTimer = null;
+  let progressEl = null;
+
+  function buildDots() {
+    const container = document.getElementById(`reel-dots`);
+    for (let i = 0; i < TOTAL_SLIDES; i++) {
+      const dot = document.createElement(`button`);
+      dot.className = `reel-dot` + (i === 0 ? ` active` : ``);
+      dot.setAttribute(`aria-label`, `Slide ` + (i + 1));
+      dot.addEventListener(`click`, () => goToSlide(i));
+      container.appendChild(dot);
+    }
+  }
+
+  function goToSlide(n) {
+    const cards = document.querySelectorAll(`.reel-card`);
+    cards[currentSlide].classList.remove(`active`);
+    document.querySelectorAll(`.reel-dot`)[currentSlide].classList.remove(`active`);
+    currentSlide = (n + TOTAL_SLIDES) % TOTAL_SLIDES;
+    cards[currentSlide].classList.add(`active`);
+    document.querySelectorAll(`.reel-dot`)[currentSlide].classList.add(`active`);
+    restartProgress();
+  }
+
+  function restartProgress() {
+    if (!progressEl) return;
+    progressEl.classList.remove(`running`);
+    // Force reflow
+    void progressEl.offsetWidth;
+    if (!reelPaused) progressEl.classList.add(`running`);
+  }
+
+  function nextSlide() {
+    if (!reelPaused) goToSlide(currentSlide + 1);
+  }
+
+  function startReelTimer() {
+    if (reelTimer) clearInterval(reelTimer);
+    reelTimer = setInterval(nextSlide, 4000);
+  }
+
+  function initReel() {
+    buildDots();
+    progressEl = document.getElementById(`reel-progress-bar`);
+    const wrapper = document.getElementById(`reel-wrapper`);
+    if (wrapper) {
+      wrapper.addEventListener(`mouseenter`, () => {
+        reelPaused = true;
+        if (progressEl) progressEl.classList.remove(`running`);
+      });
+      wrapper.addEventListener(`mouseleave`, () => {
+        reelPaused = false;
+        restartProgress();
+      });
+    }
+    progressEl.addEventListener(`animationend`, () => {
+      if (!reelPaused) {
+        goToSlide(currentSlide + 1);
+      }
+    });
+    // Start auto-advance via CSS animation end event only — no setInterval needed
+  }
+
+  initReel();
+
+  // ── Chart.js ──────────────────────────────────
+  const isDark = window.matchMedia(`(prefers-color-scheme: dark)`).matches;
+  const gridColor = isDark ? `#27272a` : `#e4e4e7`;
+  const tickColor = isDark ? `#a1a1aa` : `#71717a`;
+
+  const baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 900, easing: `easeOutQuart` },
+    plugins: {
+      legend: { labels: { color: tickColor, font: { family: `Inter`, size: 11 } } }
+    },
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { family: `Inter`, size: 11 } } },
+      y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { family: `Inter`, size: 11 } }, beginAtZero: true }
+    }
+  };
+
+  // Energy market chart (line)
+  const energyCtx = document.getElementById(`chart-energy`);
+  const energyChart = new Chart(energyCtx, {
+    type: `line`,
+    data: {
+      labels: [`2024`, `2025`, `2026`, `2027`, `2028`, `2029`, `2030`, `2031`],
+      datasets: [
+        {
+          label: `Mordor Intelligence ($B)`,
+          data: [0.47, 0.64, 0.87, 1.19, 1.62, 2.21, 3.01, 4.11],
+          borderColor: `#6366F1`,
+          backgroundColor: `rgba(99,102,241,0.08)`,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }
+      ]
+    },
+    options: {
+      ...baseOpts,
+      plugins: {
+        ...baseOpts.plugins,
+        tooltip: { callbacks: { label: ctx => ` $` + ctx.parsed.y.toFixed(2) + `B` } }
+      }
+    }
+  });
+
+  // SCM spend + adoption chart (bar + line combo)
+  const scmCtx = document.getElementById(`chart-scm`);
+  const scmChart = new Chart(scmCtx, {
+    type: `bar`,
+    data: {
+      labels: [`2025`, `2026`, `2027`, `2028`, `2029`, `2030`],
+      datasets: [
+        {
+          label: `Spend ($B) — Gartner`,
+          data: [2, 6, 14, 24, 38, 53],
+          backgroundColor: `rgba(99,102,241,0.7)`,
+          borderColor: `#6366F1`,
+          borderWidth: 1,
+          yAxisID: `y`
+        },
+        {
+          label: `Adoption (% SCM users)`,
+          data: [5, 12, 25, 38, 50, 60],
+          type: `line`,
+          borderColor: `#10B981`,
+          backgroundColor: `rgba(16,185,129,0.1)`,
+          fill: false,
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          yAxisID: `y1`
+        }
+      ]
+    },
+    options: {
+      ...baseOpts,
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: tickColor } },
+        y: { position: `left`, grid: { color: gridColor }, ticks: { color: `#6366F1`, callback: v => `$` + v + `B` }, beginAtZero: true },
+        y1: { position: `right`, grid: { drawOnChartArea: false }, ticks: { color: `#10B981`, callback: v => v + `%` }, beginAtZero: true, max: 100 }
+      }
+    }
+  });
+
+  // Trigger charts on scroll
+  let chartsTriggered = false;
+  const chartObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !chartsTriggered) {
+        chartsTriggered = true;
+        energyChart.update();
+        scmChart.update();
+        chartObserver.disconnect();
+      }
+    });
+  }, { threshold: 0.3 });
+  chartObserver.observe(document.getElementById(`chart-energy`));
+
+</script>
+</body>
+</html>
