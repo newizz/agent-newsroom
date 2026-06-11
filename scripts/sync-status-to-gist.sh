@@ -13,9 +13,27 @@ cd "$REPO_ROOT"
 CFG="office/gist-config.json"
 STATUS="office/status.json"
 
-[[ -f "$CFG" ]] || exit 0       # no gist configured
+[[ -f "$CFG" ]] || exit 0       # no gist configured — silent skip
 [[ -f "$STATUS" ]] || exit 0
 command -v jq >/dev/null 2>&1 || exit 0
+
+# ── Sanity guards — never sync corrupt data to gist ──
+# Guard 1: file must not be empty (0 bytes)
+if [[ ! -s "$STATUS" ]]; then
+  echo "✗ sync-status-to-gist: $STATUS is empty — refusing to sync" >&2
+  exit 2
+fi
+# Guard 2: file must be valid JSON
+if ! jq -e . "$STATUS" >/dev/null 2>&1; then
+  echo "✗ sync-status-to-gist: $STATUS is not valid JSON — refusing to sync" >&2
+  exit 3
+fi
+# Guard 3: schema must have agents array with ≥1 entry (catches truncation / wrong file)
+AGENT_COUNT=$(jq -r '(.agents // []) | length' "$STATUS" 2>/dev/null || echo 0)
+if [[ "$AGENT_COUNT" -lt 1 ]]; then
+  echo "✗ sync-status-to-gist: $STATUS has no agents — refusing to sync" >&2
+  exit 4
+fi
 
 GIST_ID=$(jq -r '.gistId // empty' "$CFG")
 [[ -n "$GIST_ID" ]] || exit 0

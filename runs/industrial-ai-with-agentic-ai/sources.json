@@ -1,0 +1,417 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "Siemens introduces AI agents for industrial automation",
+      "url": "https://press.siemens.com/global/en/pressrelease/siemens-introduces-ai-agents-industrial-automation",
+      "publisher": "Siemens",
+      "author": "Siemens Press",
+      "date": "2025-05-13",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Vendor press release. Claims (50% productivity target, 25% maintenance reduction) are self-reported."
+    },
+    {
+      "id": 2,
+      "title": "Agentic AI vs. Traditional AI: Key Differences",
+      "url": "https://www.fullstack.com/labs/resources/blog/agentic-ai-vs-traditional-ai-what-sets-ai-agents-apart",
+      "publisher": "FullStack Labs",
+      "author": "FullStack Editorial",
+      "date": "2025-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Secondary synthesis of definitions; useful for framing."
+    },
+    {
+      "id": 3,
+      "title": "12 Agentic AI Examples With Measurable ROI: Enterprise Case Studies From 2025-2026",
+      "url": "https://aimonk.com/agentic-ai-examples-enterprise-roi-case-studies/",
+      "publisher": "AI Monk",
+      "author": "AI Monk Editorial",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Contains General Mills case study with $20M+ savings and 5,000+ daily shipments data."
+    },
+    {
+      "id": 4,
+      "title": "The agentic supply chain in manufacturing",
+      "url": "https://www.deloitte.com/us/en/insights/industry/manufacturing-industrial-products/agentic-supply-chain-artificial-intelligence-manufacturing.html",
+      "publisher": "Deloitte",
+      "author": "Deloitte Insights",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Confirms Walmart agentic supply chain deployment. No quantified ROI; conceptual framing of technology stack."
+    },
+    {
+      "id": 5,
+      "title": "Gartner Forecasts Supply Chain Management Software with Agentic AI Will Grow to $53 Billion in Spend by 2030",
+      "url": "https://www.gartner.com/en/newsroom/press-releases/2026-04-07-gartner-forecasts-supply-chain-management-software-with-agentic-ai-will-grow-to-53-billion-in-spend-by-2030",
+      "publisher": "Gartner",
+      "author": "Gartner Newsroom",
+      "date": "2026-04-07",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Primary analyst forecast. Gartner VP Analyst Balaji Abbabatulla quoted. Includes simple vs advanced agent breakdown."
+    },
+    {
+      "id": 6,
+      "title": "Cognite and ABB Collaborate to Integrate Agentic AI into Industrial Applications to Deliver Faster Workflows",
+      "url": "https://www.businesswire.com/news/home/20260521650379/en/Cognite-and-ABB-Collaborate-to-Integrate-Agentic-AI-into-Industrial-Applications-to-Deliver-Faster-Workflows",
+      "publisher": "BusinessWire / Cognite",
+      "author": "Cognite Press",
+      "date": "2026-05-21",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Official partnership announcement. Aker BP confirmed as first customer. Agent-to-agent orchestration between ABB Ability SafetyInsight, AlarmInsight, and Cognite Data Fusion."
+    },
+    {
+      "id": 7,
+      "title": "Agentic AI in Energy and Utilities Market Size, Share & 2030 Growth Trends Report",
+      "url": "https://www.mordorintelligence.com/industry-reports/agentic-artificial-intelligence-in-energy-and-utilities-market",
+      "publisher": "Mordor Intelligence",
+      "author": "Mordor Intelligence Research",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Market research firm report. $0.64B (2025), $0.87B (2026), $4.11B (2031) at 36.35% CAGR. Methodology not publicly disclosed."
+    },
+    {
+      "id": 8,
+      "title": "Agentic AI in Life Sciences: How Pharma and Biotech Are Moving from Pilots to Production in 2026",
+      "url": "https://sakaradigital.com/blog/agentic-ai-life-sciences-pharma-biotech-pilots-production-2026/",
+      "publisher": "Sakara Digital",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "67% of life sciences in pilots Q1 2026. Performance metrics (40-50% deviation investigation reduction, 60-75% batch record compression) cited from early industry deployments; specific companies withheld."
+    },
+    {
+      "id": 9,
+      "title": "AstraZeneca: AI-Powered Pharmaceutical Manufacturing (ARC Forum February 2026 presentation)",
+      "url": "https://claritypoints.com/ai-powered-pharmaceutical-manufacturing/",
+      "publisher": "Clarity Points (secondary account of ARC Forum)",
+      "date": "2026-02-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Secondary coverage of AstraZeneca AIDA framework presentation by Magnus Nydén at ARC Forum, February 2026."
+    },
+    {
+      "id": 10,
+      "title": "Siemens and NVIDIA Expand Partnership to Build the Industrial AI Operating System",
+      "url": "https://nvidianews.nvidia.com/news/siemens-and-nvidia-expand-partnership-industrial-ai-operating-system",
+      "publisher": "NVIDIA Newsroom",
+      "author": "NVIDIA Press",
+      "date": "2025-11-01",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Official partnership announcement. Erlangen factory named as first blueprint. 2-10x EDA speedup target. Foxconn, HD Hyundai, KION Group, PepsiCo evaluating."
+    },
+    {
+      "id": 11,
+      "title": "NVIDIA and Partners Showcase the Future of AI-Driven Manufacturing at Hannover Messe 2026",
+      "url": "https://blogs.nvidia.com/blog/ai-manufacturing-hannover-messe/",
+      "publisher": "NVIDIA Blog",
+      "author": "NVIDIA Editorial",
+      "date": "2026-04-20",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Hannover Messe April 2026 demonstration of agentic design, real-time simulation, vision AI agents, and humanoid robots."
+    },
+    {
+      "id": 12,
+      "title": "Gartner Predicts Over 40% of Agentic AI Projects Will Be Canceled by End of 2027",
+      "url": "https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027",
+      "publisher": "Gartner",
+      "author": "Gartner Newsroom",
+      "date": "2025-06-25",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Key counter-signal to adoption optimism. Reasons: escalating costs, unclear business value, inadequate risk controls."
+    },
+    {
+      "id": 13,
+      "title": "Agentic AI in Industry: Adoption Level and Deployment Barriers",
+      "url": "https://arxiv.org/abs/2605.14675",
+      "publisher": "arXiv",
+      "author": "Academic researchers (names not confirmed from abstract)",
+      "date": "2026-05-01",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Academic study of 16 practitioners across 12 companies. Only 1 company at multi-agent orchestration level. Identifies 'capability-deployment verification gap' as primary barrier."
+    },
+    {
+      "id": 14,
+      "title": "prEN IEC 61508-1:2025 - Functional Safety General Requirements Standard",
+      "url": "https://standards.iteh.ai/catalog/standards/clc/5551098d-3386-4248-903c-55ac84c3a837/pren-iec-61508-1-2025",
+      "publisher": "CENELEC / IEC",
+      "date": "2025-01-01",
+      "type": "reference",
+      "accessed": "2026-06-11",
+      "notes": "2025 update extends requirements to human factors, security aspects, and clarifies AI scope."
+    },
+    {
+      "id": 15,
+      "title": "ISO/IEC CD TS 22440-1 - Artificial intelligence — Functional safety and AI systems — Part 1: Requirements",
+      "url": "https://www.iso.org/standard/89535.html",
+      "publisher": "ISO",
+      "date": "2025-01-01",
+      "type": "reference",
+      "accessed": "2026-06-11",
+      "notes": "Currently Committee Draft stage. First international standard designed specifically for AI functional safety. Parts: Requirements, Guidance, Examples."
+    },
+    {
+      "id": 16,
+      "title": "The Complete Guide to Agentic AI in Industrial Operations: How AI Agents Are Transforming Manufacturing, Mining, and Asset-Intensive Industries in 2025",
+      "url": "https://xmpro.com/the-complete-guide-to-agentic-ai-in-industrial-operations-how-ai-agents-are-transforming-manufacturing-mining-and-asset-intensive-industries-in-2025/",
+      "publisher": "XMPro",
+      "author": "XMPro Editorial",
+      "date": "2025-01-01",
+      "type": "opinion",
+      "accessed": "2026-06-11",
+      "notes": "Vendor-authored comprehensive guide. Contains AIA CPT framework, technology stack details, and industry use cases. Mining metrics (30-40% productivity, 60-70% safety incident reduction) and O&G seismic metrics are vendor claims."
+    },
+    {
+      "id": 17,
+      "title": "2026 Industrial AI Trends: Agentic Systems in Manufacturing",
+      "url": "https://www.iiot-world.com/artificial-intelligence-ml/2026-industrial-ai-trends-driving-global-manufacturing-with-agentic-systems/",
+      "publisher": "IIoT World",
+      "author": "IIoT World Editorial",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Contains Suzano (95% SAP query time reduction), Danfoss (80% order processing automation), Elanco ($1.3M productivity loss avoided) case studies."
+    },
+    {
+      "id": 18,
+      "title": "Rockwell Automation Fair 2025 Shows How Autonomous Operations Can Truly Scale",
+      "url": "https://www.verdantix.com/client-portal/blog/rockwell-automation-fair-2025-shows-how-autonomous-operations-can-truly-scale",
+      "publisher": "Verdantix",
+      "author": "Verdantix Analysts",
+      "date": "2025-11-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Independent analyst coverage of Rockwell Fair 2025. Confirms 6 initial Plex AI agents, 11 billion daily transactions on Elastic MES, Texas Instruments and GE deployments."
+    },
+    {
+      "id": 19,
+      "title": "Smart grid fault detection: how AI agents are shifting power distribution from reactive to proactive",
+      "url": "https://advaiya.com/ai-agents-smart-grid-fault-detection-power-distribution/",
+      "publisher": "Advaiya",
+      "date": "2025-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Describes self-healing grid scenarios; 80% outage duration reduction figure cited from utility pilot reports."
+    },
+    {
+      "id": 20,
+      "title": "Agentic AIs in energy systems In 2026: what's new?",
+      "url": "https://retailtechinnovationhub.com/home/2026/3/26/agentic-ais-in-energy-systems-in-2026-whats-new",
+      "publisher": "Retail Technology Innovation Hub",
+      "date": "2026-03-26",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Confirms Tata Power-Salesforce Agentforce deployment for renewable energy, March 2026."
+    },
+    {
+      "id": 21,
+      "title": "Catalysing new value streams in oil and gas with agentic AI",
+      "url": "https://www.pwc.in/research-and-insights-hub/catalysing-new-value-streams-in-oil-and-gas-with-agentic-ai.html",
+      "publisher": "PwC India",
+      "author": "PwC Research",
+      "date": "2025-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Contains BCG 2025 estimate of 30-70% incremental EBIT-equivalent from full AI agent integration in O&G. Consultant claim; independent verification not found."
+    },
+    {
+      "id": 22,
+      "title": "Operational AI Arrives: What the Palantir-NVIDIA Partnership Means for Supply Chain Leaders",
+      "url": "https://logisticsviewpoints.com/2025/10/29/operational-ai-arrives-what-the-palantir-nvidia-partnership-means-for-supply-chain-leaders/",
+      "publisher": "Logistics Viewpoints",
+      "author": "Logistics Viewpoints Editorial",
+      "date": "2025-10-29",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Covers Palantir-NVIDIA partnership and Lowe's digital twin logistics deployment. October 2025 announcement."
+    },
+    {
+      "id": 23,
+      "title": "AI Agents in Logistics & Supply Chain: Use Cases & ROI 2026",
+      "url": "https://www.ampcome.com/post/ai-agents-in-logistics-and-supply-chain",
+      "publisher": "Ampcome",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "$8.67B (2025) to $16.84B (2030) logistics/supply chain agentic AI market estimate."
+    },
+    {
+      "id": 24,
+      "title": "The state of AI in 2025: Agents, innovation, and transformation",
+      "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
+      "publisher": "McKinsey & Company / QuantumBlack",
+      "author": "McKinsey Research",
+      "date": "2025-07-01",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "McKinsey State of AI 2025. 80% cite data limitations; ~5.5% get real ROI; <10% have scaled to value; supply chain logistics >20% cost reduction figure."
+    },
+    {
+      "id": 25,
+      "title": "Samsung Electronics Announces Strategy To Transition Global Manufacturing Into AI-Driven Factories by 2030",
+      "url": "https://news.samsung.com/global/samsung-electronics-announces-strategy-to-transition-global-manufacturing-into-ai-driven-factories-by-2030",
+      "publisher": "Samsung Newsroom",
+      "date": "2025-01-01",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Official Samsung announcement. Digital twin simulations and specialized quality/logistics AI agents. 2030 target for AI-driven factory transition."
+    },
+    {
+      "id": 26,
+      "title": "Honeywell and Google Cloud to Accelerate Autonomous Operations with AI Agents for the Industrial Sector",
+      "url": "https://www.honeywell.com/us/en/press/2024/10/honeywell-and-google-cloud-to-accelerate-autonomous-operations-with-ai-agents-for-the-industrial-sector",
+      "publisher": "Honeywell",
+      "author": "Honeywell Press",
+      "date": "2024-10-21",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Announced October 2024; first solutions available to customers in 2025. Gemini on Vertex AI + Honeywell Forge IoT platform."
+    },
+    {
+      "id": 27,
+      "title": "AI-Powered Robotic Asset Inspections with ANYbotics",
+      "url": "https://www.gevernova.com/software/blog/future-ai-powered-asset-inspections-energy-organizations",
+      "publisher": "GE Vernova",
+      "date": "2025-01-01",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "GE Vernova-ANYbotics formal collaboration for legged robotics industrial inspection; 2025 announcement."
+    },
+    {
+      "id": 28,
+      "title": "Impact 2025: Cognite Brings Global Industrial Leaders Together in Houston to Accelerate Agentic AI Adoption",
+      "url": "https://www.cognite.com/en/company/newsroom/agentic-ai-takes-center-stage-at-cognite-s-global-impact-2025-conference-to-showcase-industrial",
+      "publisher": "Cognite",
+      "author": "Cognite Newsroom",
+      "date": "2025-10-01",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Conference newsroom with customer list (ExxonMobil, Koch, Aker BP, Idemitsu, NOVA Chemicals, Cosmo Energy, Nippon Shokubai, HMH). Capgemini 2025 stat (82% plan agent integration by 2027; 25-40% efficiency gains) also cited here."
+    },
+    {
+      "id": 29,
+      "title": "C3 AI Launches C3 Code",
+      "url": "https://c3.ai/c3-ai-announces-c3-code/",
+      "publisher": "C3.ai",
+      "author": "C3.ai Press",
+      "date": "2026-04-08",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "General availability of C3 Code announced April 8, 2026. Part of broader C3 Agentic AI Platform."
+    },
+    {
+      "id": 30,
+      "title": "2026: The year agentic AI transforms industrial manufacturing",
+      "url": "https://www.manufacturingdive.com/spons/2026-the-year-agentic-ai-transforms-industrial-manufacturing/812536/",
+      "publisher": "Manufacturing Dive (sponsored by Infor)",
+      "date": "2026-01-01",
+      "type": "opinion",
+      "accessed": "2026-06-11",
+      "notes": "Sponsored content from Infor. Key insight: primary barrier is psychological, not technological. Deloitte 6%→24% adoption projection also cited in related sources."
+    },
+    {
+      "id": 31,
+      "title": "Americas OT Cybersecurity Threat Landscape: ICS, SCADA & Critical Infrastructure Attack Trends",
+      "url": "https://shieldworkz.com/reports/americas-ot-ics-scada-cyber-threat-analysis",
+      "publisher": "ShieldWorkz",
+      "date": "2025-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "11% of 1M OT devices with exploitable vulnerabilities; 87% YoY OT ransomware increase; sector breakdown (manufacturing 33%, energy 23%, O&G 22%)."
+    },
+    {
+      "id": 32,
+      "title": "Agentic AI Market Size, Share & Forecast Report, 2034",
+      "url": "https://www.fortunebusinessinsights.com/agentic-ai-market-114233",
+      "publisher": "Fortune Business Insights",
+      "date": "2025-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Broad agentic AI market: $7.29B (2025), 40.50% CAGR, $139.19B by 2034. Scope includes all industries."
+    },
+    {
+      "id": 33,
+      "title": "Agentic AI Statistics 2026: 150+ Data Points Collection",
+      "url": "https://www.digitalapplied.com/blog/agentic-ai-statistics-2026-definitive-collection-150-data-points",
+      "publisher": "Digital Applied",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Aggregates multiple sources including McKinsey $2.6-4.4T annual value estimate across all business use cases (non-industrial-specific)."
+    },
+    {
+      "id": 34,
+      "title": "Gartner Predicts 40% of Enterprise Apps Will Feature Task-Specific AI Agents by 2026, Up from Less Than 5% in 2025",
+      "url": "https://www.gartner.com/en/newsroom/press-releases/2025-08-26-gartner-predicts-40-percent-of-enterprise-apps-will-feature-task-specific-ai-agents-by-2026-up-from-less-than-5-percent-in-2025",
+      "publisher": "Gartner",
+      "author": "Gartner Newsroom",
+      "date": "2025-08-26",
+      "type": "primary",
+      "accessed": "2026-06-11",
+      "notes": "Enterprise-wide prediction. 60%+ of organizations plan to deploy agents within 2 years; 40% enterprise apps with agents by end 2026."
+    },
+    {
+      "id": 35,
+      "title": "Manufacturing's 2026 Mandate: From AI Pilot to Agentic Profit",
+      "url": "https://www.dataiku.com/stories/blog/manufacturing-ai-trends-2026",
+      "publisher": "Dataiku",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "6% current manufacturing adoption (2025); Deloitte projects fourfold increase to 24% in 2026. MIT finding that only 5% of GenAI projects reach scale across industries."
+    },
+    {
+      "id": 37,
+      "title": "ABB, Cognite partner to enhance industrial workflows with agentic AI",
+      "url": "https://www.verdict.co.uk/abb-cognite-agentic-ai/",
+      "publisher": "Verdict",
+      "author": "Verdict Editorial",
+      "date": "2026-05-21",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Independent media coverage of ABB-Cognite partnership. Clarifies agent-to-agent architecture and Aker BP as first customer."
+    },
+    {
+      "id": 38,
+      "title": "Agentic AI in Energy Market Growth and Forecast",
+      "url": "https://www.precedenceresearch.com/press-release/agentic-ai-in-energy-market",
+      "publisher": "Precedence Research",
+      "date": "2026-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Alternative market forecast: $656.60M (2025) growing to $14.9B by 2035 at 36.65% CAGR. Grid operations/self-healing segment: 24.60% share in 2025. Figures differ from Mordor due to scope variation."
+    },
+    {
+      "id": 44,
+      "title": "McKinsey: Agentic AI implementations in advanced industries",
+      "url": "https://www.mckinsey.com/industries/automotive-and-assembly/our-insights/empowering-advanced-industries-with-agentic-ai",
+      "publisher": "McKinsey & Company",
+      "author": "McKinsey Research",
+      "date": "2025-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "$450B-$650B additional annual revenue potential by 2030 in advanced industries; Volvo Trucks AI maintenance system mentioned. Fetch timed out; summary from search results."
+    },
+    {
+      "id": 45,
+      "title": "How agentic AI can be a 'force multiplier' in IT and OT cybersecurity",
+      "url": "https://www.smartindustry.com/benefits-of-transformation/cybersecurity/blog/55310528/how-agentic-ai-can-be-a-force-multiplier-in-it-and-ot-cybersecurity",
+      "publisher": "Smart Industry",
+      "date": "2025-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-11",
+      "notes": "Covers both agentic AI for OT defense and the risk of AI-accelerated attack lifecycles in ICS environments."
+    }
+  ]
+}
