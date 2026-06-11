@@ -15,7 +15,7 @@ Agent #1  Intake          (agents/intake.md)
 Agent #2  Research         (agents/researcher.md)
    ↓ produces runs/<slug>/research.md + sources.json
 Agent #3  Builder          (agents/builder.md)
-   ↓ produces preview/<slug>/index.html
+   ↓ produces published/<slug>/index.html
 Agent #4  Reporter         (agents/reporter.md)
    ↓ produces runs/<slug>/report.md
 ```
@@ -89,9 +89,9 @@ After research is complete, spawn Builder via `Task`. It will:
 - If `deep-research/` exists, also read summary.md + mindmap.json + sources.json
 - Merge content (prefer Rin's findings on conflict — NotebookLM has stronger grounding)
 - Build dashboard with embedded mind map + infographic
-- Deploy to preview/<slug>/
+- Deploy to published/<slug>/
 
-Wait for `preview/<slug>/index.html`.
+Wait for `published/<slug>/index.html`.
 
 ### 6. Spawn Reporter
 
@@ -100,8 +100,7 @@ Wait for `runs/<slug>/report.md`.
 ### 7. Final response to user
 
 Post the contents of `report.md` to the user, plus:
-- 🔗 Preview: `https://newizz.github.io/agent-newsroom/preview/<slug>/`
-- ✅ Promote: `./scripts/promote-to-published.sh <slug>`
+- 🔗 Live URL: `https://newizz.github.io/agent-newsroom/published/<slug>/`
 
 Then:
 ```bash
@@ -133,7 +132,7 @@ After each agent, verify the expected output file exists. If missing:
 | Intake | `runs/<slug>/brief.md` |
 | Research (Ravi) | `runs/<slug>/research.md`, `runs/<slug>/sources.json` |
 | Deep Research (Rin) | `runs/<slug>/deep-research/summary.md` (others optional) |
-| Builder | `preview/<slug>/index.html` |
+| Builder | `published/<slug>/index.html` |
 | Reporter | `runs/<slug>/report.md` |
 
 ## Decision rules
@@ -160,6 +159,6 @@ You:
 2. `mkdir -p runs/<slug>` + status `--run <slug> deep`
 3. Spawn Intake → verify brief.md
 4. Spawn Ravi + Rin in same message (parallel) → verify both outputs
-5. Spawn Builder → verify preview/<slug>/index.html
+5. Spawn Builder → verify published/<slug>/index.html
 6. Spawn Reporter → verify report.md
 7. Return report + URLs + status `--reset`

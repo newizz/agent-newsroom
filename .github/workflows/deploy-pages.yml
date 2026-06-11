@@ -26,25 +26,11 @@ jobs:
           mkdir -p _site
           # Copy virtual office UI as the landing page
           cp -r office/* _site/
-          # Copy preview and published dashboards
-          [ -d preview ] && cp -r preview _site/preview || mkdir _site/preview
+          # Copy published dashboards (preview/promote workflow has been removed — all dashboards are published directly)
           [ -d published ] && cp -r published _site/published || mkdir _site/published
           # Generate a simple manifest of all dashboards for the office UI to read
           echo "{" > _site/manifest.json
           echo '  "generated": "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'",' >> _site/manifest.json
-          echo '  "preview": [' >> _site/manifest.json
-          if [ -d preview ]; then
-            first=1
-            for d in preview/*/; do
-              [ -d "$d" ] || continue
-              slug=$(basename "$d")
-              [ $first -eq 0 ] && echo "," >> _site/manifest.json
-              printf '    {"slug": "%s", "url": "preview/%s/"}' "$slug" "$slug" >> _site/manifest.json
-              first=0
-            done
-          fi
-          echo "" >> _site/manifest.json
-          echo '  ],' >> _site/manifest.json
           echo '  "published": [' >> _site/manifest.json
           if [ -d published ]; then
             first=1

@@ -35,6 +35,15 @@ except ImportError as e:
     print("✗ notebooklm-py not installed. Run: ./tools/notebooklm/scripts/setup.sh", file=sys.stderr)
     sys.exit(1)
 
+# Infographic enums (may not be exported on older versions — fall back to defaults if missing)
+try:
+    from notebooklm import InfographicOrientation, InfographicDetail
+    _HAS_INFOGRAPHIC_ENUMS = True
+except ImportError:
+    InfographicOrientation = None
+    InfographicDetail = None
+    _HAS_INFOGRAPHIC_ENUMS = False
+
 
 def parse_brief(brief_text: str) -> dict:
     """Extract topic, refined question, and Key Questions from brief.md."""
@@ -162,16 +171,35 @@ async def main() -> int:
             print(f"  ⚠ failed: {e}")
             mindmap_path = None
 
-        # 8. Infographic
+        # 8. Infographic — uses Enum params (orientation/detail), NOT strings
         print("→ Generating infographic...")
         infographic_path = output_dir / "infographic.png"
         try:
-            ig = await client.artifacts.generate_infographic(
-                nb.id, orientation="landscape", detail="standard"
-            )
+            # Try with explicit enum args first (preferred, library v0.5+)
+            if _HAS_INFOGRAPHIC_ENUMS:
+                ig = await client.artifacts.generate_infographic(
+                    nb.id,
+                    orientation=InfographicOrientation.LANDSCAPE,
+                    detail=InfographicDetail.STANDARD,
+                )
+            else:
+                # Fallback: defaults (PORTRAIT / STANDARD per library spec)
+                ig = await client.artifacts.generate_infographic(nb.id)
+
             await client.artifacts.wait_for_completion(nb.id, ig.task_id)
             await client.artifacts.download_infographic(nb.id, str(infographic_path))
             print(f"  saved: {infographic_path}")
+        except TypeError as e:
+            # Library signature changed — retry with bare call
+            print(f"  ⚠ signature mismatch, retrying with defaults: {e}")
+            try:
+                ig = await client.artifacts.generate_infographic(nb.id)
+                await client.artifacts.wait_for_completion(nb.id, ig.task_id)
+                await client.artifacts.download_infographic(nb.id, str(infographic_path))
+                print(f"  saved (defaults): {infographic_path}")
+            except Exception as e2:
+                print(f"  ✗ failed: {e2}")
+                infographic_path = None
         except Exception as e:
             print(f"  ⚠ failed: {e}")
             infographic_path = None

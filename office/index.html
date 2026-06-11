@@ -590,11 +590,6 @@
             <label class="text-xs flex items-center gap-1"><input type="radio" name="research" value="quick" checked class="accent-indigo-500"> ⚡ Quick <span class="muted">(Ravi only)</span></label>
             <label class="text-xs flex items-center gap-1"><input type="radio" name="research" value="deep" class="accent-indigo-500"> 🔬 Deep <span class="muted">(Ravi + Rin/NotebookLM)</span></label>
           </div>
-          <div class="flex items-center gap-3">
-            <label class="text-xs font-medium muted w-16">Deploy:</label>
-            <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="auto" checked class="accent-indigo-500"> Auto-preview</label>
-            <label class="text-xs flex items-center gap-1"><input type="radio" name="mode" value="approve" class="accent-indigo-500"> Approve first</label>
-          </div>
         </div>
         <button id="copyBtn" class="bg-accent text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition flex items-center gap-2">
           <i data-lucide="copy" class="w-4 h-4"></i> Copy command
@@ -614,11 +609,7 @@
     <h2 class="text-2xl font-semibold flex items-center gap-2">
       <i data-lucide="folder-clock" class="w-5 h-5 accent"></i> Past runs
     </h2>
-    <div class="flex gap-2 text-xs">
-      <button class="filter-btn" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="published">Published</button>
-      <button class="filter-btn" data-filter="preview">Preview</button>
-    </div>
+    <div class="flex gap-2 text-xs"></div>
   </div>
   <div id="runsList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   <div id="emptyState" class="surface rounded-xl p-12 text-center muted hidden">
@@ -980,14 +971,12 @@
   function buildCommand() {
     const topic = topicInput.value.trim() || '<your topic here>';
     const research = document.querySelector('input[name="research"]:checked').value;
-    const deploy = document.querySelector('input[name="mode"]:checked').value;
     const researchFlag = research === 'deep' ? 'deep' : 'quick';
-    const deployFlag = deploy === 'approve' ? ' — approve before deploy' : '';
-    return `@orchestrator.md Run the newsroom in ${researchFlag} mode${deployFlag}:\n"${topic}"`;
+    return `@orchestrator.md Run the newsroom in ${researchFlag} mode:\n"${topic}"`;
   }
   function refreshPreview() { cmdPreview.textContent = buildCommand(); }
   topicInput.addEventListener('input', refreshPreview);
-  document.querySelectorAll('input[name="mode"], input[name="research"]').forEach(r => r.addEventListener('change', refreshPreview));
+  document.querySelectorAll('input[name="research"]').forEach(r => r.addEventListener('change', refreshPreview));
   refreshPreview();
   copyBtn.addEventListener('click', async () => {
     const cmd = buildCommand();
@@ -1010,22 +999,19 @@
       const r = await fetch('manifest.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) throw new Error('no manifest');
       const m = await r.json();
-      const all = [
-        ...(m.published || []).map(x => ({ ...x, kind: 'published' })),
-        ...(m.preview || []).map(x => ({ ...x, kind: 'preview' }))
-      ];
+      const all = (m.published || []).map(x => ({ ...x, kind: 'published' }));
       if (all.length === 0) { empty.classList.remove('hidden'); return; }
       empty.classList.add('hidden');
       window.__allRuns = all;
-      renderRuns('all');
+      renderRuns();
     } catch (e) {
       empty.classList.remove('hidden');
     }
   }
-  function renderRuns(filter) {
+  function renderRuns() {
     const list = document.getElementById('runsList');
     list.innerHTML = '';
-    const items = (window.__allRuns || []).filter(x => filter === 'all' || x.kind === filter);
+    const items = window.__allRuns || [];
     if (items.length === 0) {
       list.innerHTML = '<div class="muted text-sm col-span-full">No items in this filter.</div>';
       return;
@@ -1036,9 +1022,7 @@
       card.className = 'surface rounded-xl p-5 hover:shadow-md transition group block';
       card.innerHTML = `
         <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium ${item.kind === 'published' ? 'text-emerald-600' : 'accent'}">
-            ${item.kind === 'published' ? '● Published' : '○ Preview'}
-          </span>
+          <span class="text-xs font-medium text-emerald-600">● Published</span>
           <i data-lucide="arrow-up-right" class="w-4 h-4 muted group-hover:accent transition"></i>
         </div>
         <div class="font-semibold text-sm mb-1 group-hover:accent transition">${item.slug}</div>
@@ -1048,14 +1032,6 @@
     });
     lucide.createIcons();
   }
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderRuns(btn.dataset.filter);
-    });
-  });
-  document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
   loadRuns();
 </script>
 

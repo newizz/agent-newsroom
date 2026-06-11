@@ -42,7 +42,7 @@ Start with the life-stage arc at the top to orient yourself — each stage card 
 
 ## Next steps
 - 👀 **View it:** https://newizz.github.io/agent-newsroom/preview/cat-life-stories/
-- ✅ **Approve & publish:** run `./scripts/promote-to-published.sh cat-life-stories`
+
 - 🔁 **Rerun deeper:** tell the orchestrator "rerun cat-life-stories with deeper research"
 - ✏️ **Edit:** open `preview/cat-life-stories/index.html` and edit directly
 

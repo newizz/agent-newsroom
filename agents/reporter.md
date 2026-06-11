@@ -12,7 +12,7 @@ One file: `runs/<slug>/report.md`
 Read runs/<slug>/brief.md
 Read runs/<slug>/research.md
 Read runs/<slug>/sources.json
-Read preview/<slug>/index.html   (just enough to confirm it exists and looks healthy)
+Read published/<slug>/index.html   (just enough to confirm it exists and looks healthy)
 ```
 
 ## Step 2: Write the report
@@ -24,7 +24,7 @@ Use this structure:
 
 **Slug:** <slug>
 **Completed:** <ISO datetime>
-**Preview URL:** https://newizz.github.io/agent-newsroom/preview/<slug>/
+**Live URL:** https://newizz.github.io/agent-newsroom/published/<slug>/
 
 ---
 
@@ -51,10 +51,9 @@ Use this structure:
 <honest list — what's uncertain, what wasn't covered, what may have changed since>
 
 ## Next steps
-- 👀 **View it:** https://newizz.github.io/agent-newsroom/preview/<slug>/
-- ✅ **Approve & publish:** run `./scripts/promote-to-published.sh <slug>`
+- 👀 **View it:** https://newizz.github.io/agent-newsroom/published/<slug>/
 - 🔁 **Rerun deeper:** tell the orchestrator "rerun <slug> with deeper research"
-- ✏️ **Edit:** open `preview/<slug>/index.html` and edit directly
+- ✏️ **Edit:** open `published/<slug>/index.html` and edit directly
 
 ---
 

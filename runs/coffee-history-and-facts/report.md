@@ -49,7 +49,7 @@ Open the preview URL in any modern browser. A **fixed side navigation** on the l
 ## Next steps
 
 - 👀 **View it:** https://newizz.github.io/agent-newsroom/preview/coffee-history-and-facts/
-- ✅ **Approve & publish:** run `./scripts/promote-to-published.sh coffee-history-and-facts`
+
 - 🔁 **Rerun deeper:** tell the orchestrator "rerun coffee-history-and-facts with deeper research"
 - ✏️ **Edit:** open `preview/coffee-history-and-facts/index.html` and edit directly
 

@@ -1,0 +1,214 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "Agentic AI, explained",
+      "url": "https://mitsloan.mit.edu/ideas-made-to-matter/agentic-ai-explained",
+      "publisher": "MIT Sloan Management Review",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 2,
+      "title": "GitHub Copilot Statistics & Adoption Trends [2025]",
+      "url": "https://www.secondtalent.com/resources/github-copilot-statistics/",
+      "publisher": "Second Talent",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 3,
+      "title": "Agentic Coding in 2026: AI's Impact on Software Development",
+      "url": "https://www.timesofai.com/industry-insights/agentic-coding-in-software-development/",
+      "publisher": "Times of AI",
+      "author": null,
+      "date": "2026",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 4,
+      "title": "Agentforce Statistics and Trends (2024–2025)",
+      "url": "https://cyntexa.com/blog/agentforce-statistics-and-trends/",
+      "publisher": "Cyntexa (citing Salesforce Q4 FY25 and Q4 FY26 earnings reports)",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 5,
+      "title": "Many health care leaders are leaning into agentic AI as adoption hurdles ease",
+      "url": "https://www.deloitte.com/us/en/insights/industry/health-care/agentic-ai-health-care-operating-model-change.html",
+      "publisher": "Deloitte Insights",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 6,
+      "title": "Reimagining the future of banking with agentic AI",
+      "url": "https://www.technologyreview.com/2025/09/04/1123023/imagining-the-future-of-banking-with-agentic-ai/",
+      "publisher": "MIT Technology Review",
+      "author": null,
+      "date": "2025-09-04",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 7,
+      "title": "The rise of agentic AI: transforming fraud risk management",
+      "url": "https://www.ey.com/en_ca/insights/banking-capital-markets/the-rise-of-agentic-ai-transforming-fraud-risk-management",
+      "publisher": "EY Canada",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 8,
+      "title": "From Lab to Clinic: How Artificial Intelligence (AI) Is Reshaping Drug Discovery Timelines and Industry Outcomes",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12298131/",
+      "publisher": "PubMed Central / National Library of Medicine",
+      "author": null,
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 9,
+      "title": "Measuring AI ROI in Drug Discovery: Key Metrics & Outcomes",
+      "url": "https://intuitionlabs.ai/articles/measuring-ai-roi-drug-discovery",
+      "publisher": "IntuitionLabs",
+      "author": null,
+      "date": "2026",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 10,
+      "title": "The Agentic Era: Why Biopharma Must Embrace Artificial Intelligence That Acts, Not Just Informs",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12048886/",
+      "publisher": "PubMed Central / National Library of Medicine",
+      "author": null,
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 11,
+      "title": "Thomson Reuters Launches CoCounsel Legal: Transforming Legal Work with Agentic AI and Deep Research",
+      "url": "https://www.thomsonreuters.com/en/press-releases/2025/august/thomson-reuters-launches-cocounsel-legal-transforming-legal-work-with-agentic-ai-and-deep-research",
+      "publisher": "Thomson Reuters",
+      "author": null,
+      "date": "2025-08",
+      "type": "primary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 12,
+      "title": "Agentic AI in Law: Transforming Legal & Enterprise Workflows",
+      "url": "https://leahai.com/news/agentic-ai-legal/",
+      "publisher": "Leah AI",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 13,
+      "title": "Siemens introduces AI agents for industrial automation",
+      "url": "https://press.siemens.com/global/en/pressrelease/siemens-introduces-ai-agents-industrial-automation",
+      "publisher": "Siemens Press",
+      "author": null,
+      "date": "2025-05",
+      "type": "primary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 14,
+      "title": "Agentic AI in Retail: Real-World Examples and Case Studies",
+      "url": "https://www.xcubelabs.com/blog/agentic-ai-in-retail-real-world-examples-and-case-studies/",
+      "publisher": "[x]cube LABS",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 15,
+      "title": "Agentic AI strategy: Deloitte Tech Trends 2026",
+      "url": "https://www.deloitte.com/us/en/insights/topics/technology-management/tech-trends/2026/agentic-ai-strategy.html",
+      "publisher": "Deloitte Insights",
+      "author": null,
+      "date": "2026",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 16,
+      "title": "Survey says: Enterprises shift from AI pilots to production — and agentic systems surge ahead",
+      "url": "https://www.battery.com/blog/survey-says-enterprises-shift-from-ai-pilots-to-production-and-agentic-systems-surge-ahead/",
+      "publisher": "Battery Ventures",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 17,
+      "title": "The agentic supply chain in manufacturing",
+      "url": "https://www.deloitte.com/us/en/insights/industry/manufacturing-industrial-products/agentic-supply-chain-artificial-intelligence-manufacturing.html",
+      "publisher": "Deloitte Insights",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 18,
+      "title": "The agentic commerce opportunity: How AI agents are ushering in a new era for consumers and merchants",
+      "url": "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-agentic-commerce-opportunity-how-ai-agents-are-ushering-in-a-new-era-for-consumers-and-merchants",
+      "publisher": "McKinsey & Company",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 19,
+      "title": "The Next 'Next Big Thing': Agentic AI's Opportunities and Risks",
+      "url": "https://scet.berkeley.edu/the-next-next-big-thing-agentic-ais-opportunities-and-risks/",
+      "publisher": "UC Berkeley Sutardja Center for Entrepreneurship & Technology",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 20,
+      "title": "Accelerating Drug Discovery Through Agentic AI: A Multi-Agent Approach to Laboratory Automation in the DMTA Cycle",
+      "url": "https://arxiv.org/html/2507.09023v1",
+      "publisher": "arXiv (preprint)",
+      "author": null,
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-05"
+    },
+    {
+      "id": 21,
+      "title": "CoCounsel vs. Harvey AI vs. Lexis+: Which Legal AI Tool Delivers the Best ROI in 2025?",
+      "url": "https://toppeconsulting.com/cocounsel-vs-harvey-ai-vs-lexis-which-legal-ai-tool-delivers-the-best-roi-in-2025/",
+      "publisher": "Toppe Consulting (citing Vals AI independent benchmark study, Feb 2025)",
+      "author": null,
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-05"
+    }
+  ]
+}

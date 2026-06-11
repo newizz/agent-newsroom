@@ -33,22 +33,36 @@ Note:
 - Key Questions Research must answer (you'll ask each in NotebookLM)
 - Any topic-specific terms that should appear in YouTube queries
 
-## Step 2: Curate YouTube sources
+## Step 2: Curate sources (web + YouTube)
 
-NotebookLM's web research auto-discovery covers articles/blogs/papers well, but doesn't always pick the best video content. You explicitly hunt for **3-5 high-quality YouTube videos**:
+You collect sources from two channels in parallel:
+
+### 2a. Web sources — target 10-30
+
+NotebookLM's `add-research --mode deep` will auto-discover web sources for you in Step 3. You don't need to gather them manually. **Aim for the script to land 10-30 web sources** when it runs. If the topic is niche and NotebookLM finds fewer than 10, supplement by passing a few authoritative URLs you found via Claude `WebSearch` (pass them through the same `--youtube` flag of the script — the worker treats any URL as a generic source).
+
+### 2b. YouTube sources — pick 10-20
+
+NotebookLM's auto-discovery is weak on video content. You hunt explicitly:
 
 ```
 WebSearch: "site:youtube.com <topic keywords>"
+WebSearch: "site:youtube.com <topic> tutorial"   (2nd pass for breadth)
+WebSearch: "site:youtube.com <topic> explained"  (3rd pass)
 ```
 
-Filter criteria (mental rule of thumb):
+Filter criteria:
 - ✅ ≥10k views (signal of quality / surfaced by algorithm)
 - ✅ Uploaded within last 2 years (current)
-- ✅ Channel looks credible (educator, news org, expert, university)
+- ✅ Channel looks credible (educator, news org, expert, university, official accounts)
+- ✅ Mix sources — don't pick 10 videos from the same channel
 - ❌ Skip Shorts (<60s) — too shallow
 - ❌ Skip clickbait or AI-generated voiceover slop
+- ❌ Skip duplicates / near-identical content
 
-Pick 3-5 URLs. Format as comma-separated string for the next step.
+Pick **10-20 URLs**. Format as comma-separated string for Step 3.
+
+**Why so many?** NotebookLM's strength is multi-source synthesis. The more good sources, the stronger the synthesis. Diminishing returns past ~20 — and indexing too many slows things down.
 
 ## Step 3: Run the NotebookLM worker
 

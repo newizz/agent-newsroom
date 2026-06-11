@@ -1,23 +1,23 @@
 {
-  "currentRun": "dog-life",
-  "currentSlug": "dog-life",
-  "currentMode": "quick",
-  "lastUpdate": "2026-06-08T06:08:48Z",
+  "currentRun": null,
+  "currentSlug": null,
+  "currentMode": null,
+  "lastUpdate": "2026-06-08T07:26:19Z",
   "agents": [
     {
       "id": "intake",
       "name": "Iris",
       "role": "Intake Specialist",
       "emoji": "🎙️",
-      "status": "busy",
-      "task": "spawning subagent"
+      "status": "offline",
+      "task": ""
     },
     {
       "id": "researcher",
       "name": "Ravi",
       "role": "Research Analyst",
       "emoji": "🔍",
-      "status": "idle",
+      "status": "offline",
       "task": ""
     },
     {
@@ -33,8 +33,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "busy",
-      "task": "writing dashboard"
+      "status": "offline",
+      "task": ""
     },
     {
       "id": "reporter",

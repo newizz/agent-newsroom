@@ -1,0 +1,124 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "Do Dogs 'Know' How Long We've Been Gone?",
+      "url": "https://www.patriciamcconnell.com/theotherendoftheleash/do-dogs-know-how-long-weve-been-gone/",
+      "publisher": "Patricia McConnell / The Other End of the Leash",
+      "author": "Patricia McConnell",
+      "date": "2011",
+      "type": "secondary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 2,
+      "title": "Study Sets Baseline for Sleep Patterns in Healthy Adult Dogs",
+      "url": "https://news.ncsu.edu/2020/12/study-adult-dogs-sleep/",
+      "publisher": "NC State University News",
+      "author": "NC State University",
+      "date": "2020-12",
+      "type": "secondary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 3,
+      "title": "Canine Olfaction: Physiology, Behavior, and Possibilities for Applied Working Animal Programs",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8388720/",
+      "publisher": "Frontiers in Veterinary Science / PubMed Central",
+      "author": "Jezierski T et al.",
+      "date": "2021",
+      "type": "primary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 4,
+      "title": "Communication in Dogs",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6116041/",
+      "publisher": "Animals (MDPI) / PubMed Central",
+      "author": "Albuquerque N et al.",
+      "date": "2018",
+      "type": "primary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 5,
+      "title": "Breed differences in social cognition, inhibitory control, and spatial problem-solving ability in the domestic dog (Canis familiaris)",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9800387/",
+      "publisher": "Scientific Reports / PubMed Central",
+      "author": "Espinosa J et al.",
+      "date": "2022",
+      "type": "primary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 6,
+      "title": "Canine Communication — Interpreting Dog Language",
+      "url": "https://vcahospitals.com/know-your-pet/canine-communication---interpreting-dog-language",
+      "publisher": "VCA Animal Hospitals",
+      "author": "VCA Veterinary Staff",
+      "date": "2023",
+      "type": "secondary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 7,
+      "title": "New Research Unpicks Root Causes of Separation Anxiety in Dogs",
+      "url": "https://www.sciencedaily.com/releases/2020/03/200318104429.htm",
+      "publisher": "ScienceDaily",
+      "author": "University of Lincoln (press release)",
+      "date": "2020-03-18",
+      "type": "secondary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 8,
+      "title": "Separation-related behavior of dogs shows association with their reactions to everyday situations that may elicit frustration or fear",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8479053/",
+      "publisher": "Scientific Reports / PubMed Central",
+      "author": "Mendes de Carvalho AC et al.",
+      "date": "2021",
+      "type": "primary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 9,
+      "title": "Dog Sense of Smell",
+      "url": "https://en.wikipedia.org/wiki/Dog_sense_of_smell",
+      "publisher": "Wikipedia",
+      "author": "Wikipedia contributors",
+      "date": "2024",
+      "type": "reference",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 10,
+      "title": "Compared to Humans, How Good Is a Dog's Visual Acuity?",
+      "url": "https://www.psychologytoday.com/us/blog/canine-corner/201712/compared-humans-how-good-is-dogs-visual-acuity",
+      "publisher": "Psychology Today",
+      "author": "Stanley Coren",
+      "date": "2017-12",
+      "type": "secondary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 11,
+      "title": "Understanding Your Dog's Four Major Life Stages",
+      "url": "https://petwellbeing.com/blogs/news/understanding-your-dogs-four-major-life-stages",
+      "publisher": "Pet Wellbeing",
+      "author": "Pet Wellbeing Editorial Team",
+      "date": "2023",
+      "type": "secondary",
+      "accessed": "2026-06-08"
+    },
+    {
+      "id": 12,
+      "title": "A functional linear modeling approach to sleep–wake cycles in dogs",
+      "url": "https://www.nature.com/articles/s41598-020-79274-2",
+      "publisher": "Scientific Reports / Nature",
+      "author": "Zager A et al.",
+      "date": "2020-12-21",
+      "type": "primary",
+      "accessed": "2026-06-08"
+    }
+  ]
+}

@@ -37,7 +37,7 @@ User topic
    │
    ▼
 ┌──────────────────┐
-│ 🎨  Builder      │  → preview/<slug>/index.html (auto-deployed)
+│ 🎨  Builder      │  → published/<slug>/index.html (auto-deployed)
 └──────────────────┘
    │
    ▼
@@ -69,12 +69,10 @@ agent-newsroom/
 │   └── status.json
 ├── scripts/                # Shell helpers used by hooks
 │   ├── update-status.sh
-│   ├── deploy-preview.sh
-│   └── promote-to-published.sh
+│   └── deploy.sh           # commit + push a published dashboard
 ├── .claude/settings.json   # Hooks that update status.json in real time
 ├── runs/<slug>/            # One folder per topic run (intermediate files)
-├── preview/<slug>/         # Auto-deployed draft dashboards
-├── published/<slug>/       # Promoted (approved) dashboards
+├── published/<slug>/       # Auto-deployed dashboards (Builder writes here directly)
 └── .github/workflows/      # GitHub Pages deploy
 ```
 
@@ -99,22 +97,12 @@ In the repo directory, start Claude Code and tell it:
 The orchestrator will:
 1. Spawn Intake to clarify and produce `brief.md`
 2. Spawn Research to produce `research.md`
-3. Spawn Builder to write `preview/<slug>/index.html` and commit
+3. Spawn Builder to write `published/<slug>/index.html` and commit
 4. Spawn Reporter to produce `report.md` and return the live URL
 
 ### Submit from the browser
 
 Open https://newizz.github.io/agent-newsroom/ — type a topic into the form. The page copies a ready-made command to your clipboard. Paste it into your local Claude Code session to start a run.
-
-### Promote a preview to published
-
-When you're happy with a `/preview/<slug>/` dashboard, run:
-
-```bash
-./scripts/promote-to-published.sh <slug>
-```
-
-This copies it to `/published/<slug>/` and pushes — that URL becomes the "official" version.
 
 ## Deep mode setup (NotebookLM via Rin)
 
@@ -206,7 +194,7 @@ All templates use the same design system: Tailwind via CDN, Inter font, Lucide i
 - **Single-file output** — every dashboard is one self-contained HTML
 - **No build step** — no npm, no bundler, just open the file
 - **Cited sources only** — Research Agent must cite every claim
-- **Two-stage publish** — auto-deploy to `/preview/`, manual promote to `/published/`
+- **Direct publish** — Builder writes dashboards straight to `/published/` (no preview / promote step)
 
 ## License
 
