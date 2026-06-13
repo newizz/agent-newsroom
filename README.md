@@ -1,6 +1,6 @@
 # agent-newsroom
 
-> A 4-agent virtual newsroom that turns any topic into a deep-research interactive dashboard, auto-published to GitHub Pages.
+> A 5-agent virtual newsroom that turns any topic into a deep-research interactive dashboard, auto-published to GitHub Pages.
 
 **agent-newsroom** is a minimal pipeline that runs entirely on top of [Claude Code](https://docs.claude.com/en/docs/claude-code). Give it a topic and a team of specialized agents take it from question to published artifact:
 
@@ -46,7 +46,7 @@ User topic
 └──────────────────┘
 ```
 
-All four agents are spawned as subagents (via Claude Code's `Task` tool) from a single orchestrator session. Hand-off between agents is via files in `runs/<slug>/`. No backend, no database, no queue.
+All five agents are spawned as subagents (via Claude Code's `Task` tool) from a single orchestrator session — Rin only activates in deep mode. Hand-off between agents is via files in `runs/<slug>/`. No backend, no database, no queue.
 
 ## Repo layout
 
