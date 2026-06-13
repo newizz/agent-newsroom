@@ -133,7 +133,7 @@ After each agent, verify the expected output file exists. If missing:
 | Research (Ravi) | `runs/<slug>/research.md`, `runs/<slug>/sources.json` |
 | Deep Research (Rin) | `runs/<slug>/deep-research/summary.md` (others optional) |
 | Builder | `published/<slug>/index.html` |
-| Reporter | `runs/<slug>/report.md` |
+| Reporter | `runs/<slug>/report.md` **AND** `kb/<slug>.md` (knowledge-base archive) |
 
 ## Decision rules
 

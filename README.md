@@ -73,8 +73,18 @@ agent-newsroom/
 ├── .claude/settings.json   # Hooks that update status.json in real time
 ├── runs/<slug>/            # One folder per topic run (intermediate files)
 ├── published/<slug>/       # Auto-deployed dashboards (Builder writes here directly)
+├── kb/<slug>.md            # Knowledge-base archive (Reporter compiles all run data)
 └── .github/workflows/      # GitHub Pages deploy
 ```
+
+### What's in `kb/`?
+
+The Reporter writes a **self-contained markdown archive** of every run to `kb/<slug>.md` — it merges the brief, research, deep-research findings, sources, and artifact paths into one citation-rich file. Useful for:
+- Searching across all past topics (`grep -l "term" kb/*.md`)
+- Feeding back into an LLM as context months later
+- Surviving even if `runs/<slug>/` is pruned over time
+
+See `kb/README.md` for the schema and search recipes.
 
 ## Usage
 
