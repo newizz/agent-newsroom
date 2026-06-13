@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Theory in Practice — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --accent: #6366F1;
+    --accent-soft: #6366F11A;
+    --accent-line: #6366F133;
+  }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .kpi { background: #131316 !important; border-color: #27272a !important; }
+    .reel-wrapper { background: #131316 !important; border-color: #27272a !important; }
+    .reel-card { background: #131316 !important; }
+    .domain-card { background: #131316 !important; border-color: #27272a !important; }
+    .deep-synth { background: #0f0f18 !important; border-color: #4338ca !important; }
+    .matrix-cell { background: #1e1e28 !important; border-color: #27272a !important; }
+    .matrix-cell:hover { background: #252534 !important; }
+    .matrix-cell.nash-cell { background: #1a1a2e !important; }
+    .matrix-cell.selected-cell { background: #2d2d5e !important; }
+    .game-btn { background: #1e1e28 !important; border-color: #27272a !important; color: #e4e4e7 !important; }
+    .game-btn.active { background: var(--accent) !important; color: #fff !important; }
+    .fail-card { background: #131316 !important; border-color: #27272a !important; }
+    .frontier-card { background: #131316 !important; border-color: #27272a !important; }
+    .sources-list li { border-color: #27272a !important; }
+  }
+
+  .surface { background: #fff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Scroll progress */
+  #scroll-progress {
+    position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+    background: var(--accent); z-index: 9999; transition: width 0.1s linear;
+  }
+
+  /* Hero */
+  .hero-gradient {
+    background: linear-gradient(135deg, #f0f0ff 0%, #fafafa 50%, #fff 100%);
+  }
+  @media (prefers-color-scheme: dark) {
+    .hero-gradient { background: linear-gradient(135deg, #0d0d1a 0%, #0a0a0b 60%, #0a0a0b 100%); }
+  }
+
+  /* KPI */
+  .kpi { padding: 1.25rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .kpi-value { font-size: 2rem; font-weight: 700; letter-spacing: -0.02em; color: var(--accent); }
+  .kpi-label { font-size: 0.78rem; color: #71717a; margin-bottom: 0.25rem; line-height: 1.4; }
+  .kpi-delta { font-size: 0.72rem; margin-top: 0.5rem; color: #71717a; }
+  .kpi-delta.up { color: #059669; }
+  .kpi-delta.down { color: #dc2626; }
+
+  /* Prose */
+  .prose-content p { margin-bottom: 1em; line-height: 1.7; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.7; }
+
+  /* Deep synthesis callout */
+  .deep-synth {
+    border-left: 4px solid var(--accent);
+    background: #f0f0ff;
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 1.25rem 1.5rem;
+    margin: 0;
+  }
+  .deep-synth-label {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;
+  }
+
+  /* Reel */
+  .reel-wrapper {
+    position: relative; overflow: hidden; border-radius: 1rem;
+    background: #fff; border: 1px solid #e4e4e7; min-height: 340px;
+  }
+  .reel-card {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 2.5rem; opacity: 0; transform: translateY(12px);
+    transition: opacity 350ms ease, transform 350ms ease;
+    pointer-events: none; background: #fff;
+  }
+  .reel-card.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+  .reel-stat-big { font-size: 3.5rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .reel-stat-label { font-size: 0.85rem; color: #71717a; margin-top: 0.25rem; margin-bottom: 0.75rem; }
+  .reel-headline { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .reel-body { font-size: 0.9rem; color: #71717a; line-height: 1.6; }
+  .reel-progress-bar {
+    position: absolute; bottom: 0; left: 0; height: 3px;
+    background: var(--accent); animation: none;
+  }
+  .reel-progress-bar.running { animation: reelProgress 4s linear forwards; }
+  @keyframes reelProgress { from { width: 0%; } to { width: 100%; } }
+  .reel-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1rem; }
+  .reel-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #d4d4d8; cursor: pointer; transition: background 0.2s;
+  }
+  .reel-dot.active { background: var(--accent); }
+
+  /* Entrance animations */
+  .fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .scale-in { opacity: 0; transform: scale(0.95); transition: opacity 0.5s ease, transform 0.5s ease; }
+  .fade-up.visible, .fade-left.visible, .scale-in.visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .fade-up, .fade-left, .scale-in { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .reel-card { transition: none !important; }
+    .reel-progress-bar { display: none !important; }
+    .kpi-value [data-counter] { transition: none !important; }
+  }
+
+  /* Card hover */
+  .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,0.12); }
+
+  /* Domain cards */
+  .domain-card {
+    background: #fff; border: 1px solid #e4e4e7; border-radius: 0.75rem;
+    padding: 1.25rem; cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .domain-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,0.12); }
+  .domain-card .domain-body { display: none; margin-top: 0.75rem; font-size: 0.875rem; line-height: 1.65; color: #52525b; }
+  .domain-card.expanded .domain-body { display: block; }
+  .domain-card .expand-arrow { transition: transform 0.25s ease; }
+  .domain-card.expanded .expand-arrow { transform: rotate(180deg); }
+  @media (prefers-color-scheme: dark) { .domain-card .domain-body { color: #a1a1aa !important; } }
+
+  /* Payoff matrix */
+  .game-btn {
+    padding: 0.4rem 1rem; border-radius: 0.5rem; font-size: 0.82rem; font-weight: 600;
+    border: 1px solid #e4e4e7; background: #f4f4f5; color: #3f3f46;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .game-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .game-btn:not(.active):hover { background: #e4e4e7; }
+
+  .matrix-table { border-collapse: separate; border-spacing: 4px; width: 100%; }
+  .matrix-table th {
+    font-size: 0.8rem; font-weight: 600; color: #71717a;
+    padding: 0.5rem 0.75rem; text-align: center;
+  }
+  .matrix-table th.player-header { font-weight: 700; color: var(--accent); font-size: 0.85rem; }
+  .matrix-cell {
+    background: #f4f4f5; border: 2px solid #e4e4e7; border-radius: 0.5rem;
+    padding: 0.75rem; text-align: center; cursor: pointer;
+    transition: all 0.2s; min-width: 100px;
+  }
+  .matrix-cell:hover { background: #e0e0ff; border-color: #a5b4fc; }
+  .matrix-cell.nash-cell { border-color: #f59e0b; background: #fffbeb; }
+  .matrix-cell.selected-cell { border-color: var(--accent); background: #e0e7ff; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+  .matrix-cell.nash-cell.selected-cell { border-color: var(--accent); background: #ddd6fe; }
+  .payoff-pair { font-size: 1.1rem; font-weight: 700; color: #18181b; }
+  @media (prefers-color-scheme: dark) { .payoff-pair { color: #e4e4e7; } }
+  .nash-badge {
+    display: inline-block; margin-top: 0.3rem;
+    font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: #92400e;
+    background: #fef3c7; border-radius: 4px; padding: 1px 5px;
+  }
+  .cell-explanation {
+    border-left: 3px solid var(--accent); background: #f5f5ff;
+    border-radius: 0 0.5rem 0.5rem 0; padding: 1rem 1.25rem;
+    font-size: 0.88rem; line-height: 1.65; margin-top: 1rem;
+    display: none;
+  }
+  .cell-explanation.visible { display: block; }
+  @media (prefers-color-scheme: dark) {
+    .cell-explanation { background: #13131e; border-color: var(--accent); color: #e4e4e7; }
+    .nash-badge { background: #312e0f; color: #fbbf24; }
+    .matrix-cell.nash-cell { background: #1e1a0a; border-color: #d97706; }
+    .matrix-cell.selected-cell { background: #1e1e40; }
+    .matrix-cell.nash-cell.selected-cell { background: #25204a; }
+  }
+
+  /* Fail + Frontier cards */
+  .fail-card, .frontier-card {
+    background: #fff; border: 1px solid #e4e4e7; border-radius: 0.75rem; padding: 1.25rem;
+  }
+  .fail-num, .frontier-num {
+    width: 2rem; height: 2rem; min-width: 2rem; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    font-weight: 700; font-size: 0.85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Sources */
+  .sources-list { list-style: none; padding: 0; margin: 0; }
+  .sources-list li {
+    padding: 0.5rem 0; border-bottom: 1px solid #e4e4e7;
+    font-size: 0.82rem; display: flex; gap: 0.75rem; align-items: baseline;
+  }
+  .sources-list li:last-child { border-bottom: none; }
+  .source-num { min-width: 2rem; font-weight: 600; color: var(--accent); }
+
+  /* Chart containers */
+  .chart-box { position: relative; height: 260px; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div id="scroll-progress"></div>
+
+<!-- ═══════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════ -->
+<header class="border-b border-soft sticky top-0 z-50" style="background:rgba(250,250,250,0.95);backdrop-filter:blur(8px);">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> agent-newsroom
+    </a>
+    <div class="text-xs muted">game-theory-in-practice &middot; 2026-06-13</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════
+     1. HERO
+═══════════════════════════════════════════════ -->
+<section class="hero-gradient px-6 pt-16 pb-12">
+  <div class="max-w-6xl mx-auto fade-up">
+    <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+      <span class="bg-accent-soft accent px-2 py-1 rounded-md">Data Story</span>
+      <span>&middot;</span>
+      <span>Deep Research</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-5 max-w-4xl leading-tight">
+      Game Theory in Practice
+    </h1>
+    <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+      How strategic logic shapes <strong style="color:var(--accent)">biology, economics, geopolitics, and AI</strong> — from life-saving kidney exchanges and Cold War brinkmanship to self-learning algorithms that collude without instructions, and where the rational-actor model meets human reality.
+    </p>
+  </div>
+</section>
+
+<!-- KPI STRIP -->
+<section class="max-w-6xl mx-auto px-6 -mt-2 mb-12">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="kpi card-hover fade-up">
+      <div class="kpi-label">FCC Spectrum Auction Revenue (U.S. cumulative, 2020)</div>
+      <div class="kpi-value">$<span data-counter="100" data-suffix="B+">0</span></div>
+      <div class="kpi-delta up">&#8593; First auction raised $617M in July 1994</div>
+    </div>
+    <div class="kpi card-hover fade-up" style="transition-delay:60ms">
+      <div class="kpi-label">NKR Kidney Transplants Facilitated (cumulative)</div>
+      <div class="kpi-value"><span data-counter="10000" data-suffix="" data-format="comma">0</span></div>
+      <div class="kpi-delta up">&#8593; 1,744 paired exchanges in 2024 alone</div>
+    </div>
+    <div class="kpi card-hover fade-up" style="transition-delay:120ms">
+      <div class="kpi-label">Algorithmic Collusion Price Premium</div>
+      <div class="kpi-value"><span data-counter="20" data-suffix="%" data-prefix="10&#8211;">0</span></div>
+      <div class="kpi-delta">Calvano et al., AER 2020 &mdash; no communication</div>
+    </div>
+    <div class="kpi card-hover fade-up" style="transition-delay:180ms">
+      <div class="kpi-label">Ultimatum Game: Typical Proposer Offer</div>
+      <div class="kpi-value"><span data-counter="50" data-suffix="%" data-prefix="30&#8211;">0</span></div>
+      <div class="kpi-delta down">&#8595; Nash predicts near-zero offer</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     2. VISUAL OVERVIEW
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="image" class="w-4 h-4"></i> Visual Overview</div>
+  <h2 class="text-2xl font-semibold mb-4">The Game Theory Landscape</h2>
+  <div class="surface rounded-xl overflow-hidden scale-in">
+    <img src="infographic.png" alt="Game Theory in Practice — Visual Overview infographic" class="w-full h-auto" style="display:block;" loading="lazy">
+    <div class="px-6 py-3 text-xs muted text-center border-t border-soft">
+      Infographic synthesized from 15 sources (5 web + 10 video) via NotebookLM deep research
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     3. DEEP SYNTHESIS CALLOUT
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="deep-synth fade-left">
+    <div class="deep-synth-label">&#128300; DEEP RESEARCH &mdash; synthesized from 15 sources via NotebookLM</div>
+    <p class="text-base leading-relaxed">
+      Game theory serves as a framework for analyzing strategic interactions where one player's success depends on the choices of others. In <strong style="color:var(--accent)">biology</strong>, it explains how cooperation evolves through "reciprocal altruism" — vampire bats sharing blood with the expectation of future help, or impalas grooming each other to manage tick-borne health risks. In <strong style="color:var(--accent)">economics</strong>, its power is revealed through "market design," where algorithms match medical residents to hospitals or donors to patients in life-saving kidney exchanges. In <strong style="color:var(--accent)">geopolitics</strong>, doctrines like Mutually Assured Destruction and brinkmanship were the Cold War's operating system. These applications demonstrate that by understanding payoffs, institutions can resolve "coordination problems" that traditionally hinder social welfare — but only when they account for how messy, emotional, and bounded human rationality actually is.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     4. ANIMATED INSIGHT REEL
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="zap" class="w-4 h-4"></i> Insight Reel</div>
+  <h2 class="text-2xl font-semibold mb-4">Six Numbers That Define the Field</h2>
+  <div class="reel-wrapper" id="reel" style="min-height:340px;">
+    <!-- Slides injected by JS -->
+    <div id="reel-progress-bar" class="reel-progress-bar"></div>
+  </div>
+  <div class="reel-dots" id="reel-dots"></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     5. KEY FINDINGS
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="list-checks" class="w-4 h-4"></i> Key Findings</div>
+  <h2 class="text-2xl font-semibold mb-6">Eight Results That Changed How We Think About Strategy</h2>
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div class="surface rounded-xl p-5 card-hover fade-up">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">1</div>
+        <div>
+          <h3 class="font-semibold mb-1">Mechanism Design: Game Theory as Engineering</h3>
+          <p class="text-sm muted leading-relaxed">When economists stop predicting how people play a game and start <em>designing the game itself</em>, outcomes become measurable. The FCC's Simultaneous Multiple Round Ascending auction raised $23 billion in 1994&ndash;1997 and over $100 billion total by 2020. These are not predictions &mdash; they are engineered equilibria.
+            <sup><a href="#src-1">[1]</a><a href="#src-2">[2]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:60ms">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">2</div>
+        <div>
+          <h3 class="font-semibold mb-1">Kidney Exchange: Matching Markets Save Lives</h3>
+          <p class="text-sm muted leading-relaxed">Alvin Roth's kidney-exchange algorithms match incompatible donor-recipient pairs. The National Kidney Registry facilitated 1,744 paired exchanges in 2024 alone and reached its 10,000th cumulative transplant. The same logic underpins the NRMP and NYC school-choice systems.
+            <sup><a href="#src-3">[3]</a><a href="#src-25">[25]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:120ms">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">3</div>
+        <div>
+          <h3 class="font-semibold mb-1">Cold War Deterrence: MAD as Nash Equilibrium</h3>
+          <p class="text-sm muted leading-relaxed">Mutual Assured Destruction is formally a Nash equilibrium: given credible second-strike capability, neither superpower had a rational first-strike incentive. Direct nuclear war was avoided for ~45 years. Schelling's focal-point and brinkmanship concepts shaped actual U.S. nuclear doctrine.
+            <sup><a href="#src-4">[4]</a><a href="#src-22">[22]</a><a href="#src-23">[23]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:180ms">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">4</div>
+        <div>
+          <h3 class="font-semibold mb-1">Fairness Defeats Nash: The Ultimatum Game</h3>
+          <p class="text-sm muted leading-relaxed">Werner G&uuml;th's 1982 experiment &mdash; replicated hundreds of times &mdash; showed proposers typically offer 30&ndash;50% of a stake, and responders reject offers below 20&ndash;25%, accepting personal loss to punish unfairness. The subgame-perfect Nash prediction ($0.01 offer, accepted) is almost never observed.
+            <sup><a href="#src-6">[6]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:240ms">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">5</div>
+        <div>
+          <h3 class="font-semibold mb-1">Tit-for-Tat: Cooperation from Simple Rules</h3>
+          <p class="text-sm muted leading-relaxed">In Robert Axelrod's 1980 tournament of 14 strategies competing in 200-round iterated prisoner's dilemmas, Anatol Rapoport's two-line "tit-for-tat" won &mdash; being nice, retaliatory, forgiving, and clear. This showed cooperation can emerge among self-interested agents without altruism.
+            <sup><a href="#src-7">[7]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:300ms">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">6</div>
+        <div>
+          <h3 class="font-semibold mb-1">Algorithmic Collusion: AI Rediscovers Grim Trigger</h3>
+          <p class="text-sm muted leading-relaxed">Calvano et al. (2020, AER) showed Q-learning algorithms converge on prices 10&ndash;20% above competitive levels without communicating, without instructions to collude, and without violating antitrust law. Machine learning independently rediscovered the grim-trigger structure.
+            <sup><a href="#src-8">[8]</a><a href="#src-9">[9]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:360ms">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">7</div>
+        <div>
+          <h3 class="font-semibold mb-1">Evolutionary Stable Strategies: No Rationality Required</h3>
+          <p class="text-sm muted leading-relaxed">John Maynard Smith and George R. Price's ESS framework explains hawk-dove population ratios in animals, the near-universal 1:1 sex ratio, and the evolution of fairness norms &mdash; all without any agent consciously choosing a strategy. Selection pressure alone drives the result.
+            <sup><a href="#src-10">[10]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="surface rounded-xl p-5 card-hover fade-up" style="transition-delay:400ms">
+      <div class="flex items-start gap-3">
+        <div class="fail-num flex-shrink-0">8</div>
+        <div>
+          <h3 class="font-semibold mb-1">Winner's Curse: Even Sophisticated Bidders Overpay</h3>
+          <p class="text-sm muted leading-relaxed">Capen, Clapp, and Campbell (1971) found companies winning Gulf of Mexico oil leases consistently overpaid because the highest bidder was the most optimistic, not the most accurate. Robert Wilson's theoretical work explained why rational bidders should shade bids below private estimates &mdash; part of his 2020 Nobel citation.
+            <sup><a href="#src-12">[12]</a><a href="#src-2">[2]</a></sup>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     CHARTS
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="bar-chart-2" class="w-4 h-4"></i> Data</div>
+  <h2 class="text-2xl font-semibold mb-6">The Numbers Behind the Theory</h2>
+  <div class="grid md:grid-cols-2 gap-6">
+
+    <div class="surface rounded-xl p-6 scale-in">
+      <h3 class="font-semibold mb-1">FCC Spectrum Auction Revenue Milestones</h3>
+      <p class="text-xs muted mb-4">U.S. federal revenue from mechanism-designed auctions (1994&ndash;2020)</p>
+      <div class="chart-box"><canvas id="chart-fcc"></canvas></div>
+      <p class="text-xs muted mt-2">Sources: Cramton (1997) [1]; Nobel Committee 2020 [2]</p>
+    </div>
+
+    <div class="surface rounded-xl p-6 scale-in" style="transition-delay:120ms">
+      <h3 class="font-semibold mb-1">Ultimatum Game: Nash Prediction vs. Observed Rejection Rate</h3>
+      <p class="text-xs muted mb-4">% of responders rejecting offers at each level &mdash; Nash predicts zero rejections</p>
+      <div class="chart-box"><canvas id="chart-ultimatum"></canvas></div>
+      <p class="text-xs muted mt-2">Sources: G&uuml;th et al. (1982); Henrich et al. (2001) [6]</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     6. DOMAINS & CASE STUDIES
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="layout-grid" class="w-4 h-4"></i> Domains</div>
+  <h2 class="text-2xl font-semibold mb-2">Five Domains, Five Stories</h2>
+  <p class="text-sm muted mb-6">Click any domain to expand the case study details.</p>
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+    <div class="domain-card fade-up" onclick="toggleDomain(this)">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span style="font-size:1.75rem;">&#127963;</span>
+          <div>
+            <div class="font-semibold text-sm">Auctions &amp; Mechanism Design</div>
+            <div class="text-xs muted">FCC, Kidney Exchange, Google</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-down" class="expand-arrow w-4 h-4 muted flex-shrink-0"></i>
+      </div>
+      <div class="domain-body">
+        <p>The FCC's Simultaneous Multiple Round Ascending auction (designed by Milgrom, Wilson, McAfee) raised $617M in its first use and over $100 billion by 2020 by solving complementarity and exposure-risk problems. <sup><a href="#src-1">[1]</a><a href="#src-2">[2]</a></sup></p>
+        <p>Alvin Roth's kidney exchange created chains of incompatible donor pairs. NYC redesigned high-school placement for 90,000 students using deferred acceptance, reducing the 30,000 administratively assigned students to near zero. Google's Generalized Second-Price auction scaled to $19B+ per quarter. <sup><a href="#src-3">[3]</a><a href="#src-13">[13]</a><a href="#src-25">[25]</a></sup></p>
+        <p><strong>Key insight:</strong> Mechanism design works because it engineers equilibria rather than predicting them. Every tighter rule-set, however, produces new strategic responses.</p>
+      </div>
+    </div>
+
+    <div class="domain-card fade-up" style="transition-delay:60ms" onclick="toggleDomain(this)">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span style="font-size:1.75rem;">&#9762;</span>
+          <div>
+            <div class="font-semibold text-sm">Cold War &amp; Geopolitical Deterrence</div>
+            <div class="text-xs muted">MAD, Cuban Missile Crisis, Trade Wars</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-down" class="expand-arrow w-4 h-4 muted flex-shrink-0"></i>
+      </div>
+      <div class="domain-body">
+        <p>Thomas Schelling's focal-point and brinkmanship concepts reframed nuclear weapons as deterrents whose power lay entirely in the credibility of a threat never to execute. MAD is formally a Nash equilibrium: given second-strike capability, first-strike produces mutual annihilation vs. the status quo. <sup><a href="#src-4">[4]</a><a href="#src-23">[23]</a></sup></p>
+        <p>The Cuban Missile Crisis maps onto a game of Chicken: Kennedy chose blockade (less escalatory); Khrushchev withdrew. The resolution included a tacit deal &mdash; U.S. removed Jupiter missiles from Turkey and pledged no Cuba invasion. <sup><a href="#src-5">[5]</a></sup></p>
+        <p><strong>Caveat:</strong> A 1983 Soviet early-warning system false alarm (sunlight on clouds) nearly triggered a retaliatory strike, demonstrating the system's fragility to random "noise." Historians debate whether deterrence caused peace or merely describes it post-hoc. <sup><a href="#src-22">[22]</a></sup></p>
+      </div>
+    </div>
+
+    <div class="domain-card fade-up" style="transition-delay:120ms" onclick="toggleDomain(this)">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span style="font-size:1.75rem;">&#128200;</span>
+          <div>
+            <div class="font-semibold text-sm">Oligopoly Pricing &amp; OPEC</div>
+            <div class="text-xs muted">Cartels, Price Wars, Signaling</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-down" class="expand-arrow w-4 h-4 muted flex-shrink-0"></i>
+      </div>
+      <div class="domain-body">
+        <p>OPEC is the world's most prominent legal cartel. Each member's dominant strategy is to exceed production quota, but universal cheating collapses prices. The cartel survives via grim-trigger logic: Saudi Arabia as swing producer can credibly threaten price wars (as in 2014&ndash;16 and 2020). Iraq and Kazakhstan have chronically exceeded quotas in recent years. <sup><a href="#src-15">[15]</a><a href="#src-21">[21]</a></sup></p>
+        <p>Spence's signaling model showed costly education can function as a signal of worker quality even without directly useful skills &mdash; a disturbing implication that a share of educational investment generates private returns without commensurate social returns. <sup><a href="#src-16">[16]</a></sup></p>
+        <p><strong>Key insight:</strong> Repeated interaction makes future punishment credible. Cooperation collapses when discount rates are high or punishment is slow.</p>
+      </div>
+    </div>
+
+    <div class="domain-card fade-up" style="transition-delay:180ms" onclick="toggleDomain(this)">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span style="font-size:1.75rem;">&#129422;</span>
+          <div>
+            <div class="font-semibold text-sm">Evolutionary Biology</div>
+            <div class="text-xs muted">Hawk-Dove, ESS, Vampire Bats</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-down" class="expand-arrow w-4 h-4 muted flex-shrink-0"></i>
+      </div>
+      <div class="domain-body">
+        <p>Evolutionarily Stable Strategy (ESS), introduced by Maynard Smith and Price (1973), requires only selection pressure &mdash; no rationality. The hawk-dove game predicts the proportion of aggressive vs. submissive individuals tracks the value/cost ratio of contested resources. Real animal populations confirm this frequency-dependent behavior. <sup><a href="#src-10">[10]</a></sup></p>
+        <p>Vampire bats share blood with ailing bats expecting future reciprocity &mdash; a textbook iterated prisoner's dilemma in nature. Impalas groom each other to remove ticks despite the costs, because daily repeated interactions make cooperation more beneficial than isolation.</p>
+        <p>The near-universal 1:1 sex ratio is an ESS: if males were rare, producing sons yields higher reproductive fitness, driving ratios back to 1:1. No conscious calculation needed &mdash; selection does the work.</p>
+      </div>
+    </div>
+
+    <div class="domain-card fade-up" style="transition-delay:240ms" onclick="toggleDomain(this)">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span style="font-size:1.75rem;">&#129302;</span>
+          <div>
+            <div class="font-semibold text-sm">Algorithmic Agents &amp; AI</div>
+            <div class="text-xs muted">Collusion, Flash Crashes, Platforms</div>
+          </div>
+        </div>
+        <i data-lucide="chevron-down" class="expand-arrow w-4 h-4 muted flex-shrink-0"></i>
+      </div>
+      <div class="domain-body">
+        <p>Calvano et al. (2020) showed Q-learning algorithms sustain 10&ndash;20% supracompetitive prices using punishment phases &mdash; grim-trigger behavior emerging from reinforcement learning. Amazon reportedly updated prices every ~10 minutes on top products by 2018; ~one-third of the top 1,600 products used algorithmic pricing by 2015. <sup><a href="#src-8">[8]</a><a href="#src-9">[9]</a></sup></p>
+        <p>Platform markets exhibit winner-take-all dynamics: cross-side network effects (more users &rarr; more developers &rarr; more users) create self-reinforcing coordination equilibria. Katz and Shapiro (1985) formalized this; the Uber/Lyft duopoly illustrates that monopoly is not inevitable when differentiation and multi-homing are feasible. <sup><a href="#src-17">[17]</a></sup></p>
+        <p><strong>Open legal gap:</strong> Current antitrust law requires proof of intent or communication. Algorithmic collusion without communication falls outside existing frameworks, flagged by competition authorities in France, Germany, Japan, Denmark, Norway, and Sweden.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     7. INTERACTIVE PAYOFF MATRIX
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="grid-3x3" class="w-4 h-4"></i> Interactive</div>
+  <h2 class="text-2xl font-semibold mb-2">Payoff Matrix Explorer</h2>
+  <p class="text-sm muted mb-6">Select a game, then click any cell to see the strategic logic of that outcome. Nash equilibria are marked with a gold border.</p>
+
+  <div class="surface rounded-xl p-6 fade-up">
+    <!-- Game selector -->
+    <div class="flex flex-wrap gap-2 mb-5">
+      <button class="game-btn active" id="btn-pd" onclick="selectGame('pd')">Prisoner's Dilemma</button>
+      <button class="game-btn" id="btn-chicken" onclick="selectGame('chicken')">Chicken (Hawk-Dove)</button>
+      <button class="game-btn" id="btn-stag" onclick="selectGame('stag')">Stag Hunt</button>
+    </div>
+
+    <!-- Game description -->
+    <p id="game-desc" class="text-sm muted mb-5 leading-relaxed"></p>
+
+    <!-- Matrix table -->
+    <div class="overflow-x-auto">
+      <table class="matrix-table" id="payoff-table"></table>
+    </div>
+
+    <!-- Cell explanation -->
+    <div id="cell-explanation" class="cell-explanation"></div>
+
+    <!-- Legend -->
+    <div class="flex flex-wrap gap-4 mt-5 text-xs muted">
+      <span class="flex items-center gap-1.5">
+        <span style="display:inline-block;width:14px;height:14px;border:2px solid #f59e0b;border-radius:3px;background:#fffbeb;"></span>
+        Nash Equilibrium
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span style="display:inline-block;width:14px;height:14px;border:2px solid var(--accent);border-radius:3px;background:#e0e7ff;"></span>
+        Selected cell
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     8. WHERE GAME THEORY FAILS
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Limitations</div>
+  <h2 class="text-2xl font-semibold mb-6">Where Game Theory Fails in Practice</h2>
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div class="fail-card card-hover fade-up">
+      <div class="flex gap-3">
+        <div class="fail-num flex-shrink-0">F1</div>
+        <div>
+          <h3 class="font-semibold mb-1">Fairness &amp; the Ultimatum Game</h3>
+          <p class="text-sm muted leading-relaxed">Nash theory predicts a proposer should offer $0.01 and a responder accept any positive amount. In practice, proposers offer 30&ndash;50%, and responders reject offers below 20&ndash;25% at personal cost. The deviation is not noise &mdash; it is systematic, replicable, and large. Cross-cultural studies find fairness norms vary (25% in Machiguenga societies to over 50% in some Melanesian groups) but never disappear entirely. <sup><a href="#src-6">[6]</a></sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="fail-card card-hover fade-up" style="transition-delay:60ms">
+      <div class="flex gap-3">
+        <div class="fail-num flex-shrink-0">F2</div>
+        <div>
+          <h3 class="font-semibold mb-1">Bounded Rationality &amp; Backward Induction</h3>
+          <p class="text-sm muted leading-relaxed">The centipede game (Rosenthal 1981) shows Nash predicts defection on the first move, but players cooperate for many rounds, leaving money on the table from a "rational" perspective. Most people cannot perform backward-induction chains longer than 2&ndash;3 steps. Kahneman and Tversky's prospect theory documents loss aversion (losses feel ~2&times; as bad as equivalent gains feel good), anchoring, and probability weighting that systematically distort Nash calculations. <sup><a href="#src-6">[6]</a></sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="fail-card card-hover fade-up" style="transition-delay:120ms">
+      <div class="flex gap-3">
+        <div class="fail-num flex-shrink-0">F3</div>
+        <div>
+          <h3 class="font-semibold mb-1">Noise in Deterrence</h3>
+          <p class="text-sm muted leading-relaxed">Classical deterrence models assume rationality and correct signal interpretation. In 1983, a Soviet satellite mistakenly detected a U.S. missile launch (sunlight reflecting off clouds). Lieutenant Colonel Stanislav Petrov decided not to report it as an attack, averting potential retaliation. Pure Nash equilibrium analysis cannot account for such random "noise" &mdash; cooperative signals misread as defection can trigger defensive retaliation that mirrors the very threat they feared. <sup><a href="#src-22">[22]</a></sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="fail-card card-hover fade-up" style="transition-delay:180ms">
+      <div class="flex gap-3">
+        <div class="fail-num flex-shrink-0">F4</div>
+        <div>
+          <h3 class="font-semibold mb-1">Repugnant Transactions &amp; Moral Limits</h3>
+          <p class="text-sm muted leading-relaxed">Even if a market is mathematically efficient &mdash; paying living kidney donors would dramatically expand supply &mdash; it may be banned because society finds placing a monetary value on human organs morally unacceptable. Alvin Roth calls these "repugnant transactions." Airbnb's disruption of neighborhoods and commercial surrogacy face the same constraint: some people want to engage in them and others believe they shouldn't be allowed, and the social objection overrides the efficiency argument.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="fail-card card-hover fade-up" style="transition-delay:240ms">
+      <div class="flex gap-3">
+        <div class="fail-num flex-shrink-0">F5</div>
+        <div>
+          <h3 class="font-semibold mb-1">Climate: Identifying the Problem Is Not Solving It</h3>
+          <p class="text-sm muted leading-relaxed">Greenhouse gas abatement is a global public-goods game with a classic free-rider structure: every nation prefers others absorb the cost. Bruce Bueno de Mesquita's model predicted multilateral treaties with unconditioned pledges would fail &mdash; the Kyoto Protocol's enforcement failure and the Paris Agreement's unconditional NDC structure both fit this prediction. Game theory identifies the problem perfectly but, without a supranational enforcement body covering 190+ sovereign nations, offers no ready mechanism-design solution. <sup><a href="#src-11">[11]</a><a href="#src-20">[20]</a></sup></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="fail-card card-hover fade-up" style="transition-delay:300ms">
+      <div class="flex gap-3">
+        <div class="fail-num flex-shrink-0">F6</div>
+        <div>
+          <h3 class="font-semibold mb-1">Selection Effects: Theory Works Better Under Pressure</h3>
+          <p class="text-sm muted leading-relaxed">Behavioral deviations from Nash shrink &mdash; but do not disappear &mdash; among experienced traders, financial professionals, and high-stakes repeated decision-makers. Selection and learning matter. Game theory's predictions are strongest when players are experienced, stakes are high, and the game is repeated. This means the theory's most impressive failures are concentrated precisely where it is most often applied: one-shot, high-stakes, novel situations with inexperienced actors.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     9. MODERN FRONTIER
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="cpu" class="w-4 h-4"></i> Modern Frontier</div>
+  <h2 class="text-2xl font-semibold mb-6">Open Problems &amp; Emerging Challenges</h2>
+  <div class="grid md:grid-cols-3 gap-4">
+
+    <div class="frontier-card card-hover scale-in">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:1.5rem;">&#129302;</span>
+        <h3 class="font-semibold">Algorithmic Collusion &amp; Antitrust</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed">Current law requires proof of intent or communication for illegal collusion. Calvano et al.'s Q-learning algorithms achieve 10&ndash;20% supracompetitive prices without either. Competition authorities in six countries have published policy papers on the gap &mdash; none has resolved it. The open question is whether "algorithmic communication" can be proven from price trajectories alone. <sup><a href="#src-8">[8]</a><a href="#src-9">[9]</a></sup></p>
+    </div>
+
+    <div class="frontier-card card-hover scale-in" style="transition-delay:100ms">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:1.5rem;">&#127931;</span>
+        <h3 class="font-semibold">Mechanism Design for Large Language Models</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed">A 2024 ACM Web Conference Best Paper (Duetting et al.) examined incentive-compatible aggregation of LLM outputs: when advertisers have private preferences about AI-generated content, how do you elicit honest signals without creating incentives to game? This extends Vickrey-Clarke-Groves auction theory into a fundamentally new domain where "bids" are AI outputs. <sup><a href="#src-18">[18]</a></sup></p>
+    </div>
+
+    <div class="frontier-card card-hover scale-in" style="transition-delay:200ms">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:1.5rem;">&#127758;</span>
+        <h3 class="font-semibold">Refugee Resettlement &amp; Migration Markets</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed">Roth identifies refugee resettlement as a matching market "working very badly" &mdash; existing systems fail to account for the preferences of migrants (who seek opportunity) and host countries (who have resource constraints). Applying deferred-acceptance algorithms and preference elicitation to this domain is an active research frontier with enormous humanitarian stakes.</p>
+    </div>
+
+    <div class="frontier-card card-hover scale-in" style="transition-delay:300ms">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:1.5rem;">&#9889;</span>
+        <h3 class="font-semibold">AI Financial Markets &amp; Flash Crashes</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed">Algorithmic high-frequency trading plays games at microsecond timescales where human reaction is strategically irrelevant. The 2010 U.S. equity flash crash (Dow down ~1,000 points in minutes) demonstrated how algorithmic agents interacting at speed produce catastrophic disequilibria no individual intended. Market microstructure theory must be substantially revised for this regime.</p>
+    </div>
+
+    <div class="frontier-card card-hover scale-in" style="transition-delay:400ms">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:1.5rem;">&#128203;</span>
+        <h3 class="font-semibold">Emissions Permit Auctions</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed">The EU Emissions Trading System and U.S. Regional Greenhouse Gas Initiative use auction mechanisms to allocate carbon permits. Milgrom and Wilson's complementarity insights apply directly; active research examines how to design permit auctions resistant to market power manipulation while achieving efficiency targets. The FCC Incentive Auction (2016&ndash;2017) offers a frontier template for combinatorial designs.</p>
+    </div>
+
+    <div class="frontier-card card-hover scale-in" style="transition-delay:500ms">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:1.5rem;">&#128279;</span>
+        <h3 class="font-semibold">Robust Mechanism Design</h3>
+      </div>
+      <p class="text-sm muted leading-relaxed">Most mechanism design assumes players know the game they are playing. In reality, players are uncertain about opponents' payoffs, rationality, and the number of actors. Robust mechanism design &mdash; institutions that work acceptably under wide ranges of model misspecification &mdash; is an active frontier. Noise-tolerant strategies (e.g., Generous Tit-for-Tat, which forgives ~10% of apparent defections) outperform strict Nash strategies in real-world repeated games.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     10. SOURCES
+═══════════════════════════════════════════════ -->
+<section class="max-w-6xl mx-auto px-6 mb-12">
+  <div class="section-label"><i data-lucide="link" class="w-4 h-4"></i> Sources</div>
+  <h2 class="text-2xl font-semibold mb-6">All Citations</h2>
+  <div class="surface rounded-xl p-6 text-sm">
+    <h3 class="font-semibold mb-4 text-base">Research Sources</h3>
+    <ol class="sources-list">
+      <li id="src-1"><span class="source-num">[1]</span><span>Cramton, Peter. "The FCC Spectrum Auctions: An Early Assessment." <em>Journal of Economics &amp; Management Strategy</em> 6(3), 1997. <a href="https://cramton.umd.edu/papers1995-1999/97jems-fcc-spectrum-auctions.pdf" target="_blank" rel="noopener">cramton.umd.edu</a></span></li>
+      <li id="src-2"><span class="source-num">[2]</span><span>Nobel Committee. "Press Release: Sveriges Riksbank Prize in Economic Sciences 2020 (Milgrom &amp; Wilson)." Royal Swedish Academy of Sciences, Oct 12, 2020. <a href="https://www.nobelprize.org/prizes/economic-sciences/2020/press-release/" target="_blank" rel="noopener">nobelprize.org</a></span></li>
+      <li id="src-3"><span class="source-num">[3]</span><span>National Kidney Registry. "National Kidney Registry Facilitates 10,000th Living Donor Kidney Transplant." 2024. <a href="https://www.kidneyregistry.com/news/national-kidney-registry-facilitates-10000th-living-donor-kidney-transplant/" target="_blank" rel="noopener">kidneyregistry.com</a></span></li>
+      <li id="src-4"><span class="source-num">[4]</span><span>"Thomas Schelling: the legacy of a master strategist." <em>The Conversation</em>, Dec 14, 2016. <a href="https://theconversation.com/thomas-schelling-the-legacy-of-a-master-strategist-70394" target="_blank" rel="noopener">theconversation.com</a></span></li>
+      <li id="src-5"><span class="source-num">[5]</span><span>Brams, Steven J. "Game theory and the Cuban missile crisis." <em>Plus Magazine</em> (University of Cambridge), 2014. <a href="https://plus.maths.org/content/game-theory-and-cuban-missile-crisis" target="_blank" rel="noopener">plus.maths.org</a></span></li>
+      <li id="src-6"><span class="source-num">[6]</span><span>"The Ultimatum Game." iMotions, 2023. Primary source: G&uuml;th, Schmittberger, Schwarze, <em>Journal of Economic Behavior &amp; Organization</em> 3(4), 1982; Henrich et al. (2001). <a href="https://imotions.com/blog/learning/research-fundamentals/the-ultimatum-game/" target="_blank" rel="noopener">imotions.com</a></span></li>
+      <li id="src-7"><span class="source-num">[7]</span><span>Axelrod Python Library. "Background to Axelrod's Tournament." Primary source: Axelrod, R. <em>The Evolution of Cooperation</em>, Basic Books, 1984. <a href="https://axelrod.readthedocs.io/en/fix-documentation/reference/description.html" target="_blank" rel="noopener">axelrod.readthedocs.io</a></span></li>
+      <li id="src-8"><span class="source-num">[8]</span><span>Calvano, Calzolari, Denic&ograve;l&ograve;, Pastorello. "Artificial Intelligence, Algorithmic Pricing, and Collusion." <em>American Economic Review</em> 110(10): 3267&ndash;97, 2020. <a href="https://www.aeaweb.org/articles?id=10.1257/aer.20190623" target="_blank" rel="noopener">aeaweb.org</a></span></li>
+      <li id="src-9"><span class="source-num">[9]</span><span>Mikl&oacute;s-Thal, Tucker. "AI, Algorithmic Pricing, and Collusion." Simon Business School, 2019. <a href="https://simon.rochester.edu/blog/deans-corner/ai-algorithmic-pricing-and-collusion" target="_blank" rel="noopener">simon.rochester.edu</a></span></li>
+      <li id="src-10"><span class="source-num">[10]</span><span>Nature Education. "Game Theory, Evolutionary Stable Strategies and the Evolution of Biological Interactions." Primary: Maynard Smith &amp; Price, <em>Nature</em> 246, 1973. <a href="https://www.nature.com/scitable/knowledge/library/game-theory-evolutionary-stable-strategies-and-the-25953132/" target="_blank" rel="noopener">nature.com/scitable</a></span></li>
+      <li id="src-11"><span class="source-num">[11]</span><span>Biello, David. "Game Theory: Climate Talks Destined to Fail." <em>Scientific American</em>, Dec 2009. <a href="https://www.scientificamerican.com/article/game-theorist-predicts-failure-at-climate-talks/" target="_blank" rel="noopener">scientificamerican.com</a></span></li>
+      <li id="src-12"><span class="source-num">[12]</span><span>"Winner's Curse." Wikipedia. Primary: Capen, Clapp, Campbell, <em>JPT</em> 23, 1971. <a href="https://en.wikipedia.org/wiki/Winner%27s_curse" target="_blank" rel="noopener">wikipedia.org</a></span></li>
+      <li id="src-13"><span class="source-num">[13]</span><span>"Importance of Vickrey Auction shown through Google AdWords." Cornell INFO 2040, 2016. <a href="https://blogs.cornell.edu/info2040/2016/10/24/importance-of-vickery-auction-shown-through-google-adwords/" target="_blank" rel="noopener">blogs.cornell.edu</a></span></li>
+      <li id="src-14"><span class="source-num">[14]</span><span>Hooper, Vincent James. "Trump's Tariff Pause and the Game Theory Gamble." <em>International Policy Digest</em>, 2025. <a href="https://intpolicydigest.org/the-platform/trump-s-tariff-pause-and-the-game-theory-gamble/" target="_blank" rel="noopener">intpolicydigest.org</a></span></li>
+      <li id="src-15"><span class="source-num">[15]</span><span>"OPEC and the Geopolitics of Oil." MAS Economics, 2023. <a href="https://maseconomics.com/opec-and-the-geopolitics-of-oil-how-a-cartel-controls-the-worlds-most-important-commodity/" target="_blank" rel="noopener">maseconomics.com</a></span></li>
+      <li id="src-16"><span class="source-num">[16]</span><span>"Analyzing Signaling Games in Labor Market Theories." Number Analytics, 2024. Primary: Spence, <em>QJE</em> 87(3), 1973. <a href="https://www.numberanalytics.com/blog/analyzing-signaling-games-labor-market-theories" target="_blank" rel="noopener">numberanalytics.com</a></span></li>
+      <li id="src-17"><span class="source-num">[17]</span><span>"Mastering Platform Competition." Number Analytics, 2024. Primary: Katz &amp; Shapiro, <em>AER</em> 75(3), 1985. <a href="https://www.numberanalytics.com/blog/ultimate-guide-platform-competition-algorithmic-game-theory" target="_blank" rel="noopener">numberanalytics.com</a></span></li>
+      <li id="src-18"><span class="source-num">[18]</span><span>Duetting et al. "Mechanism Design for Large Language Models." <em>ACM Web Conference 2024</em> (Best Paper). <a href="https://research.google/blog/mechanism-design-for-large-language-models/" target="_blank" rel="noopener">research.google</a></span></li>
+      <li id="src-19"><span class="source-num">[19]</span><span>HRSA/OPTN. "Organ transplants exceeded 48,000 in 2024." Press release, 2025. <a href="https://www.hrsa.gov/optn/news-events/news/organ-transplants-exceeded-48000-2024-33-percent-increase-transplants-performed-2023" target="_blank" rel="noopener">hrsa.gov</a></span></li>
+      <li id="src-20"><span class="source-num">[20]</span><span>Multiple authors. "Self-enforcing strategies to deter free-riding in the climate change mitigation game." <em>PNAS</em>, Dec 2011. <a href="https://www.pnas.org/doi/10.1073/pnas.1106265108" target="_blank" rel="noopener">pnas.org</a></span></li>
+      <li id="src-21"><span class="source-num">[21]</span><span>Wilcockson. "The Game Theory of OPEC." Stanford PH 240 course paper, 2017. <a href="http://large.stanford.edu/courses/2017/ph240/wilcockson1/" target="_blank" rel="noopener">large.stanford.edu</a></span></li>
+      <li id="src-22"><span class="source-num">[22]</span><span>"Mutually Assured Destruction: Game Theory in the Cold War." Cornell INFO 2040, 2017. <a href="https://blogs.cornell.edu/info2040/2017/09/11/mutually-assured-destruction-game-theory-in-the-cold-war/" target="_blank" rel="noopener">blogs.cornell.edu</a></span></li>
+      <li id="src-23"><span class="source-num">[23]</span><span>Nobel Committee. "Nobel Prize in Economic Sciences 2005 — Popular Information (Schelling &amp; Aumann)." <a href="https://www.nobelprize.org/prizes/economic-sciences/2005/popular-information/" target="_blank" rel="noopener">nobelprize.org</a></span></li>
+      <li id="src-24"><span class="source-num">[24]</span><span>"Prisoner's dilemma." Wikipedia. <a href="https://en.wikipedia.org/wiki/Prisoner%27s_dilemma" target="_blank" rel="noopener">wikipedia.org</a></span></li>
+      <li id="src-25"><span class="source-num">[25]</span><span>"Alvin Roth &amp; the Kidney Exchange Program." UBS Nobel Perspectives, 2013. <a href="https://www.ubs.com/microsites/nobel-perspectives/en/laureates/alvin-roth.html" target="_blank" rel="noopener">ubs.com</a></span></li>
+    </ol>
+
+    <h3 class="font-semibold mt-8 mb-4 text-base">Video Sources (NotebookLM deep research)</h3>
+    <ol class="sources-list" style="counter-reset: none;">
+      <li><span class="source-num">V1</span><span>"Animal Behavior and Cooperation in Evolutionary Game Theory." <a href="https://www.youtube.com/watch?v=HRH3LTZaVhg" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V2</span><span>Nalebuff, Barry. "Business and Game Theory's Prisoners Dilemma." Big Think. <a href="https://www.youtube.com/watch?v=ymuiknGE4Is" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V3</span><span>"Big Ideas: Market Design with Nobel Laureate Alvin Roth." <a href="https://www.youtube.com/watch?v=TuN9QL5KOb8" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V4</span><span>Pinker, Steven. "Game Theory &amp; Nuclear Disarmament." <a href="https://www.youtube.com/watch?v=VslI79R7Ypo" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V5</span><span>"Game Theory (Prisoner's Dilemma) | From A Business Professor." <a href="https://www.youtube.com/watch?v=DlY4sP6YUts" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V6</span><span>Andrew H. "Game Theory and the real world." TEDxYouth@HarrowHK. <a href="https://www.youtube.com/watch?v=OIsV4-hJET4" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V7</span><span>"Russian Nuclear Geopolitics &amp; Game Theory." <a href="https://www.youtube.com/watch?v=KRXmX2M5Rp4" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V8</span><span>"Strategy Management &mdash; Game Theory: Guide to Solve Prisoners' Dilemma (Video #114)." <a href="https://www.youtube.com/watch?v=p_02zcz_0FE" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V9</span><span>"This game theory problem will change the way you see the world." <a href="https://www.youtube.com/watch?v=mScpHTIi-kM" target="_blank" rel="noopener">youtube.com</a></span></li>
+      <li><span class="source-num">V10</span><span>"Understanding Game Theory &mdash; Fundamentals and Real World Applications (11 Minutes)." <a href="https://www.youtube.com/watch?v=w94h9UqNzb4" target="_blank" rel="noopener">youtube.com</a></span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     11. FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-13</div>
+    <a href="../../" class="hover:text-current transition flex items-center gap-1">
+      <i data-lucide="home" class="w-4 h-4"></i> Office
+    </a>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+  // ── Scroll progress bar ──────────────────────────
+  const scrollBar = document.getElementById(`scroll-progress`);
+  window.addEventListener(`scroll`, () => {
+    const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+    scrollBar.style.width = Math.min(pct, 100) + `%`;
+  }, { passive: true });
+
+  // ── Lucide icons ─────────────────────────────────
+  lucide.createIcons();
+
+  // ── IntersectionObserver for entrance animations ─
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add(`visible`);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll(`.fade-up, .fade-left, .scale-in`).forEach((el, i) => {
+    observer.observe(el);
+  });
+
+  // ── Stagger grid children ────────────────────────
+  document.querySelectorAll(`.grid`).forEach(grid => {
+    Array.from(grid.children).forEach((child, i) => {
+      if (!child.style.transitionDelay) {
+        child.style.transitionDelay = Math.min(i * 60, 400) + `ms`;
+      }
+    });
+  });
+
+  // ── animateCounter ───────────────────────────────
+  function animateCounter(el, target, duration) {
+    const suffix = el.dataset.suffix || ``;
+    const prefix = el.dataset.prefix || ``;
+    const useComma = el.dataset.format === `comma`;
+    const start = performance.now();
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(eased * target);
+      const display = useComma ? value.toLocaleString() : value;
+      el.textContent = prefix + display + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // Trigger counters on viewport entry
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.counter, 10);
+        animateCounter(el, target, 1200);
+        counterObserver.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll(`[data-counter]`).forEach(el => counterObserver.observe(el));
+
+  // ── Insight Reel ─────────────────────────────────
+  const insights = [
+    {
+      icon: `dollar-sign`,
+      stat: `$100B+`,
+      statNumeric: 100,
+      statPrefix: `$`,
+      statSuffix: `B+`,
+      statLabel: `U.S. spectrum auction cumulative revenue (to 2020)`,
+      headline: `Mechanism Design Engineered a $100 Billion Market`,
+      body: `The FCC's Simultaneous Multiple Round Ascending auction — designed by Paul Milgrom and Robert Wilson — raised $617M in July 1994 and over $100 billion by 2020. Game theory applied as engineering, not prediction, transformed how governments allocate scarce public resources.`,
+      color: `#6366F1`
+    },
+    {
+      icon: `heart`,
+      stat: `10,000`,
+      statNumeric: 10000,
+      statPrefix: ``,
+      statSuffix: ``,
+      statLabel: `kidney transplants facilitated by National Kidney Registry (cumulative)`,
+      headline: `Matching Theory Creates Life-Saving Value Money Cannot Buy`,
+      body: `Alvin Roth's kidney-exchange algorithms match incompatible donor-recipient pairs across hospitals. The National Kidney Registry reached its 10,000th cumulative transplant and facilitated 1,744 paired exchanges in 2024 alone — in a market where paying donors remains illegal.`,
+      color: `#10B981`
+    },
+    {
+      icon: `trending-up`,
+      stat: `10–20%`,
+      statNumeric: null,
+      statLabel: `price premium from algorithmic collusion (Calvano et al., AER 2020)`,
+      headline: `AI Rediscovered Collusion Without Being Programmed To`,
+      body: `Q-learning algorithms in a landmark 2020 study converged on prices 10–20% above competitive levels without communicating, without instructions, and without violating antitrust law. Machine learning independently rediscovered grim-trigger: the most powerful cartel enforcement mechanism in classical game theory.`,
+      color: `#F59E0B`
+    },
+    {
+      icon: `scale`,
+      stat: `30–50%`,
+      statNumeric: null,
+      statLabel: `typical proposer offer in ultimatum game (Nash predicts near-zero)`,
+      headline: `Humans Sacrifice Money to Punish Unfairness`,
+      body: `Nash theory predicts a rational proposer should offer $0.01 and a responder accept. In practice, proposers offer 30–50% and responders reject offers below 20–25% at personal cost. The deviation is systematic, replicable, and large — appearing in hundreds of cross-cultural replications since 1982.`,
+      color: `#EF4444`
+    },
+    {
+      icon: `shield`,
+      stat: `45 yrs`,
+      statNumeric: 45,
+      statPrefix: ``,
+      statSuffix: ` yrs`,
+      statLabel: `Cold War nuclear peace under Mutual Assured Destruction (1945–1991)`,
+      headline: `MAD: The Nash Equilibrium That (Probably) Prevented Nuclear War`,
+      body: `Mutual Assured Destruction is formally a Nash equilibrium — given credible second-strike capability, first-strike produces mutual annihilation worse than the status quo. Direct nuclear war was avoided for roughly 45 years. A 1983 Soviet satellite false alarm nearly broke the equilibrium; a human's judgment averted catastrophe.`,
+      color: `#6366F1`
+    },
+    {
+      icon: `trophy`,
+      stat: `14`,
+      statNumeric: 14,
+      statPrefix: ``,
+      statSuffix: ``,
+      statLabel: `strategies in Axelrod's 1980 computer tournament`,
+      headline: `Tit-for-Tat Beat Every Complex Strategy With Two Lines of Code`,
+      body: `Axelrod's tournament pitted 14 strategies against each other in 200-round iterated prisoner's dilemmas. The winner was a two-line strategy: cooperate first, then copy your opponent's last move. Being nice, retaliatory, forgiving, and predictable proved sufficient to outcompete all sophisticated alternatives.`,
+      color: `#8B5CF6`
+    }
+  ];
+
+  let currentSlide = 0;
+  let reelPaused = false;
+  let reelTimer = null;
+  let slidesShown = new Set();
+
+  function buildReel() {
+    const reel = document.getElementById(`reel`);
+    const progressBar = document.getElementById(`reel-progress-bar`);
+    // Create cards
+    insights.forEach((ins, i) => {
+      const card = document.createElement(`div`);
+      card.className = `reel-card` + (i === 0 ? ` active` : ``);
+      card.innerHTML =
+        `<div style="color:${ins.color};font-size:2.5rem;margin-bottom:0.75rem;">` +
+          `<i data-lucide="${ins.icon}" style="width:2.5rem;height:2.5rem;"></i>` +
+        `</div>` +
+        `<div class="reel-stat-big" id="reel-stat-${i}" style="color:${ins.color}">${ins.stat}</div>` +
+        `<div class="reel-stat-label">${ins.statLabel}</div>` +
+        `<div class="reel-headline">${ins.headline}</div>` +
+        `<div class="reel-body">${ins.body}</div>`;
+      reel.insertBefore(card, progressBar);
+    });
+    lucide.createIcons();
+
+    // Build dots
+    const dotsEl = document.getElementById(`reel-dots`);
+    insights.forEach((_, i) => {
+      const dot = document.createElement(`div`);
+      dot.className = `reel-dot` + (i === 0 ? ` active` : ``);
+      dot.onclick = () => goToSlide(i);
+      dotsEl.appendChild(dot);
+    });
+
+    // Animate first slide counter
+    animateReelStat(0);
+    startProgress();
+    scheduleTick();
+  }
+
+  function animateReelStat(idx) {
+    if (slidesShown.has(idx)) return;
+    slidesShown.add(idx);
+    const ins = insights[idx];
+    if (ins.statNumeric === null) return;
+    const el = document.getElementById(`reel-stat-${idx}`);
+    if (!el) return;
+    const target = ins.statNumeric;
+    const prefix = ins.statPrefix;
+    const suffix = ins.statSuffix;
+    const useComma = target >= 1000;
+    const duration = 900;
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(eased * target);
+      const display = useComma ? value.toLocaleString() : value;
+      el.textContent = prefix + display + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function startProgress() {
+    const bar = document.getElementById(`reel-progress-bar`);
+    bar.classList.remove(`running`);
+    void bar.offsetWidth;
+    bar.classList.add(`running`);
+  }
+
+  function goToSlide(idx) {
+    const cards = document.querySelectorAll(`.reel-card`);
+    const dots = document.querySelectorAll(`.reel-dot`);
+    cards[currentSlide].classList.remove(`active`);
+    dots[currentSlide].classList.remove(`active`);
+    currentSlide = idx;
+    cards[currentSlide].classList.add(`active`);
+    dots[currentSlide].classList.add(`active`);
+    animateReelStat(currentSlide);
+    startProgress();
+    clearTimeout(reelTimer);
+    if (!reelPaused) scheduleTick();
+  }
+
+  function scheduleTick() {
+    reelTimer = setTimeout(() => {
+      goToSlide((currentSlide + 1) % insights.length);
+    }, 4000);
+  }
+
+  const reelWrapper = document.getElementById(`reel`);
+  reelWrapper.addEventListener(`mouseenter`, () => { reelPaused = true; clearTimeout(reelTimer); });
+  reelWrapper.addEventListener(`mouseleave`, () => { reelPaused = false; scheduleTick(); });
+
+  buildReel();
+
+  // ── Domain card expand/collapse ───────────────────
+  function toggleDomain(card) {
+    card.classList.toggle(`expanded`);
+  }
+
+  // ── Payoff Matrix ────────────────────────────────
+  const gameData = {
+    pd: {
+      title: `Prisoner's Dilemma`,
+      rowLabel: `Player A`,
+      colLabel: `Player B`,
+      rowStrategies: [`Cooperate`, `Defect`],
+      colStrategies: [`Cooperate`, `Defect`],
+      payoffs: [[[3,3],[0,5]],[[5,0],[1,1]]],
+      nashCells: [[1,1]],
+      description: `Each player's dominant strategy is to defect, even though mutual cooperation (3,3) would leave both better off. The Nash equilibrium (Defect, Defect) = (1,1) is worse for both. This gap between individual rationality and collective optimality is the engine behind most real-world game theory: OPEC, arms races, climate negotiations.`,
+      outcomes: [
+        [
+          `Mutual Cooperation — (3, 3): Both players cooperate. This is the Pareto-optimal outcome — total welfare is 6. But each player has a unilateral incentive to defect and get 5 instead of 3. Real-world parallel: OPEC production quotas, nuclear arms treaties, emissions pledges. Cooperation requires repeated interaction, binding agreements, or tit-for-tat enforcement.`,
+          `B Defects, A Cooperates — (0, 5): A is exploited. B gains the maximum while A receives nothing. This is the "sucker" outcome. When OPEC members exceed quotas while others show restraint, quota violators gain at the cartel's collective expense — until grim-trigger punishment arrives.`
+        ],
+        [
+          `A Defects, B Cooperates — (5, 0): A free-rides on B's cooperation. A gains the maximum; B is exploited. Symmetric to the (0,5) outcome. In arms races: one side builds while the other disarms unilaterally. The incentive to defect is always present regardless of what the opponent does — that is what makes it a "dominant strategy."`,
+          `Nash Equilibrium — (1, 1): Both defect. Neither player can improve by switching alone — this is the Nash equilibrium. Individual rationality produces collective irrationality. The Cold War arms race: both superpowers spent an estimated $10 trillion each on arsenals of weapons neither could realistically use.`
+        ]
+      ]
+    },
+    chicken: {
+      title: `Chicken (Hawk-Dove)`,
+      rowLabel: `Player A`,
+      colLabel: `Player B`,
+      rowStrategies: [`Swerve`, `Straight`],
+      colStrategies: [`Swerve`, `Straight`],
+      payoffs: [[[2,2],[1,3]],[[3,1],[0,0]]],
+      nashCells: [[0,1],[1,0]],
+      description: `Unlike the Prisoner's Dilemma, Chicken has no dominant strategy. Two asymmetric Nash equilibria exist: (Swerve, Straight) and (Straight, Swerve). The player who can credibly commit to "Straight" — by removing their ability to reverse — wins. This is Schelling's insight about brinkmanship in the Cuban Missile Crisis.`,
+      outcomes: [
+        [
+          `Both Swerve — (2, 2): Both players back down. A face-saving compromise with moderate payoffs for both. Neither side gains advantage, but catastrophe is avoided. In trade wars, a bilateral tariff truce; in geopolitics, a negotiated settlement. Not a Nash equilibrium — each player would prefer to go Straight if they knew the other would Swerve.`,
+          `Nash Equilibrium — (1, 3): A swerves, B goes Straight. B wins — captures the strategic advantage while A avoids catastrophe but loses face. One of two asymmetric Nash equilibria. In the Cuban Missile Crisis, Khrushchev's withdrawal of Soviet missiles from Cuba corresponds roughly to this outcome, with Khrushchev as the "swerving" party.`
+        ],
+        [
+          `Nash Equilibrium — (3, 1): A goes Straight, B swerves. A wins; B avoids catastrophe. The other asymmetric Nash equilibrium. The challenge is coordinating on which asymmetric outcome occurs. Commitment devices — Schelling's "locking the steering wheel" — create advantage by making Straight credible and irreversible. Burning bridges behind an army is a historical example.`,
+          `Catastrophe — (0, 0): Both go Straight. Mutual destruction — the worst outcome for both. This is what makes Chicken fundamentally different from the Prisoner's Dilemma: defection by both is catastrophic, not merely suboptimal. The threat of (0,0) gives brinkmanship its coercive power, and its credibility its danger.`
+        ]
+      ]
+    },
+    stag: {
+      title: `Stag Hunt (Coordination Game)`,
+      rowLabel: `Player A`,
+      colLabel: `Player B`,
+      rowStrategies: [`Hunt Stag`, `Hunt Hare`],
+      colStrategies: [`Hunt Stag`, `Hunt Hare`],
+      payoffs: [[[4,4],[0,2]],[[2,0],[2,2]]],
+      nashCells: [[0,0],[1,1]],
+      description: `The Stag Hunt has two Nash equilibria: (Stag, Stag) = (4,4) is Pareto-optimal; (Hare, Hare) = (2,2) is risk-dominant. The problem is not misaligned incentives — both players prefer (Stag, Stag) — but uncertainty about coordination. Schelling points, reputation, and pre-commitment help both players trust the cooperative equilibrium.`,
+      outcomes: [
+        [
+          `Nash Equilibrium (Pareto-optimal) — (4, 4): Both hunt stag. The best outcome for both players individually and collectively. But it only works if both players trust each other to coordinate. Real-world parallels: USB-C standard adoption, COVID vaccination campaigns, climate coalitions where collective commitment unlocks mutual benefit. Trust and communication are the key enablers.`,
+          `Risk Trap — (0, 2): A hunts stag, B hunts hare. A risks everything and catches nothing. B plays it safe and gets 2. A's unilateral stag-hunt fails without B's cooperation. This is why coordination games break down even when both players prefer the joint optimum — the risk of being left holding the bag makes the safe option rational.`
+        ],
+        [
+          `Risk Trap — (2, 0): A hunts hare, B hunts stag. Mirror of the (0,2) outcome. B's stag-hunt fails. Unlike the Prisoner's Dilemma, there is no incentive to free-ride here — if B hunts stag and A also hunts stag, A is better off. The problem is purely about uncertainty and trust, not conflicting incentives.`,
+          `Nash Equilibrium (risk-dominant) — (2, 2): Both hunt hare. The safe Nash equilibrium. Guarantees 2 regardless of what the other player does. Prevails when trust is low or communication is absent, even though (Stag, Stag) = (4,4) is available. Organizations that cannot coordinate on technical standards, industries that cannot agree on regulation, and nations that cannot commit to climate targets all get stuck here.`
+        ]
+      ]
+    }
+  };
+
+  let activeGame = `pd`;
+  let selectedCell = null;
+
+  function selectGame(gameId) {
+    activeGame = gameId;
+    selectedCell = null;
+    [`pd`, `chicken`, `stag`].forEach(id => {
+      document.getElementById(`btn-${id}`).classList.toggle(`active`, id === gameId);
+    });
+    renderMatrix();
+  }
+
+  function renderMatrix() {
+    const g = gameData[activeGame];
+    document.getElementById(`game-desc`).textContent = g.description;
+    const explanation = document.getElementById(`cell-explanation`);
+    explanation.classList.remove(`visible`);
+
+    let html = `<thead>`;
+    html += `<tr><th></th><th class="player-header" colspan="2">${g.colLabel}</th></tr>`;
+    html += `<tr><th class="player-header" style="text-align:left;">${g.rowLabel}</th>`;
+    g.colStrategies.forEach(cs => { html += `<th>${cs}</th>`; });
+    html += `</tr></thead><tbody>`;
+
+    g.rowStrategies.forEach((rs, r) => {
+      html += `<tr><th style="text-align:left;font-size:0.8rem;color:#71717a;padding:0.5rem 0.75rem;">${rs}</th>`;
+      g.colStrategies.forEach((cs, c) => {
+        const isNash = g.nashCells.some(nc => nc[0] === r && nc[1] === c);
+        const isSel = selectedCell && selectedCell[0] === r && selectedCell[1] === c;
+        let cls = `matrix-cell`;
+        if (isNash) cls += ` nash-cell`;
+        if (isSel) cls += ` selected-cell`;
+        const payoff = g.payoffs[r][c];
+        html += `<td class="${cls}" onclick="selectMatrixCell(${r},${c})">`;
+        html += `<div class="payoff-pair">(${payoff[0]}, ${payoff[1]})</div>`;
+        if (isNash) html += `<div class="nash-badge">Nash Eq.</div>`;
+        html += `</td>`;
+      });
+      html += `</tr>`;
+    });
+    html += `</tbody>`;
+    document.getElementById(`payoff-table`).innerHTML = html;
+  }
+
+  function selectMatrixCell(r, c) {
+    selectedCell = [r, c];
+    renderMatrix();
+    const g = gameData[activeGame];
+    const exp = document.getElementById(`cell-explanation`);
+    exp.textContent = g.outcomes[r][c];
+    exp.classList.add(`visible`);
+  }
+
+  renderMatrix();
+
+  // ── Chart.js ──────────────────────────────────────
+  const isDark = window.matchMedia(`(prefers-color-scheme: dark)`).matches;
+  const gridColor = isDark ? `#27272a` : `#e4e4e7`;
+  const tickColor = isDark ? `#a1a1aa` : `#71717a`;
+
+  const baseChartOpts = {
+    responsive: true, maintainAspectRatio: false,
+    animation: { duration: 900, easing: `easeOutQuart` },
+    plugins: { legend: { labels: { color: tickColor, font: { family: `Inter`, size: 11 } } } },
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { family: `Inter` } } },
+      y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { family: `Inter` } }, beginAtZero: true }
+    }
+  };
+
+  let chartsCreated = false;
+  const chartObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !chartsCreated) {
+      chartsCreated = true;
+      createCharts();
+    }
+  }, { threshold: 0.2 });
+  chartObserver.observe(document.getElementById(`chart-fcc`));
+
+  function createCharts() {
+    // Chart 1: FCC Auction Revenue
+    new Chart(document.getElementById(`chart-fcc`), {
+      type: `bar`,
+      data: {
+        labels: [`First Auction\n(Jul 1994)`, `PCS Broadband\n(Dec 1994–96)`, `Cumulative\n(2020)`],
+        datasets: [{
+          label: `Revenue ($ millions)`,
+          data: [617, 7000, 100000],
+          backgroundColor: [`#6366F1aa`, `#6366F1cc`, `#6366F1`],
+          borderColor: `#6366F1`,
+          borderWidth: 1,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        ...baseChartOpts,
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { family: `Inter`, size: 10 } } },
+          y: {
+            type: `logarithmic`,
+            grid: { color: gridColor },
+            ticks: {
+              color: tickColor, font: { family: `Inter`, size: 10 },
+              callback: val => {
+                if (val === 1000) return `$1B`;
+                if (val === 10000) return `$10B`;
+                if (val === 100000) return `$100B`;
+                if (val === 100) return `$100M`;
+                if (val === 1000) return `$1B`;
+                return null;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Chart 2: Ultimatum Game
+    new Chart(document.getElementById(`chart-ultimatum`), {
+      type: `bar`,
+      data: {
+        labels: [`$1 offer`, `$20 offer`, `$40 offer`, `$50 offer`],
+        datasets: [
+          {
+            label: `Nash Prediction (Rejection %)`,
+            data: [0, 0, 0, 0],
+            backgroundColor: `rgba(99,102,241,0.2)`,
+            borderColor: `rgba(99,102,241,0.5)`,
+            borderWidth: 1,
+            borderRadius: 4
+          },
+          {
+            label: `Observed Rejection Rate %`,
+            data: [80, 50, 5, 2],
+            backgroundColor: `#6366F1`,
+            borderColor: `#4f46e5`,
+            borderWidth: 1,
+            borderRadius: 4
+          }
+        ]
+      },
+      options: {
+        ...baseChartOpts,
+        scales: {
+          x: { grid: { color: gridColor }, ticks: { color: tickColor, font: { family: `Inter` } } },
+          y: {
+            grid: { color: gridColor }, ticks: { color: tickColor, font: { family: `Inter` }, callback: v => v + `%` },
+            beginAtZero: true, max: 100
+          }
+        }
+      }
+    });
+  }
+</script>
+</body>
+</html>

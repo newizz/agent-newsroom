@@ -1,15 +1,15 @@
 {
-  "currentRun": null,
-  "currentSlug": null,
-  "currentMode": null,
-  "lastUpdate": "2026-06-11T01:55:00Z",
+  "currentRun": "game-theory-in-practice",
+  "currentSlug": "game-theory-in-practice",
+  "currentMode": "deep",
+  "lastUpdate": "2026-06-13T03:08:43Z",
   "agents": [
     {
       "id": "intake",
       "name": "Iris",
       "role": "Intake Specialist",
       "emoji": "🎙️",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -17,7 +17,7 @@
       "name": "Ravi",
       "role": "Research Analyst",
       "emoji": "🔍",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -25,7 +25,7 @@
       "name": "Rin",
       "role": "Deep Researcher",
       "emoji": "🧬",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -33,8 +33,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "offline",
-      "task": ""
+      "status": "busy",
+      "task": "Building Game Theory dashboard"
     },
     {
       "id": "reporter",
