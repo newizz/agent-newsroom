@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ตรรกะวิบัติ — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root {
+  --accent: #6366F1;
+  --accent-soft: rgba(99,102,241,0.1);
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --border: #e4e4e7;
+  --text: #18181b;
+  --muted: #71717a;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0a0a0b;
+    --surface: #131316;
+    --border: #27272a;
+    --text: #e4e4e7;
+    --muted: #a1a1aa;
+  }
+}
+html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+body { background: var(--bg); color: var(--text); min-height: 100vh; }
+.surface { background: var(--surface); border: 1px solid var(--border); }
+.muted { color: var(--muted); }
+.accent { color: var(--accent); }
+.bg-accent-soft { background: var(--accent-soft); }
+.border-soft { border-color: var(--border); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Animation system */
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+  .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .55s ease, transform .55s ease; }
+  .scale-in  { opacity: 0; transform: scale(0.93); transition: opacity .45s ease, transform .45s ease; }
+  .visible   { opacity: 1 !important; transform: none !important; }
+}
+
+/* Card hover */
+.card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+.card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,.13); }
+
+/* Fallacy card */
+.fallacy-card { background: var(--surface); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; cursor: pointer; }
+.fallacy-card .toggle-chevron { transition: transform .2s ease; }
+
+/* TOC link active */
+.toc-link { font-size: 0.875rem; padding: 6px 12px; border-radius: 0.375rem; transition: background .15s ease, color .15s ease; color: var(--muted); }
+.toc-link:hover, .toc-link.active { background: var(--accent-soft); color: var(--accent); text-decoration: none; }
+
+/* Filter buttons */
+.filter-btn { padding: 5px 14px; border-radius: 999px; font-size: 0.78rem; font-weight: 500; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer; transition: all .15s ease; }
+.filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.filter-btn:not(.active):hover { border-color: var(--accent); color: var(--accent); }
+
+/* Worked example quote */
+.scenario-quote { border-left: 3px solid var(--accent); padding: 10px 14px; margin: 10px 0; background: var(--accent-soft); border-radius: 0 8px 8px 0; font-size: 0.88rem; font-style: italic; line-height: 1.6; }
+.fallacy-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; background: var(--accent-soft); color: var(--accent); margin-left: 6px; }
+
+/* Steps */
+.steps { counter-reset: step; }
+.step { counter-increment: step; display: flex; align-items: flex-start; gap: 14px; }
+.step::before { content: counter(step); display: inline-flex; width: 32px; height: 32px; flex-shrink: 0; align-items: center; justify-content: center; background: var(--accent-soft); color: var(--accent); border-radius: 8px; font-weight: 700; font-size: 0.85rem; margin-top: 2px; }
+
+/* Comparison table */
+.cmp-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.cmp-table th { padding: 10px 14px; text-align: left; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.cmp-table td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.6; }
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table tr:hover td { background: var(--accent-soft); }
+
+/* Glossary */
+.glossary-grid { display: grid; gap: 0; }
+.glossary-item { padding: 12px 0; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: minmax(220px, 1fr) 2fr; gap: 16px; }
+.glossary-item:last-child { border-bottom: none; }
+@media (max-width: 600px) {
+  .glossary-item { grid-template-columns: 1fr; gap: 4px; }
+  .cmp-table th:nth-child(3), .cmp-table td:nth-child(3) { display: none; }
+}
+
+/* Print */
+@media print {
+  #progress, nav { display: none; }
+  .surface { border: 1px solid #ccc; }
+}
+
+/* Scroll margin for anchor links */
+section[id] { scroll-margin-top: 80px; }
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Header -->
+<header style="border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; background: var(--bg);">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition" style="text-decoration:none;">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      agent-newsroom
+    </a>
+    <div class="text-xs muted">logical-fallacies-overview · 2026-06-19</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-12 pb-8">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span style="background:var(--accent-soft);color:var(--accent);padding:3px 10px;border-radius:6px;font-weight:600;">Concept Explainer</span>
+    <span style="background:rgba(16,185,129,0.1);color:#10b981;padding:3px 10px;border-radius:6px;font-weight:600;">ภาษาไทย</span>
+  </div>
+  <h1 style="font-size:clamp(2rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin-bottom:12px;line-height:1.15;">
+    ตรรกะวิบัติ
+    <span style="display:block;font-size:clamp(1.1rem,2.5vw,1.5rem);font-weight:400;color:var(--muted);letter-spacing:0;margin-top:4px;">Logical Fallacies</span>
+  </h1>
+  <p style="font-size:1.05rem;color:var(--muted);max-width:680px;line-height:1.75;">
+    ข้อโต้แย้งที่ฟังดูน่าเชื่อแต่มีข้อผิดพลาดในกระบวนการให้เหตุผล — รู้จัก 18 ประเภทหลัก เข้าใจความหมาย และเห็นตัวอย่างจริงในการเมือง โฆษณา และโซเชียลมีเดีย
+  </p>
+</section>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-3 flex flex-wrap gap-1">
+    <a href="#reel" class="toc-link">ภาพรวม</a>
+    <a href="#overview" class="toc-link">ตรรกะวิบัติคืออะไร</a>
+    <a href="#explorer" class="toc-link">18 ประเภท</a>
+    <a href="#examples" class="toc-link">ตัวอย่างจริง</a>
+    <a href="#guide" class="toc-link">คู่มือปฏิบัติ</a>
+    <a href="#comparison" class="toc-link">เปรียบเทียบคู่</a>
+    <a href="#glossary" class="toc-link">คำศัพท์</a>
+    <a href="#sources" class="toc-link">แหล่งอ้างอิง</a>
+  </div>
+</nav>
+
+<!-- ── INSIGHT REEL ─────────────────────────────────────────────────────── -->
+<section id="reel" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="zap" class="w-5 h-5 accent"></i>
+    <span>ข้อค้นพบสำคัญ</span>
+  </h2>
+  <div class="surface rounded-2xl overflow-hidden fade-up" id="reel" style="border:1px solid var(--border);">
+    <div id="reelSlides" style="position:relative;min-height:160px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- ── OVERVIEW ─────────────────────────────────────────────────────────── -->
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2 fade-up">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i>
+    ตรรกะวิบัติคืออะไร?
+  </h2>
+  <div class="surface rounded-xl p-8 fade-up">
+    <p style="line-height:1.8;margin-bottom:1em;font-size:0.95rem;">
+      <strong style="color:var(--accent);">ตรรกะวิบัติ (Logical Fallacy)</strong> คือรูปแบบการให้เหตุผลที่มีข้อผิดพลาด ซึ่งทำให้ข้อโต้แย้งฟังดูน่าเชื่อแต่จริงๆ แล้วสนับสนุนข้อสรุปได้ไม่เพียงพอ<sup><a href="#source-1">[1]</a></sup>
+      สิ่งสำคัญที่ต้องเข้าใจคือ ตรรกะวิบัติเป็นเรื่องของ <em>กระบวนการให้เหตุผล</em> ไม่ใช่เรื่องความจริงหรือเท็จของข้อสรุป — ข้อสรุปที่ได้จากตรรกะวิบัติอาจเป็นจริงก็ได้ แต่เหตุผลที่ใช้สนับสนุนนั้นไม่สมเหตุสมผล<sup><a href="#source-2">[2]</a></sup>
+    </p>
+    <p style="line-height:1.8;margin-bottom:1.5em;font-size:0.95rem;">
+      คำว่า "fallacy" มาจากภาษาละติน <em>fallacia</em> แปลว่า "การหลอกลวง" Aristotle เป็นคนแรกที่จัดระบบตรรกะวิบัติในหนังสือ Sophistical Refutations<sup><a href="#source-4">[4]</a></sup>
+      ในยุคโซเชียลมีเดีย ตรรกะวิบัติถูกใช้เป็นเครื่องมือโน้มน้าวใจอย่างกว้างขวาง — ทั้งโดยตั้งใจและไม่ตั้งใจ โดยนักการเมือง แบรนด์โฆษณา และผู้คนในชีวิตประจำวัน<sup><a href="#source-7">[7]</a><a href="#source-8">[8]</a></sup>
+    </p>
+
+    <!-- Formal vs Informal -->
+    <div style="margin-top:1.5rem;">
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:1rem;color:var(--accent);">2 ประเภทใหญ่</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="padding:16px;border-radius:10px;background:var(--accent-soft);border:1px solid var(--border);">
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);margin-bottom:6px;">Formal Fallacies</div>
+          <div style="font-weight:700;margin-bottom:6px;font-size:0.95rem;">ตรรกะวิบัติเชิงรูปแบบ</div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.65;">เกิดจาก<strong style="color:var(--text);">โครงสร้างตรรกะที่ผิด</strong> สามารถตรวจพบได้โดยพิจารณาแค่รูปแบบ ไม่ต้องสนใจเนื้อหา<sup><a href="#source-1">[1]</a><a href="#source-3">[3]</a></sup></p>
+          <p style="font-size:0.78rem;color:var(--muted);margin-top:8px;font-style:italic;">ตัวอย่าง: "ถ้า A แล้ว B; B จริง; ดังนั้น A จริง" — ผิดรูปแบบ</p>
+        </div>
+        <div style="padding:16px;border-radius:10px;background:rgba(239,68,68,0.07);border:1px solid var(--border);">
+          <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#ef4444;margin-bottom:6px;">Informal Fallacies</div>
+          <div style="font-weight:700;margin-bottom:6px;font-size:0.95rem;">ตรรกะวิบัติเชิงเนื้อหา</div>
+          <p style="font-size:0.83rem;color:var(--muted);line-height:1.65;">เกิดจากปัญหาที่<strong style="color:var(--text);">เนื้อหา บริบท หรือวิธีนำเสนอ</strong> พบในชีวิตจริงมากกว่ามาก แบ่งเป็น 3 กลุ่มย่อย<sup><a href="#source-1">[1]</a></sup></p>
+          <p style="font-size:0.78rem;color:var(--muted);margin-top:8px;font-style:italic;">กลุ่มย่อย: Relevance · Presumption · Weak Inference</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 subgroups -->
+    <div style="margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+      <div style="padding:12px;border-radius:8px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:1.4rem;margin-bottom:4px;">🎯</div>
+        <div style="font-weight:700;font-size:0.82rem;margin-bottom:4px;">Relevance</div>
+        <div style="font-size:0.75rem;color:var(--muted);">ความไม่เกี่ยวข้อง</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Ad Hominem, Appeal to Emotion, Bandwagon, Red Herring, Tu Quoque</div>
+      </div>
+      <div style="padding:12px;border-radius:8px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:1.4rem;margin-bottom:4px;">⚠️</div>
+        <div style="font-weight:700;font-size:0.82rem;margin-bottom:4px;">Presumption</div>
+        <div style="font-size:0.75rem;color:var(--muted);">ข้อสมมติที่ผิด</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Straw Man, False Dilemma, Hasty Generalization, Circular Reasoning, Loaded Question, Appeal to Ignorance</div>
+      </div>
+      <div style="padding:12px;border-radius:8px;border:1px solid var(--border);text-align:center;">
+        <div style="font-size:1.4rem;margin-bottom:4px;">🔍</div>
+        <div style="font-weight:700;font-size:0.82rem;margin-bottom:4px;">Weak Inference</div>
+        <div style="font-size:0.75rem;color:var(--muted);">การอนุมานที่อ่อน</div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:4px;">Slippery Slope, Appeal to Authority, Post Hoc, Appeal to Nature, Appeal to Tradition, False Analogy</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FALLACY EXPLORER ─────────────────────────────────────────────────── -->
+<section id="explorer" class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+    <h2 class="text-2xl font-semibold flex items-center gap-2 fade-up">
+      <i data-lucide="layers" class="w-5 h-5 accent"></i>
+      18 ประเภทหลัก
+    </h2>
+    <div style="font-size:0.82rem;color:var(--muted);">แสดง <span id="card-count">18</span> / 18</div>
+  </div>
+
+  <!-- Search + Filters -->
+  <div class="fade-up" style="margin-bottom:16px;">
+    <input id="search-input" type="text" placeholder="ค้นหาตรรกะวิบัติ (ไทย หรือ English)..."
+      style="width:100%;padding:9px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:0.88rem;outline:none;box-sizing:border-box;margin-bottom:10px;"
+      oninput="applyFilters()">
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+      <span style="font-size:0.75rem;color:var(--muted);align-self:center;margin-right:2px;">หมวด:</span>
+      <button class="filter-btn active" data-cat="all" onclick="setCatFilter(this)">ทั้งหมด</button>
+      <button class="filter-btn" data-cat="Relevance" onclick="setCatFilter(this)" style="border-color:rgba(239,68,68,0.3);">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ef4444;margin-right:5px;vertical-align:middle;"></span>ความไม่เกี่ยวข้อง
+      </button>
+      <button class="filter-btn" data-cat="Presumption" onclick="setCatFilter(this)" style="border-color:rgba(245,158,11,0.3);">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#f59e0b;margin-right:5px;vertical-align:middle;"></span>ข้อสมมติที่ผิด
+      </button>
+      <button class="filter-btn" data-cat="Weak Inference" onclick="setCatFilter(this)" style="border-color:rgba(59,130,246,0.3);">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#3b82f6;margin-right:5px;vertical-align:middle;"></span>การอนุมานที่อ่อน
+      </button>
+      <button class="filter-btn" data-cat="Ambiguity" onclick="setCatFilter(this)" style="border-color:rgba(139,92,246,0.3);">
+        <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#8b5cf6;margin-right:5px;vertical-align:middle;"></span>ความกำกวม
+      </button>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+      <span style="font-size:0.75rem;color:var(--muted);align-self:center;margin-right:2px;">โดเมน:</span>
+      <button class="filter-btn active" data-domain="all" onclick="setDomainFilter(this)">ทุกโดเมน</button>
+      <button class="filter-btn" data-domain="politics" onclick="setDomainFilter(this)">🏛 การเมือง</button>
+      <button class="filter-btn" data-domain="advertising" onclick="setDomainFilter(this)">📢 โฆษณา</button>
+      <button class="filter-btn" data-domain="social" onclick="setDomainFilter(this)">📱 โซเชียลมีเดีย</button>
+      <button class="filter-btn" data-domain="everyday" onclick="setDomainFilter(this)">🏠 ชีวิตประจำวัน</button>
+    </div>
+  </div>
+
+  <!-- Card grid -->
+  <div id="fallacy-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;"></div>
+  <div id="no-results" style="display:none;text-align:center;padding:40px;color:var(--muted);font-size:0.9rem;">ไม่พบตรรกะวิบัติที่ตรงกับการค้นหา</div>
+</section>
+
+<!-- ── WORKED EXAMPLES ──────────────────────────────────────────────────── -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2 fade-up">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i>
+    ตัวอย่างจริงในชีวิตประจำวัน
+  </h2>
+  <p class="muted text-sm mb-6 fade-up" style="line-height:1.7;">สามฉากต่อไปนี้แสดงให้เห็นว่าตรรกะวิบัติหลายประเภทสามารถปรากฏพร้อมกันในบริบทเดียวได้อย่างไร<sup><a href="#source-5">[5]</a><a href="#source-6">[6]</a></sup></p>
+
+  <!-- Scenario 1 -->
+  <div class="surface rounded-xl p-6 mb-4 fade-up card-hover" style="border-left: 4px solid var(--accent);">
+    <div style="display:flex;align-items:center;gap-10px;margin-bottom:12px;">
+      <span style="font-size:1.3rem;">🏛</span>
+      <div style="margin-left:10px;">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);">ฉากที่ 1</div>
+        <h3 style="font-weight:700;font-size:1rem;">การดีเบตทางการเมือง — รายการทีวีนโยบายสาธารณสุข</h3>
+      </div>
+    </div>
+    <div class="scenario-quote">
+      <strong>นักการเมือง A:</strong> "ฝ่ายตรงข้ามต้องการยกเลิกระบบประกันสุขภาพถ้วนหน้า แล้วปล่อยให้คนไทยที่ยากจนไม่มีหมอ!"
+      <span class="fallacy-tag">Straw Man</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ ฝ่ายตรงข้ามอาจแค่เสนอให้ปรับโครงสร้าง ไม่ได้ต้องการยกเลิก</div>
+    </div>
+    <div class="scenario-quote">
+      <strong>นักการเมือง B:</strong> "ขอถามก่อนว่า นักการเมือง A เคยโกงภาษีหรือเปล่า?"
+      <span class="fallacy-tag">Ad Hominem</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ ไม่ตอบประเด็นนโยบาย แต่โจมตีตัวบุคคล</div>
+    </div>
+    <div class="scenario-quote">
+      <strong>นักการเมือง B (อีกครั้ง):</strong> "ยังไม่มีหลักฐานพิสูจน์ว่านโยบายนี้เป็นอันตราย!"
+      <span class="fallacy-tag">Appeal to Ignorance</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ การขาดหลักฐานไม่ใช่หลักฐานว่าปลอดภัย</div>
+    </div>
+  </div>
+
+  <!-- Scenario 2 -->
+  <div class="surface rounded-xl p-6 mb-4 fade-up card-hover" style="border-left: 4px solid #10b981;">
+    <div style="display:flex;align-items:center;gap-10px;margin-bottom:12px;">
+      <span style="font-size:1.3rem;">📢</span>
+      <div style="margin-left:10px;">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#10b981;">ฉากที่ 2</div>
+        <h3 style="font-weight:700;font-size:1rem;">โฆษณาผลิตภัณฑ์วิตามินเสริมอาหาร</h3>
+      </div>
+    </div>
+    <div class="scenario-quote" style="border-left-color:#10b981;">
+      "แพทย์ดัง 3 ท่านแนะนำผลิตภัณฑ์นี้!"
+      <span class="fallacy-tag">Appeal to Authority</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ แพทย์อาจได้รับค่าจ้างจากบริษัท หรือความเชี่ยวชาญไม่ตรงสาขา</div>
+    </div>
+    <div class="scenario-quote" style="border-left-color:#10b981;">
+      "ลูกค้าของเรา 10,000 คนพอใจ ดังนั้นผลิตภัณฑ์นี้ต้องดี!"
+      <span class="fallacy-tag">Bandwagon</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ ความนิยมไม่รับประกันประสิทธิภาพ</div>
+    </div>
+    <div class="scenario-quote" style="border-left-color:#10b981;">
+      "ผลิตภัณฑ์ 100% จากธรรมชาติ ไม่มีสารเคมีสังเคราะห์!"
+      <span class="fallacy-tag">Appeal to Nature</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ สิ่งธรรมชาติไม่ได้ดีหรือปลอดภัยเสมอ — พิษสัตว์ก็ "ธรรมชาติ"</div>
+    </div>
+  </div>
+
+  <!-- Scenario 3 -->
+  <div class="surface rounded-xl p-6 fade-up card-hover" style="border-left: 4px solid #0ea5e9;">
+    <div style="display:flex;align-items:center;gap-10px;margin-bottom:12px;">
+      <span style="font-size:1.3rem;">📱</span>
+      <div style="margin-left:10px;">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#0ea5e9;">ฉากที่ 3</div>
+        <h3 style="font-weight:700;font-size:1rem;">การโต้เถียงในโซเชียลมีเดีย</h3>
+      </div>
+    </div>
+    <div class="scenario-quote" style="border-left-color:#0ea5e9;">
+      "เพื่อนฉัน 2 คนออกกำลังกายหนักแล้วหัวใจวาย ดังนั้นออกกำลังกายหนักอันตราย"
+      <span class="fallacy-tag">Hasty Generalization</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ 2 ตัวอย่างไม่เพียงพอที่จะสรุปเป็นกฎทั่วไป</div>
+    </div>
+    <div class="scenario-quote" style="border-left-color:#0ea5e9;">
+      "คนที่เสนอให้ลดชั่วโมงเรียนน่าจะต้องการยกเลิกการศึกษาทั้งหมดแน่ๆ!"
+      <span class="fallacy-tag">Straw Man + Slippery Slope</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ บิดเบือนข้อเสนอ และอ้างผลลัพธ์สุดโต่งโดยไม่มีหลักฐาน</div>
+    </div>
+    <div class="scenario-quote" style="border-left-color:#0ea5e9;">
+      โพสต์ไวรัลที่แชร์ 100,000 ครั้ง โดยไม่มีแหล่งอ้างอิง: "ต้องเป็นความจริงแน่ๆ"
+      <span class="fallacy-tag">Bandwagon</span>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:6px;">→ อัลกอริทึมโซเชียลมีเดียขยายการแพร่กระจายโดยไม่คำนึงถึงความถูกต้อง<sup><a href="#source-7">[7]</a></sup></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRACTICAL GUIDE ──────────────────────────────────────────────────── -->
+<section id="guide" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2 fade-up">
+    <i data-lucide="shield-check" class="w-5 h-5 accent"></i>
+    คู่มือปฏิบัติ: โต้แย้งโดยไม่ทะเลาะ
+  </h2>
+  <div class="surface rounded-xl p-8 steps fade-up">
+    <div class="step fade-left" style="margin-bottom:24px;">
+      <div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:6px;">ระบุโครงสร้างของข้อโต้แย้ง</div>
+        <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;">แยกแยะว่า <strong style="color:var(--text);">"ข้ออ้าง" (premise)</strong> คืออะไร และ <strong style="color:var(--text);">"ข้อสรุป" (conclusion)</strong> คืออะไร แล้วถามว่าข้ออ้างสนับสนุนข้อสรุปได้จริงหรือไม่<sup><a href="#source-5">[5]</a><a href="#source-6">[6]</a></sup></p>
+      </div>
+    </div>
+    <div class="step fade-left" style="margin-bottom:24px;">
+      <div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:6px;">ตั้งคำถามเพื่อเปิดเผยข้อสมมติฐาน</div>
+        <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:8px;">คำถามที่มีประสิทธิภาพ:</p>
+        <ul style="font-size:0.85rem;color:var(--muted);line-height:1.8;padding-left:16px;">
+          <li>"มีหลักฐานอะไรสนับสนุนข้อสรุปนี้?"</li>
+          <li>"มีทางเลือกอื่นที่เป็นไปได้หรือไม่?"</li>
+          <li>"ตัวอย่างที่ยกมาเป็นตัวแทนที่ดีพอหรือเปล่า?"</li>
+          <li>"ความสัมพันธ์ที่กล่าวอ้างเป็นเหตุและผล หรือแค่เกิดพร้อมกัน?"</li>
+        </ul>
+      </div>
+    </div>
+    <div class="step fade-left" style="margin-bottom:24px;">
+      <div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:6px;">ระบุตรรกะวิบัติอย่างสุภาพ</div>
+        <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;">พูดว่า <span style="background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:4px;font-size:0.83rem;">"ฉันคิดว่าข้อโต้แย้งนี้อาจมีปัญหาเรื่อง Straw Man เพราะ..."</span> แทนที่จะพูดว่า "คุณใช้ตรรกะวิบัติ!" ซึ่งทำให้คู่สนทนาตั้งรับ<sup><a href="#source-6">[6]</a></sup></p>
+      </div>
+    </div>
+    <div class="step fade-left">
+      <div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:6px;">นำกลับสู่หลักฐาน</div>
+        <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;">หลังจากชี้จุดผิดพลาดแล้ว นำการสนทนากลับสู่หัวข้อหลักและหลักฐานที่เกี่ยวข้อง แทนที่จะหมกมุ่นกับการโต้เถียงว่าใครใช้ตรรกะวิบัติ<sup><a href="#source-5">[5]</a><a href="#source-6">[6]</a></sup></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fallacy Fallacy warning -->
+  <div class="fade-up" style="margin-top:12px;padding:14px 18px;border-radius:10px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.25);">
+    <div style="font-size:0.78rem;font-weight:700;color:#f59e0b;margin-bottom:4px;">⚠️ ระวัง: Fallacy Fallacy</div>
+    <p style="font-size:0.85rem;color:var(--muted);line-height:1.6;">การระบุว่าข้อโต้แย้งมีตรรกะวิบัติ <strong>ไม่ได้พิสูจน์ว่าข้อสรุปของข้อโต้แย้งนั้นผิด</strong> — ต้องโต้แย้งด้วยหลักฐาน ไม่ใช่แค่ชี้ว่าเหตุผลมีข้อผิดพลาด<sup><a href="#source-7">[7]</a></sup></p>
+  </div>
+</section>
+
+<!-- ── COMPARISON TABLE ─────────────────────────────────────────────────── -->
+<section id="comparison" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2 fade-up">
+    <i data-lucide="git-compare" class="w-5 h-5 accent"></i>
+    คู่ที่มักสับสน — แยกแยะอย่างไร?
+  </h2>
+  <div class="surface rounded-xl overflow-hidden fade-up">
+    <table class="cmp-table">
+      <thead>
+        <tr>
+          <th>คู่ที่ 1</th>
+          <th>คู่ที่ 2</th>
+          <th>วิธีแยกแยะ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Ad Hominem</strong><br><span style="font-size:0.78rem;color:var(--muted);">การโจมตีตัวบุคคล</span></td>
+          <td><strong>Tu Quoque</strong><br><span style="font-size:0.78rem;color:var(--muted);">ตัวเองก็ทำเหมือนกัน</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Ad Hominem โจมตีลักษณะส่วนตัว (บุคลิก ประวัติ); Tu Quoque โจมตีความไม่สอดคล้องระหว่างคำพูดกับการกระทำ</td>
+        </tr>
+        <tr>
+          <td><strong>Straw Man</strong><br><span style="font-size:0.78rem;color:var(--muted);">การสร้างหุ่นฟาง</span></td>
+          <td><strong>Red Herring</strong><br><span style="font-size:0.78rem;color:var(--muted);">การเบี่ยงเบนประเด็น</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Straw Man ยังพูดถึงประเด็นเดิมแต่บิดเบือน; Red Herring เปลี่ยนไปพูดเรื่องอื่นที่ไม่เกี่ยวเลย</td>
+        </tr>
+        <tr>
+          <td><strong>Slippery Slope</strong><br><span style="font-size:0.78rem;color:var(--muted);">ทางลาดลื่นสู่หายนะ</span></td>
+          <td><strong>False Dilemma</strong><br><span style="font-size:0.78rem;color:var(--muted);">ทางเลือกลวง</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Slippery Slope อ้างลำดับเหตุการณ์ที่ไม่หลีกเลี่ยง; False Dilemma บีบให้เลือกแค่ 2 ทาง</td>
+        </tr>
+        <tr>
+          <td><strong>Post Hoc</strong><br><span style="font-size:0.78rem;color:var(--muted);">เพราะตามหลังจึงเป็นเหตุ</span></td>
+          <td><strong>False Cause (Cum Hoc)</strong><br><span style="font-size:0.78rem;color:var(--muted);">สาเหตุลวง</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Post Hoc: B เกิดหลัง A จึงคิดว่า A ทำให้เกิด B; Cum Hoc: B เกิดพร้อม A จึงคิดเช่นนั้น</td>
+        </tr>
+        <tr>
+          <td><strong>Appeal to Authority</strong><br><span style="font-size:0.78rem;color:var(--muted);">การอ้างผู้มีอำนาจ</span></td>
+          <td><strong>Bandwagon</strong><br><span style="font-size:0.78rem;color:var(--muted);">การโหนกระแสมวลชน</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Appeal to Authority อ้างบุคคล/สถาบันที่มีสถานะ; Bandwagon อ้างคนหมู่มากทั่วไป</td>
+        </tr>
+        <tr>
+          <td><strong>Circular Reasoning</strong><br><span style="font-size:0.78rem;color:var(--muted);">การให้เหตุผลวนเวียน</span></td>
+          <td><strong>Loaded Question</strong><br><span style="font-size:0.78rem;color:var(--muted);">คำถามตั้งกับดัก</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Circular Reasoning: ข้อสรุปเป็นส่วนหนึ่งของเหตุผล วนในตัวเอง; Loaded Question: คำถามฝังข้อสมมติที่บังคับยอมรับ</td>
+        </tr>
+        <tr>
+          <td><strong>Appeal to Nature</strong><br><span style="font-size:0.78rem;color:var(--muted);">การอ้างธรรมชาติ</span></td>
+          <td><strong>Appeal to Tradition</strong><br><span style="font-size:0.78rem;color:var(--muted);">การอ้างความเก่าแก่</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Appeal to Nature: "ธรรมชาติ = ดี"; Appeal to Tradition: "ทำมาช้านาน = ถูกต้อง"</td>
+        </tr>
+        <tr>
+          <td><strong>Hasty Generalization</strong><br><span style="font-size:0.78rem;color:var(--muted);">การด่วนสรุป</span></td>
+          <td><strong>Cherry Picking</strong><br><span style="font-size:0.78rem;color:var(--muted);">เลือกหลักฐานเฉพาะส่วน</span></td>
+          <td style="font-size:0.82rem;color:var(--muted);">Hasty Generalization: ตัวอย่างน้อยเกินไป; Cherry Picking: เลือกเฉพาะหลักฐานที่เห็นด้วย ละเว้นส่วนที่ขัดแย้ง</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ── GLOSSARY ─────────────────────────────────────────────────────────── -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2 fade-up">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i>
+    คำศัพท์สำคัญ
+  </h2>
+  <div class="surface rounded-xl p-6 fade-up">
+    <div class="glossary-grid">
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">ตรรกะวิบัติ (Logical Fallacy)</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ข้อโต้แย้งที่มีข้อผิดพลาดในกระบวนการให้เหตุผล ฟังดูน่าเชื่อแต่ไม่สนับสนุนข้อสรุปได้จริง</div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">เหตุผลวิบัติ</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ชื่อทางวิชาการของตรรกะวิบัติที่ใช้ใน Thai Wikipedia<sup><a href="#source-4">[4]</a></sup></div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">ข้ออ้าง / Premise</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ข้อความที่ใช้เป็นหลักฐานสนับสนุนข้อสรุป</div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">ข้อสรุป / Conclusion</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ข้อความที่ต้องการพิสูจน์หรือโน้มน้าวในข้อโต้แย้ง</div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">Formal Fallacy</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ตรรกะวิบัติที่เกิดจากโครงสร้างตรรกะที่ผิด ตรวจพบจากรูปแบบล้วนๆ</div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">Informal Fallacy</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ตรรกะวิบัติที่เกิดจากเนื้อหาหรือบริบทของข้อโต้แย้ง พบในชีวิตจริงมากกว่า</div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">Causation vs. Correlation</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">Causation = A ทำให้เกิด B โดยตรง; Correlation = A และ B มักเกิดพร้อมกัน แต่ไม่ใช่เหตุผลซึ่งกันและกัน</div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">Echo Chamber</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">สภาพแวดล้อมที่อัลกอริทึมเสนอเฉพาะเนื้อหาที่ยืนยันความเชื่อเดิม ทำให้ตรรกะวิบัติแพร่กระจายง่ายขึ้น<sup><a href="#source-7">[7]</a></sup></div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">Fallacy Fallacy</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ตรรกะวิบัติที่สรุปว่าข้อสรุปผิด เพียงเพราะข้อโต้แย้งมีตรรกะวิบัติ — การระบุตรรกะวิบัติไม่พิสูจน์ว่าข้อสรุปนั้นผิด</div></div>
+      <div class="glossary-item"><div style="font-weight:700;font-size:0.9rem;">Burden of Proof</div><div style="font-size:0.85rem;color:var(--muted);line-height:1.6;">ภาระของการพิสูจน์ตกอยู่กับผู้อ้างข้อเรียกร้อง ไม่ใช่ผู้ที่ไม่เชื่อ</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOURCES ───────────────────────────────────────────────────────────── -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i>
+    แหล่งอ้างอิง
+  </h2>
+  <div class="surface rounded-xl p-6 text-sm fade-up">
+    <ol style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px;">
+      <li id="source-1" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[1]</span><span><a href="https://iep.utm.edu/fallacy/" target="_blank" rel="noopener">Fallacies</a> — Internet Encyclopedia of Philosophy (2024)</span></li>
+      <li id="source-2" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[2]</span><span><a href="https://www.britannica.com/summary/fallacy" target="_blank" rel="noopener">Formal and Informal Fallacy</a> — Encyclopaedia Britannica (2024)</span></li>
+      <li id="source-3" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[3]</span><span><a href="https://plato.stanford.edu/entries/fallacies/" target="_blank" rel="noopener">Fallacies</a> — Stanford Encyclopedia of Philosophy, Hans Hansen (2023)</span></li>
+      <li id="source-4" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[4]</span><span><a href="https://th.wikipedia.org/wiki/%E0%B9%80%E0%B8%AB%E0%B8%95%E0%B8%B8%E0%B8%9C%E0%B8%A5%E0%B8%A7%E0%B8%B4%E0%B8%9A%E0%B8%B1%E0%B8%95%E0%B8%B4" target="_blank" rel="noopener">เหตุผลวิบัติ</a> — วิกิพีเดียภาษาไทย (2024)</span></li>
+      <li id="source-5" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[5]</span><span><a href="https://thinkingispower.com/logical-fallacies/" target="_blank" rel="noopener">Guide to the Most Common Logical Fallacies</a> — Melanie Trecek-King / Thinking Is Power (2023)</span></li>
+      <li id="source-6" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[6]</span><span><a href="https://writingcenter.unc.edu/tips-and-tools/fallacies/" target="_blank" rel="noopener">Fallacies — Tips and Tools</a> — UNC Writing Center (2023)</span></li>
+      <li id="source-7" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[7]</span><span><a href="https://spotfallacy.com/blog/logical-fallacy/logical-fallacies-list" target="_blank" rel="noopener">Logical Fallacies List: 30+ Common Fallacies</a> — SpotFallacy.com (2024)</span></li>
+      <li id="source-8" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[8]</span><span><a href="https://bidscube.com/blog/advertising-fallacies-10-real-world-examples-marketers-still-fall-for/" target="_blank" rel="noopener">Fallacies in Advertising: 10 Real-World Examples</a> — BidsCube (2024)</span></li>
+      <li id="source-9" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[9]</span><span><a href="https://mysaara.wordpress.com/2016/10/26/%E0%B8%95%E0%B8%A3%E0%B8%A3%E0%B8%81%E0%B8%B0%E0%B8%A7%E0%B8%B4%E0%B8%9A%E0%B8%B1%E0%B8%95%E0%B8%B4-fallacy-%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B9%80%E0%B8%A3%E0%B8%B2-%E0%B9%86-%E0%B8%97%E0%B9%88/" target="_blank" rel="noopener">ตรรกะวิบัติที่เรา ๆ ท่าน ๆ มักจะใช้</a> — MySaara Blog (2016)</span></li>
+      <li id="source-10" style="display:flex;gap:10px;line-height:1.6;"><span style="font-weight:700;color:var(--accent);flex-shrink:0;">[10]</span><span><a href="https://thethaiger.com/th/news/1167852/" target="_blank" rel="noopener">10 ข้อ ตรรกะวิบัติ รู้เท่าทัน ไม่ตกเป็นเหยื่อ</a> — The Thaiger Thailand (2023)</span></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ── FOOTER ───────────────────────────────────────────────────────────── -->
+<footer style="border-top:1px solid var(--border);margin-top:4rem;padding:2rem 0;">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-19</div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <button onclick="window.print()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:0.875rem;display:flex;align-items:center;gap:4px;">
+        <i data-lucide="printer" class="w-4 h-4"></i> Print
+      </button>
+      <a href="../../" style="display:flex;align-items:center;gap:4px;color:var(--muted);">
+        <i data-lucide="home" class="w-4 h-4"></i> Office
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+
+const catMeta = {
+  'Relevance':     { bg: 'rgba(239,68,68,0.12)',  color: '#ef4444', label: 'ความไม่เกี่ยวข้อง' },
+  'Presumption':   { bg: 'rgba(245,158,11,0.12)', color: '#f59e0b', label: 'ข้อสมมติที่ผิด' },
+  'Weak Inference':{ bg: 'rgba(59,130,246,0.12)', color: '#3b82f6', label: 'การอนุมานที่อ่อน' },
+  'Ambiguity':     { bg: 'rgba(139,92,246,0.12)', color: '#8b5cf6', label: 'ความกำกวม' }
+};
+
+const domainMeta = {
+  'politics':    { bg: 'rgba(99,102,241,0.1)',  color: '#6366f1', label: '🏛 การเมือง' },
+  'advertising': { bg: 'rgba(16,185,129,0.1)',  color: '#10b981', label: '📢 โฆษณา' },
+  'social':      { bg: 'rgba(14,165,233,0.1)',  color: '#0ea5e9', label: '📱 โซเชียล' },
+  'everyday':    { bg: 'rgba(120,113,108,0.1)', color: '#78716c', label: '🏠 ประจำวัน' }
+};
+
+const fallacies = [
+  {
+    id: 1, thName: 'การโจมตีตัวบุคคล', enName: 'Ad Hominem',
+    category: 'Relevance', domains: ['politics','social'],
+    definition: 'โจมตีลักษณะส่วนตัวของผู้โต้แย้ง เช่น บุคลิก ประวัติ แรงจูงใจ แทนที่จะจัดการกับเนื้อหาของข้อโต้แย้งโดยตรง',
+    error: 'ลักษณะส่วนตัวของผู้พูดไม่เกี่ยวกับความถูกผิดของข้อโต้แย้งนั้น',
+    examples: [
+      'การเมือง: "คุณไม่ควรเชื่อนโยบายเศรษฐกิจของเขา — เขาหย่าร้างถึงสองครั้งและมีคดีค้างในศาล"',
+      'ชีวิตประจำวัน: "จะมาบอกให้เลิกกินขนมหวานได้ยังไง ในเมื่อตัวเองก็อ้วนเหมือนกัน"'
+    ],
+    distinction: 'vs. Tu Quoque: Ad Hominem โจมตีลักษณะส่วนตัว; Tu Quoque โจมตีความไม่สอดคล้องระหว่างคำพูดกับการกระทำ',
+    refs: [5,10]
+  },
+  {
+    id: 2, thName: 'การสร้างหุ่นฟาง', enName: 'Straw Man',
+    category: 'Presumption', domains: ['politics','social'],
+    definition: 'บิดเบือนหรือขยายความข้อโต้แย้งของฝ่ายตรงข้ามให้สุดโต่งกว่าความจริง แล้วโจมตีเวอร์ชันที่บิดเบือนนั้น',
+    error: 'ไม่ได้โต้แย้งสิ่งที่อีกฝ่ายพูดจริงๆ แต่โจมตี "หุ่นฟาง" ที่สร้างขึ้นเอง',
+    examples: [
+      'การเมือง: นักการเมือง A เสนอให้ขึ้นภาษีคนรวย ฝ่ายตรงข้ามโต้: "เขาต้องการยึดทรัพย์สินพวกเราทุกคน!"',
+      'โซเชียล: มีคนเสนอให้กำหนดอายุขั้นต่ำใช้โซเชียลมีเดีย คู่โต้แย้ง: "คุณต้องการแบนอินเทอร์เน็ตทั้งหมดสำหรับเด็กใช่ไหม?"'
+    ],
+    distinction: 'vs. Red Herring: Straw Man บิดเบือนประเด็นเดิมแล้วโจมตี; Red Herring เปลี่ยนไปพูดเรื่องอื่นที่ไม่เกี่ยวเลย',
+    refs: [5,6]
+  },
+  {
+    id: 3, thName: 'ทางเลือกลวง', enName: 'False Dilemma / False Dichotomy',
+    category: 'Presumption', domains: ['politics','advertising'],
+    definition: 'นำเสนอเพียง 2 ทางเลือกสุดขั้ว ทั้งที่มีทางเลือกที่ 3 หรือตำแหน่งกลางๆ ที่เป็นไปได้',
+    error: 'ในความเป็นจริงมักมีทางเลือกหลายทาง ไม่ใช่แค่ "A หรือ B"',
+    examples: [
+      'การเมือง: "ถ้าคุณไม่สนับสนุนนโยบายนี้ แสดงว่าคุณไม่รักชาติ"',
+      'โฆษณา: "คุณต้องการผอมหรืออยากป่วยเป็นโรคอ้วนไปตลอดชีวิต?"'
+    ],
+    distinction: 'vs. Slippery Slope: False Dilemma บีบให้เลือกแค่ 2 ทาง; Slippery Slope อ้างลำดับเหตุการณ์ที่ไม่หลีกเลี่ยง',
+    refs: [5,6,10]
+  },
+  {
+    id: 4, thName: 'ทางลาดลื่นสู่หายนะ', enName: 'Slippery Slope',
+    category: 'Weak Inference', domains: ['politics','advertising'],
+    definition: 'อ้างว่าการกระทำ A จะนำไปสู่ผลลัพธ์สุดโต่ง Z อย่างหลีกเลี่ยงไม่ได้ โดยไม่มีหลักฐานสนับสนุนลำดับเหตุการณ์นั้น',
+    error: 'ไม่มีหลักฐานว่าแต่ละขั้นตอนในลูกโซ่เหตุการณ์จะเกิดขึ้นจริง',
+    examples: [
+      'การเมือง: "ถ้าเราอนุญาตให้มีการสมรสเพศเดียวกัน ต่อไปคนจะขอแต่งงานกับสัตว์ได้"',
+      'สุขภาพ: "ถ้าคุณข้ามมื้อเช้าเพียงมื้อเดียว พลังงานจะพัง ประสิทธิภาพตก และสุขภาพพังทลาย"'
+    ],
+    distinction: 'vs. False Dilemma: Slippery Slope อ้างลำดับเหตุการณ์; False Dilemma บีบให้เลือกแค่ 2 ทาง',
+    refs: [5,7]
+  },
+  {
+    id: 5, thName: 'การด่วนสรุปจากตัวอย่างน้อยเกินไป', enName: 'Hasty Generalization',
+    category: 'Presumption', domains: ['social','everyday'],
+    definition: 'ดึงข้อสรุปกว้างๆ จากตัวอย่างที่ไม่เพียงพอหรือไม่เป็นตัวแทนของกลุ่มทั้งหมด มักนำไปสู่อคติและภาพเหมารวม',
+    error: 'ตัวอย่างน้อยเกินไปหรือไม่ได้เป็นตัวแทนที่ดีของกลุ่มทั้งหมด',
+    examples: [
+      'ชีวิตประจำวัน: "เพื่อนฉัน 2 คนที่ไปเรียนต่างจังหวัดทำแฟนทิ้ง ดังนั้นความสัมพันธ์ระยะไกลไม่มีทางได้ผล"',
+      'สังคม: "คนแรกที่ฉันเจอจากจังหวัดนั้นพูดจาหยาบ ดังนั้นคนจากจังหวัดนั้นพูดจาหยาบทุกคน"'
+    ],
+    distinction: 'vs. Cherry Picking: Hasty Generalization ใช้ตัวอย่างน้อยเกินไป; Cherry Picking เลือกเฉพาะหลักฐานที่สนับสนุนโดยละเว้นส่วนที่ขัดแย้ง',
+    refs: [5,6]
+  },
+  {
+    id: 6, thName: 'การอ้างผู้มีอำนาจอย่างไม่สมเหตุ', enName: 'Appeal to Authority',
+    category: 'Weak Inference', domains: ['advertising','everyday'],
+    definition: 'อ้างว่าสิ่งหนึ่งเป็นความจริงเพียงเพราะผู้มีชื่อเสียงกล่าวอ้าง โดยไม่ตรวจสอบว่าความเชี่ยวชาญนั้นเกี่ยวข้องหรือไม่',
+    error: 'ผู้เชี่ยวชาญอาจอยู่นอกสาขา ขัดแย้งกับฉันทามติ หรือมีผลประโยชน์ทับซ้อน',
+    examples: [
+      'โฆษณา: นักฟุตบอลดังโปรโมตอาหารเสริมสมอง — "ถ้า X ดีพอสำหรับผม คุณก็ควรลองด้วย"',
+      'สุขภาพ: "หมอคนนี้บอกให้กินวิตามิน C ขนาดสูงรักษามะเร็ง" แม้สวนทางกับฉันทามติทางการแพทย์'
+    ],
+    distinction: 'หมายเหตุ: การอ้างผู้เชี่ยวชาญในสาขาของตน โดยมีหลักฐานสนับสนุน ไม่ใช่ตรรกะวิบัติ',
+    refs: [5,6,8]
+  },
+  {
+    id: 7, thName: 'การอ้างอารมณ์แทนเหตุผล', enName: 'Appeal to Emotion',
+    category: 'Relevance', domains: ['advertising','politics'],
+    definition: 'โน้มน้าวผู้ฟังโดยกระตุ้นอารมณ์ (กลัว เศร้า สงสาร ภาคภูมิใจ) แทนที่จะนำเสนอข้อมูลและตรรกะที่หนักแน่น',
+    error: 'อารมณ์ไม่ใช่หลักฐานว่าข้อสรุปนั้นถูกต้อง',
+    examples: [
+      'โฆษณา: โฆษณาประกันภัยแสดงภาพครอบครัวโศกเศร้า โดยไม่มีข้อมูลเปรียบเทียบความคุ้มค่า',
+      'การเมือง: "ถ้าคุณรักลูกของคุณ คุณต้องลงคะแนนให้พรรคของฉัน"'
+    ],
+    distinction: 'มีรูปแบบย่อย: Appeal to Fear (ความกลัว), Appeal to Pity (ความสงสาร), Appeal to Flattery (ความภาคภูมิใจ)',
+    refs: [5,6,10]
+  },
+  {
+    id: 8, thName: 'การโหนกระแสมวลชน', enName: 'Bandwagon',
+    category: 'Relevance', domains: ['advertising','social'],
+    definition: 'อ้างว่าสิ่งหนึ่งถูกต้องหรือดีเพียงเพราะคนส่วนใหญ่เชื่อหรือทำสิ่งนั้น ทั้งที่ความนิยมไม่ได้รับประกันความถูกต้อง',
+    error: 'ความเชื่อของคนส่วนใหญ่ไม่พิสูจน์ว่าสิ่งนั้นถูกต้อง — ประวัติศาสตร์มีตัวอย่างมากมายที่คนส่วนใหญ่เชื่อผิด',
+    examples: [
+      'โฆษณา: "ยาสีฟันยี่ห้อนี้: 9 ใน 10 ทันตแพทย์แนะนำ" โดยไม่บอกเงื่อนไขการสำรวจ',
+      'โซเชียล: "ข่าวนี้แชร์ไปกว่า 100,000 ครั้งแล้ว แสดงว่าต้องเป็นความจริง"'
+    ],
+    distinction: 'vs. Appeal to Authority: Bandwagon อ้างคนหมู่มากทั่วไป; Appeal to Authority อ้างบุคคล/สถาบันที่มีสถานะ',
+    refs: [5,7,8]
+  },
+  {
+    id: 9, thName: 'การให้เหตุผลวนเวียน', enName: 'Circular Reasoning / Begging the Question',
+    category: 'Presumption', domains: ['everyday','politics'],
+    definition: 'ใช้ข้อสรุปเป็นส่วนหนึ่งของเหตุผล ทำให้การโต้แย้งวนเป็นวงกลม ไม่มีข้อมูลใหม่เพิ่มเข้ามาเลย',
+    error: 'ไม่มีหลักฐานใหม่ — แค่พูดซ้ำข้อสรุปในรูปแบบอื่น',
+    examples: [
+      'ความเชื่อ: "คัมภีร์ X ถูกต้องเพราะเขียนโดยพระเจ้า และเราทราบเพราะคัมภีร์ X บอกไว้"',
+      'การเมือง: "กฎหมายนี้ถูกต้องเพราะมันถูกกฎหมาย"'
+    ],
+    distinction: 'vs. Loaded Question: Circular Reasoning วนในตัวเอง; Loaded Question ฝังข้อสมมติในคำถาม',
+    refs: [4,6]
+  },
+  {
+    id: 10, thName: 'การเบี่ยงเบนประเด็น', enName: 'Red Herring',
+    category: 'Relevance', domains: ['politics','everyday'],
+    definition: 'นำเสนอข้อมูลหรือประเด็นที่ไม่เกี่ยวข้องเพื่อเบี่ยงความสนใจออกจากประเด็นหลัก',
+    error: 'ข้อมูลใหม่ที่นำเสนอไม่เกี่ยวกับคำถามเดิม ทำให้ผู้ฟังลืมประเด็นที่แท้จริง',
+    examples: [
+      'การเมือง: ถามนักการเมืองเรื่องนโยบายสิ่งแวดล้อม เขาตอบว่า "เรามาพูดถึงความสำเร็จด้านเศรษฐกิจก่อนดีกว่า"',
+      'ชีวิตประจำวัน: ลูกถูกถามว่าทำการบ้านหรือยัง ตอบว่า "วันนี้หนูช่วยน้องทบทวนบทเรียนนะ"'
+    ],
+    distinction: 'vs. Straw Man: Red Herring เปลี่ยนหัวข้อไปเลย; Straw Man ยังโต้แย้งประเด็นเดิมแต่บิดเบือนไป',
+    refs: [5,7,10]
+  },
+  {
+    id: 11, thName: 'เพราะตามหลังจึงเป็นเหตุ', enName: 'Post Hoc Ergo Propter Hoc',
+    category: 'Weak Inference', domains: ['everyday','advertising'],
+    definition: 'สมมติว่า B เกิดขึ้นเพราะ A เพียงเพราะ B เกิดขึ้นหลังจาก A — ลำดับเวลาไม่ใช่หลักฐานของความสัมพันธ์เชิงเหตุผล',
+    error: '"หลังจากนั้น" ไม่เท่ากับ "เกิดจากนั้น" มีปัจจัยอื่นอีกมากมายที่อาจเป็นสาเหตุ',
+    examples: [
+      'ชีวิตประจำวัน: "ฉันสวมถุงเท้าสีแดงวันที่ทีมชนะ ดังนั้นถุงเท้าสีแดงทำให้ทีมชนะ"',
+      'สุขภาพ: "ฉันกินอาหารเสริม X แล้วอาการดีขึ้น แสดงว่า X หายโรค" — อาจหายเองหรือมีปัจจัยอื่น'
+    ],
+    distinction: 'vs. Cum Hoc (False Cause): Post Hoc = B เกิดหลัง A; Cum Hoc = B เกิดพร้อม A — ทั้งคู่สรุปผิดว่า A ทำให้เกิด B',
+    refs: [4,6]
+  },
+  {
+    id: 12, thName: 'การอ้างธรรมชาติ', enName: 'Appeal to Nature',
+    category: 'Weak Inference', domains: ['advertising','everyday'],
+    definition: 'อ้างว่าสิ่งที่ "เป็นธรรมชาติ" ดีกว่าหรือถูกต้องกว่าเสมอ และสิ่งที่ "สังเคราะห์" แย่กว่าหรือผิด',
+    error: 'ธรรมชาติมีทั้งสิ่งดีและอันตราย (พิษสัตว์) และสิ่งสังเคราะห์หลายอย่างช่วยชีวิตคน (ยาปฏิชีวนะ)',
+    examples: [
+      'โฆษณา: "ผลิตภัณฑ์ของเรา 100% จากธรรมชาติ ไม่มีสารเคมี" — น้ำก็เป็นสารเคมีตามนิยามวิทยาศาสตร์',
+      'สุขภาพ: "การรักษาด้วยสมุนไพรดีกว่าเคมีบำบัด เพราะเป็นธรรมชาติ"'
+    ],
+    distinction: 'vs. Appeal to Tradition: Appeal to Nature อ้างว่าสิ่งนั้นมีในธรรมชาติ; Appeal to Tradition อ้างความเก่าแก่ทางวัฒนธรรม',
+    refs: [5,7]
+  },
+  {
+    id: 13, thName: 'การอ้างความเก่าแก่ดั้งเดิม', enName: 'Appeal to Tradition',
+    category: 'Weak Inference', domains: ['everyday','social'],
+    definition: 'อ้างว่าสิ่งหนึ่งถูกหรือดีเพราะทำมาช้านาน — "เราทำแบบนี้เสมอ" ไม่ใช่เหตุผลว่าสิ่งนั้นถูกต้อง',
+    error: 'ความยาวนานไม่รับประกันความถูกต้อง — หลายประเพณีที่ทำมานานก็ถูกพิสูจน์ว่าผิด',
+    examples: [
+      'สังคม: "สตรีไม่ควรออกนอกบ้านคนเดียว เราทำแบบนี้มาหลายร้อยปีแล้ว"',
+      'ธุรกิจ: "เราไม่เปลี่ยนวิธีการทำงาน เพราะบริษัทนี้ทำแบบนี้มาตั้งแต่ก่อตั้ง"'
+    ],
+    distinction: 'vs. Appeal to Nature: Appeal to Tradition อ้างวัฒนธรรม/ประเพณี; Appeal to Nature อ้างว่าสิ่งนั้นเป็นของธรรมชาติ',
+    refs: [5,7]
+  },
+  {
+    id: 14, thName: 'ตัวเองก็ทำเหมือนกัน', enName: 'Tu Quoque',
+    category: 'Relevance', domains: ['politics','everyday'],
+    definition: 'ตอบสนองต่อการวิพากษ์วิจารณ์โดยชี้ว่าผู้วิจารณ์ก็ทำในสิ่งเดียวกัน แทนที่จะตอบสนองต่อเนื้อหาของการวิจารณ์นั้น',
+    error: 'ความไม่สอดคล้องของผู้พูดไม่ได้ทำให้ข้อโต้แย้งนั้นผิดหรือถูก',
+    examples: [
+      'ครอบครัว: พ่อแม่บอกให้เลิกสูบบุหรี่ ลูกตอบว่า "คุณพ่อสมัยหนุ่มก็สูบนะ"',
+      'การเมือง: "พรรคของคุณวิจารณ์การทุจริตของเรา แต่พรรคคุณเองก็เคยมีคดีทุจริต"'
+    ],
+    distinction: 'vs. Ad Hominem: Tu Quoque ชี้ว่าคู่โต้แย้งทำไม่สอดคล้องกับคำพูด; Ad Hominem โจมตีลักษณะส่วนตัว',
+    refs: [5,9,10]
+  },
+  {
+    id: 15, thName: 'คำถามตั้งกับดัก', enName: 'Loaded Question / Complex Question',
+    category: 'Presumption', domains: ['politics','social'],
+    definition: 'ถามคำถามที่ฝังข้อสมมติฐานที่ยังไม่พิสูจน์ไว้ ทำให้การตอบทุกรูปแบบยอมรับข้อสมมติฐานนั้นโดยปริยาย',
+    error: 'ผู้ถามบังคับให้ยอมรับข้อสมมติฐานที่ซ่อนอยู่ก่อนจะตอบได้',
+    examples: [
+      'การเมือง: "เมื่อไหรคุณจะหยุดโกหกประชาชน?" — บังคับให้ยอมรับว่ากำลังโกหกอยู่',
+      'ชีวิตประจำวัน: "ทำไมนักเรียนสมัยนี้ถึงขี้เกียจ?" — บังคับให้ยอมรับว่านักเรียนสมัยนี้ขี้เกียจ'
+    ],
+    distinction: 'ตัวอย่างคลาสสิก: "คุณเลิกตีภรรยาแล้วหรือยัง?" — ตอบ "ใช่" = เคยตี; ตอบ "ไม่" = ยังตีอยู่',
+    refs: [4,7]
+  },
+  {
+    id: 16, thName: 'การเปรียบเทียบที่ผิดพลาด', enName: 'False Analogy / Weak Analogy',
+    category: 'Weak Inference', domains: ['politics','everyday'],
+    definition: 'เปรียบเทียบสองสิ่งที่คล้ายกันในบางด้าน แล้วสรุปว่าต้องเหมือนกันในด้านอื่นๆ ด้วย ทั้งที่มีความแตกต่างสำคัญ',
+    error: 'การอุปมาต้องมีความคล้ายคลึงในด้านที่เกี่ยวข้องกับข้อสรุป ไม่ใช่แค่บางด้าน',
+    examples: [
+      'การโต้เถียง: "รัฐบาลควรบริหารประเทศเหมือนบริหารธุรกิจ — ต้องแสวงหากำไรเสมอ"',
+      'สุขภาพ: "ร่างกายเหมือนเครื่องยนต์ ถ้าชิ้นส่วนพัง แค่เปลี่ยนชิ้นส่วน" — ร่างกายซับซ้อนกว่ามาก'
+    ],
+    distinction: 'การเปรียบเทียบที่ดีต้องคล้ายกันในด้านที่เกี่ยวข้องกับข้อสรุปที่ต้องการ ไม่ใช่แค่ผิวเผิน',
+    refs: [6,7]
+  },
+  {
+    id: 17, thName: 'การอ้างความไม่รู้', enName: 'Appeal to Ignorance',
+    category: 'Presumption', domains: ['everyday','social'],
+    definition: 'อ้างว่าสิ่งหนึ่งเป็นจริงเพราะไม่มีหลักฐานพิสูจน์ว่าเป็นเท็จ (หรือในทางกลับกัน) — การขาดหลักฐานไม่ใช่หลักฐาน',
+    error: 'ภาระของการพิสูจน์ตกอยู่กับผู้อ้าง ไม่ใช่ผู้ปฏิเสธ',
+    examples: [
+      'ความเชื่อ: "ยังไม่มีใครพิสูจน์ว่าผีไม่มีอยู่จริง ดังนั้นผีมีอยู่จริง"',
+      'วิทยาศาสตร์เทียม: "วิทยาศาสตร์ยังอธิบายจักรวาลได้ไม่ครบ แสดงว่าทฤษฎีสร้างสรรค์ X ต้องถูก"'
+    ],
+    distinction: 'หลักการ Burden of Proof: ภาระพิสูจน์ตกอยู่กับผู้อ้างข้อเรียกร้อง ไม่ใช่ผู้ที่ไม่เชื่อ',
+    refs: [5,7]
+  },
+  {
+    id: 18, thName: 'การใช้คำสองแง่', enName: 'Equivocation',
+    category: 'Ambiguity', domains: ['everyday','politics'],
+    definition: 'ใช้คำเดียวกันในความหมายต่างกันในส่วนต่างๆ ของข้อโต้แย้ง ทำให้ดูเหมือนมีตรรกะที่สมบูรณ์แต่จริงๆ สับสนความหมาย',
+    error: 'ความหมายของคำเปลี่ยนไประหว่างกลาง ทำให้ข้อโต้แย้งดูสมเหตุสมผลแต่ไม่ใช่',
+    examples: [
+      'ภาษาไทย: "ยาบ้าทำให้บ้า ดังนั้นบ้าทำให้ยาบ้า" — คำว่า "บ้า" มีความหมายต่างกันในแต่ละประโยค',
+      'โฆษณา: คำว่า "ธรรมชาติ" ใช้ทั้งแปลว่า "ไม่เคมี" และ "ดีต่อสุขภาพ" ในข้อโต้แย้งเดียวกัน'
+    ],
+    distinction: 'มักพบในโฆษณาและการโต้เถียงที่ใช้คำศัพท์ที่มีความหมายหลายอย่าง เช่น "ธรรมชาติ" "ปลอดภัย" "ดี"',
+    refs: [4,6]
+  }
+];
+
+// ── INSIGHT REEL ──────────────────────────────────────────────────────────
+
+const insights = [
+  {
+    stat: 18, suffix: '', statLabel: 'ประเภทหลัก', color: '#6366F1',
+    headline: 'ตรรกะวิบัติ 18 ประเภทที่พบบ่อยในชีวิตจริง',
+    body: 'ครอบคลุมกว่า 90% ของตรรกะวิบัติในการโต้แย้งทั่วไป — จากการดีเบตการเมืองสู่โฆษณาและโซเชียลมีเดีย'
+  },
+  {
+    stat: 5, suffix: '', statLabel: 'อันดับแรกที่พบบ่อยสุด', color: '#10B981',
+    headline: 'Top 5: Ad Hominem, Straw Man, False Dilemma, Red Herring, Hasty Generalization',
+    body: 'นักวิชาการด้านตรรกศาสตร์ระบุว่า 5 ประเภทนี้ปรากฏในการสนทนาทั่วไปมากกว่าประเภทอื่นอย่างชัดเจน'
+  },
+  {
+    stat: 2, suffix: '', statLabel: 'หมวดใหญ่', color: '#F59E0B',
+    headline: 'Formal vs. Informal — รากฐานที่ต้องเข้าใจก่อน',
+    body: 'Formal Fallacies ผิดที่โครงสร้างตรรกะ; Informal Fallacies ผิดที่เนื้อหา — ประเภทหลังพบในชีวิตจริงมากกว่ามาก'
+  },
+  {
+    stat: 3, suffix: '', statLabel: 'โดเมนหลัก', color: '#0EA5E9',
+    headline: 'การเมือง โฆษณา โซเชียลมีเดีย — 3 แหล่งรวมตรรกะวิบัติ',
+    body: 'Ad Hominem ครองการเมือง, Bandwagon ครองโฆษณา, Appeal to Emotion ครองโซเชียล — แต่ละโดเมนมีตรรกะวิบัติประจำ'
+  },
+  {
+    stat: 4, suffix: '', statLabel: 'ขั้นตอนปฏิบัติ', color: '#8B5CF6',
+    headline: 'โต้แย้งได้อย่างสุภาพใน 4 ขั้นตอน',
+    body: 'ระบุโครงสร้าง → ตั้งคำถาม → ระบุจุดผิด → นำกลับสู่หลักฐาน — ไม่ต้องทะเลาะ แค่ถามถูกคำถาม'
+  }
+];
+
+function animateCounter(el, target, duration, suffix) {
+  suffix = suffix || '';
+  var start = performance.now();
+  function update(now) {
+    var t = Math.min((now - start) / duration, 1);
+    var ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+function buildSlide(ins) {
+  return '<div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">' +
+    '<div style="text-align:center;min-width:110px;flex-shrink:0;">' +
+      '<div id="reel-stat" style="font-size:2.8rem;font-weight:800;color:' + ins.color + ';line-height:1;">0</div>' +
+      '<div style="font-size:0.7rem;color:var(--muted);margin-top:4px;">' + ins.statLabel + '</div>' +
+    '</div>' +
+    '<div style="flex:1;min-width:200px;">' +
+      '<div style="font-size:1.05rem;font-weight:700;margin-bottom:6px;">' + ins.headline + '</div>' +
+      '<div style="font-size:0.88rem;color:var(--muted);line-height:1.65;">' + ins.body + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+var reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function showSlide(idx, animate) {
+  if (animate === undefined) animate = true;
+  if (reelAnimating) return;
+  reelAnimating = true;
+  reelIdx = ((idx % insights.length) + insights.length) % insights.length;
+
+  var wrap = document.getElementById('reelSlides');
+  if (animate) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+
+  setTimeout(function() {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'none';
+    reelAnimating = false;
+    var statEl = document.getElementById('reel-stat');
+    if (statEl) animateCounter(statEl, insights[reelIdx].stat, 1200, insights[reelIdx].suffix);
+  }, animate ? 350 : 0);
+
+  document.querySelectorAll('.reel-dot').forEach(function(d, i) {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+
+  var bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(function() {
+    bar.style.transition = 'width 4s linear';
+    bar.style.width = '100%';
+  });
+}
+
+function startReel() { reelTimer = setInterval(function() { showSlide(reelIdx + 1); }, 4000); }
+function stopReel()  { clearInterval(reelTimer); }
+
+(function initReel() {
+  var dotsWrap = document.getElementById('reelDots');
+  insights.forEach(function(_, i) {
+    var d = document.createElement('button');
+    d.className = 'reel-dot';
+    d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;background:#d4d4d8;';
+    d.onclick = function() { stopReel(); showSlide(i); startReel(); };
+    dotsWrap.appendChild(d);
+  });
+
+  var reelWrap = document.getElementById('reel');
+  reelWrap.setAttribute('tabindex', '0');
+  reelWrap.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1); startReel(); }
+    if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1); startReel(); }
+  });
+  reelWrap.addEventListener('mouseenter', stopReel);
+  reelWrap.addEventListener('mouseleave', startReel);
+
+  showSlide(0, false);
+  startReel();
+})();
+
+// ── FALLACY CARDS ─────────────────────────────────────────────────────────
+
+function toggleCard(card) {
+  var panel = card.querySelector('.examples-panel');
+  var chevron = card.querySelector('.toggle-chevron');
+  var toggleText = card.querySelector('.toggle-text');
+  var isOpen = card.classList.contains('expanded');
+  if (isOpen) {
+    card.classList.remove('expanded');
+    panel.style.display = 'none';
+    chevron.style.transform = 'rotate(0deg)';
+    toggleText.textContent = 'ดูตัวอย่าง';
+  } else {
+    card.classList.add('expanded');
+    panel.style.display = 'block';
+    chevron.style.transform = 'rotate(180deg)';
+    toggleText.textContent = 'ซ่อนตัวอย่าง';
+  }
+}
+
+function renderFallacyCards() {
+  var grid = document.getElementById('fallacy-grid');
+  fallacies.forEach(function(f, i) {
+    var catC = catMeta[f.category];
+    var domBadges = f.domains.map(function(d) {
+      var dc = domainMeta[d];
+      return '<span style="background:' + dc.bg + ';color:' + dc.color + ';font-size:0.65rem;padding:2px 7px;border-radius:999px;font-weight:500;">' + dc.label + '</span>';
+    }).join('');
+    var exHtml = f.examples.map(function(ex) {
+      return '<p style="font-size:0.81rem;line-height:1.65;margin-bottom:7px;padding-left:10px;border-left:3px solid ' + catC.color + ';opacity:0.9;">' + ex + '</p>';
+    }).join('');
+    var refHtml = f.refs.map(function(r) {
+      return '<a href="#source-' + r + '" onclick="event.stopPropagation()" style="color:var(--accent);">[' + r + ']</a>';
+    }).join(' ');
+
+    var wrapper = document.createElement('div');
+    wrapper.className = 'fallacy-card-wrapper scale-in';
+    wrapper.style.transitionDelay = Math.min(i * 55, 400) + 'ms';
+
+    wrapper.innerHTML = '<div class="fallacy-card card-hover" ' +
+      'data-category="' + f.category + '" ' +
+      'data-domains="' + f.domains.join(',') + '" ' +
+      'data-fullname="' + f.thName + ' ' + f.enName + '" ' +
+      'onclick="toggleCard(this)">' +
+
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;">' +
+        '<div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;">' +
+          '<span style="background:' + catC.bg + ';color:' + catC.color + ';font-size:0.63rem;padding:2px 8px;border-radius:999px;font-weight:700;">' + catC.label + '</span>' +
+          domBadges +
+        '</div>' +
+        '<span style="font-size:0.7rem;color:var(--muted);font-weight:500;padding:1px 6px;border:1px solid var(--border);border-radius:5px;flex-shrink:0;">' + String(f.id).padStart(2,'0') + '</span>' +
+      '</div>' +
+
+      '<h3 style="font-size:1.05rem;font-weight:700;margin-bottom:3px;line-height:1.3;">' + f.thName + '</h3>' +
+      '<p style="font-size:0.75rem;font-weight:600;color:' + catC.color + ';margin-bottom:8px;">' + f.enName + '</p>' +
+      '<p style="font-size:0.83rem;color:var(--muted);line-height:1.6;">' + f.definition + '</p>' +
+
+      '<div class="examples-panel" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);" onclick="event.stopPropagation()">' +
+        '<div style="font-size:0.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px;">ข้อผิดพลาดที่ทำ</div>' +
+        '<p style="font-size:0.81rem;color:var(--muted);line-height:1.6;margin-bottom:10px;">' + f.error + '</p>' +
+        '<div style="font-size:0.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">ตัวอย่าง</div>' +
+        exHtml +
+        '<div style="padding:8px 12px;border-radius:7px;background:var(--accent-soft);font-size:0.79rem;color:var(--muted);line-height:1.55;margin-top:8px;">' +
+          '<span style="font-weight:700;color:var(--accent);">แยกแยะ: </span>' + f.distinction +
+        '</div>' +
+        '<div style="margin-top:8px;font-size:0.7rem;color:var(--muted);">อ้างอิง: ' + refHtml + '</div>' +
+      '</div>' +
+
+      '<button style="margin-top:12px;display:flex;align-items:center;gap:4px;font-size:0.76rem;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;" onclick="event.stopPropagation();toggleCard(this.closest(\'[data-category]\'))">' +
+        '<span class="toggle-text">ดูตัวอย่าง</span>' +
+        '<svg class="toggle-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>' +
+      '</button>' +
+    '</div>';
+
+    grid.appendChild(wrapper);
+  });
+}
+
+// ── FILTER LOGIC ──────────────────────────────────────────────────────────
+
+var activeCategory = 'all';
+var activeDomain   = 'all';
+
+function applyFilters() {
+  var query = document.getElementById('search-input').value.toLowerCase();
+  var wrappers = document.querySelectorAll('.fallacy-card-wrapper');
+  var visible = 0;
+  wrappers.forEach(function(wrapper) {
+    var card = wrapper.querySelector('.fallacy-card');
+    var cat  = card.dataset.category;
+    var doms = card.dataset.domains.split(',');
+    var name = card.dataset.fullname.toLowerCase();
+    var catMatch  = activeCategory === 'all' || cat === activeCategory;
+    var domMatch  = activeDomain === 'all' || doms.indexOf(activeDomain) !== -1;
+    var nameMatch = query === '' || name.indexOf(query) !== -1;
+    var show = catMatch && domMatch && nameMatch;
+    wrapper.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('card-count').textContent = visible;
+  document.getElementById('no-results').style.display = visible === 0 ? 'block' : 'none';
+}
+
+function setCatFilter(btn) {
+  activeCategory = btn.dataset.cat;
+  document.querySelectorAll('[data-cat]').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function setDomainFilter(btn) {
+  activeDomain = btn.dataset.domain;
+  document.querySelectorAll('[data-domain]').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+// ── ENTRANCE ANIMATIONS ───────────────────────────────────────────────────
+
+var io = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+      setTimeout(function() {
+        e.target.classList.remove('fade-up','fade-left','scale-in','visible');
+      }, 620);
+    }
+  });
+}, { threshold: 0.07 });
+
+function observeAnimated() {
+  document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(function(el) {
+    io.observe(el);
+  });
+}
+
+// ── SCROLL PROGRESS ───────────────────────────────────────────────────────
+
+window.addEventListener('scroll', function() {
+  var pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── TOC SPY ───────────────────────────────────────────────────────────────
+
+var sections = [];
+function initTocSpy() {
+  document.querySelectorAll('section[id]').forEach(function(s) {
+    sections.push(s);
+  });
+  window.addEventListener('scroll', updateToc, { passive: true });
+  updateToc();
+}
+
+function updateToc() {
+  var scrollY = window.scrollY + 120;
+  var current = '';
+  sections.forEach(function(s) {
+    if (s.offsetTop <= scrollY) current = s.id;
+  });
+  document.querySelectorAll('.toc-link').forEach(function(a) {
+    var href = a.getAttribute('href').replace('#','');
+    a.classList.toggle('active', href === current);
+  });
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+
+renderFallacyCards();
+observeAnimated();
+initTocSpy();
+lucide.createIcons();
+</script>
+</body>
+</html>

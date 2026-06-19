@@ -1,8 +1,8 @@
 {
-  "currentRun": "game-theory-in-practice",
-  "currentSlug": "game-theory-in-practice",
+  "currentRun": "logical-fallacies-overview",
+  "currentSlug": "logical-fallacies-overview",
   "currentMode": "deep",
-  "lastUpdate": "2026-06-13T03:08:43Z",
+  "lastUpdate": "2026-06-19T04:56:13Z",
   "agents": [
     {
       "id": "intake",
@@ -17,8 +17,8 @@
       "name": "Ravi",
       "role": "Research Analyst",
       "emoji": "🔍",
-      "status": "idle",
-      "task": ""
+      "status": "busy",
+      "task": "researching logical fallacies"
     },
     {
       "id": "deep-researcher",
@@ -34,7 +34,7 @@
       "role": "Dashboard Builder",
       "emoji": "🎨",
       "status": "busy",
-      "task": "Building Game Theory dashboard"
+      "task": "building dashboard"
     },
     {
       "id": "reporter",
