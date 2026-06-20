@@ -55,9 +55,11 @@ except ImportError:
 YOUTUBE_RE = re.compile(r"(youtube\.com/watch|youtu\.be/|youtube\.com/shorts/)", re.IGNORECASE)
 
 
-def is_youtube(url: str | None) -> bool:
-    """Detect YouTube URLs by pattern (NotebookLM's `type` field is always 'unknown')."""
-    return bool(url and YOUTUBE_RE.search(url))
+def is_youtube(url: str | None, title: str | None = None) -> bool:
+    """Detect YouTube by pattern. Checks BOTH url and title because NotebookLM
+    sometimes leaves `url` null and stores the YouTube URL in `title` instead."""
+    target = f"{url or ''} {title or ''}"
+    return bool(YOUTUBE_RE.search(target))
 
 
 def parse_brief(brief_text: str) -> dict:
@@ -83,12 +85,43 @@ def parse_brief(brief_text: str) -> dict:
     return {"topic": topic, "refined": refined, "questions": questions}
 
 
+SCRIPT_VERSION = "2026-06-19"  # bump on prompt/code changes for traceability
+
+
 class ErrorLog:
-    """Collects non-fatal errors so the run continues but failures stay visible."""
+    """Collects non-fatal errors so the run continues but failures stay visible.
+
+    P0 guarantees:
+      - A startup marker is written immediately on init (so even instant crashes
+        leave evidence — empty deep-research/ folder = no Python started at all).
+      - flush() is idempotent and safe to call multiple times.
+      - Designed to be called from a try/finally so the log ALWAYS lands on disk,
+        even if the script blows up before reaching the happy-path end.
+    """
 
     def __init__(self, output_dir: Path):
         self.output_dir = output_dir
         self.entries: list[dict] = []
+        self._started_at = datetime.now(timezone.utc)
+        self._wrote_startup_marker = False
+        # Write the startup marker SYNCHRONOUSLY before anything else can fail
+        self._write_startup_marker()
+
+    def _write_startup_marker(self) -> None:
+        try:
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+            marker = self.output_dir / "errors.log"
+            with marker.open("w", encoding="utf-8") as f:
+                f.write(f"# Deep-research run log (initial — will be rewritten on completion)\n")
+                f.write(f"# Started: {self._started_at.isoformat()}\n")
+                f.write(f"# Script version: {SCRIPT_VERSION}\n")
+                f.write(f"# Python: {sys.version.split()[0]}\n")
+                f.write(f"# PID: {sys.argv}\n\n")
+                f.write("(no errors yet — this file will be rewritten if the run completes)\n")
+            self._wrote_startup_marker = True
+        except Exception as e:
+            # If we can't even write a marker, surface to stderr loudly
+            print(f"✗ FATAL: cannot write to {self.output_dir}: {e}", file=sys.stderr, flush=True)
 
     def add(self, step: str, exc: BaseException, severity: str = "error") -> None:
         entry = {
@@ -100,7 +133,6 @@ class ErrorLog:
             "traceback": traceback.format_exc(),
         }
         self.entries.append(entry)
-        # Surface immediately to stderr too — Reporter or operator should see this
         print(
             f"  ✗ [{step}] {entry['type']}: {entry['message']}",
             file=sys.stderr,
@@ -120,21 +152,34 @@ class ErrorLog:
         print(f"  ⚠ [{step}] {message}", file=sys.stderr, flush=True)
 
     def flush(self) -> Path | None:
-        if not self.entries:
+        """Write all entries to errors.log. Idempotent — safe to call multiple times."""
+        try:
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+            path = self.output_dir / "errors.log"
+            now = datetime.now(timezone.utc)
+            with path.open("w", encoding="utf-8") as f:
+                if not self.entries:
+                    f.write(f"# Deep-research run — no errors\n")
+                    f.write(f"# Started: {self._started_at.isoformat()}\n")
+                    f.write(f"# Completed: {now.isoformat()}\n")
+                    f.write(f"# Script version: {SCRIPT_VERSION}\n")
+                    return None
+                f.write(f"# Deep-research run errors — {len(self.entries)} entry(s)\n")
+                f.write(f"# Started: {self._started_at.isoformat()}\n")
+                f.write(f"# Flushed: {now.isoformat()}\n")
+                f.write(f"# Script version: {SCRIPT_VERSION}\n\n")
+                for e in self.entries:
+                    f.write(f"[{e['ts']}] {e['severity'].upper()} :: {e['step']}\n")
+                    f.write(f"  {e['type']}: {e['message']}\n")
+                    if e["traceback"].strip():
+                        f.write("  --- traceback ---\n")
+                        for line in e["traceback"].splitlines():
+                            f.write(f"  {line}\n")
+                    f.write("\n")
+            return path
+        except Exception as e:
+            print(f"✗ FATAL: errors.log flush failed: {e}", file=sys.stderr, flush=True)
             return None
-        path = self.output_dir / "errors.log"
-        with path.open("w", encoding="utf-8") as f:
-            f.write(f"# Deep-research run errors — {len(self.entries)} entry(s)\n")
-            f.write(f"# Generated: {datetime.now(timezone.utc).isoformat()}\n\n")
-            for e in self.entries:
-                f.write(f"[{e['ts']}] {e['severity'].upper()} :: {e['step']}\n")
-                f.write(f"  {e['type']}: {e['message']}\n")
-                if e["traceback"].strip():
-                    f.write("  --- traceback ---\n")
-                    for line in e["traceback"].splitlines():
-                        f.write(f"  {line}\n")
-                f.write("\n")
-        return path
 
     def has_errors(self) -> bool:
         return any(e["severity"] == "error" for e in self.entries)
@@ -145,31 +190,27 @@ class ErrorLog:
 # ──────────────────────────────────────────────────────────────────
 
 
-async def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--slug", required=True, help="run slug")
-    parser.add_argument("--brief", required=True, help="path to brief.md")
-    parser.add_argument("--output-dir", required=True, help="where to write outputs")
-    parser.add_argument("--youtube", default="", help="comma-separated YouTube URLs")
-    args = parser.parse_args()
-
+async def _main_inner(args, err_log: "ErrorLog") -> int:
+    """The actual work — wrapped by main() in try/finally for guaranteed flush."""
     brief_path = Path(args.brief)
     output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    err_log = ErrorLog(output_dir)
 
     if not brief_path.exists():
-        print(f"✗ brief not found: {brief_path}", file=sys.stderr)
+        err_log.add("brief_missing", FileNotFoundError(f"brief not found: {brief_path}"))
         return 1
 
+    output_dir = Path(args.output_dir)
     brief = parse_brief(brief_path.read_text(encoding="utf-8"))
     youtube_urls = [u.strip() for u in args.youtube.split(",") if u.strip()]
+    web_fallback_urls = [u.strip() for u in args.web_urls.split(",") if u.strip()]
 
-    print(f"→ Slug:      {args.slug}")
-    print(f"→ Topic:     {brief['topic']}")
-    print(f"→ Refined:   {brief['refined'][:80]}...")
-    print(f"→ Questions: {len(brief['questions'])}")
-    print(f"→ YouTube:   {len(youtube_urls)} URL(s)")
+    print(f"→ Script ver:  {SCRIPT_VERSION}")
+    print(f"→ Slug:        {args.slug}")
+    print(f"→ Topic:       {brief['topic']}")
+    print(f"→ Refined:     {brief['refined'][:80]}...")
+    print(f"→ Questions:   {len(brief['questions'])}")
+    print(f"→ YouTube:     {len(youtube_urls)} URL(s)")
+    print(f"→ Web fallback:{len(web_fallback_urls)} URL(s)")
     print()
 
     async with await NotebookLMClient.from_storage() as client:
@@ -183,44 +224,85 @@ async def main() -> int:
             err_log.flush()
             return 2
 
-        # ── 2. Web research (3-step flow per notebooklm-py docs) ────
-        # FIX #1: was `client.sources.add_research()` (does not exist).
-        # Correct API is client.research.start → wait_for_completion → import_sources.
-        print("→ Running NotebookLM web research (deep mode)…")
+        # ── 2. Web research (3-step flow + retry + fallback) ────────
+        # Strategy (A+C combined):
+        #   A. Try mode="deep" with extended timeout (1800s = 30 min)
+        #   A. If "no_research" timeout → retry mode="fast" (smaller, more reliable)
+        #   C. If both fail OR import < 5 → add Rin's pre-curated web URLs directly
+        print("→ Running NotebookLM web research…")
         research_task_id: str | None = None
         research_imported = 0
-        try:
+        research_mode_used: str | None = None
+        web_fallback_added = 0
+
+        async def try_research(mode: str, timeout: int) -> int:
+            """Run research.start → wait → import. Returns count of imported sources."""
+            nonlocal research_task_id, research_mode_used
+            print(f"  attempting mode='{mode}' (timeout {timeout}s)...")
             result = await client.research.start(
-                nb.id, brief["refined"], source="web", mode="deep"
+                nb.id, brief["refined"], source="web", mode=mode
             )
             if result is None:
-                err_log.warn("web_research_start", "research.start returned None")
-            else:
-                research_task_id = result.get("task_id")
-                print(f"  task_id: {research_task_id}")
+                err_log.warn(f"research_start_{mode}", "research.start returned None")
+                return 0
+            research_task_id = result.get("task_id")
+            research_mode_used = mode
+            print(f"    task_id: {research_task_id}")
 
-                status = await client.research.wait_for_completion(
-                    nb.id, research_task_id, timeout=900, interval=8
+            status = await client.research.wait_for_completion(
+                nb.id, research_task_id, timeout=timeout, interval=10
+            )
+
+            discovered = status.get("sources", [])
+            web_only = [
+                s for s in discovered
+                if s.get("result_type") in (1, None)
+                and (s.get("url") or "").startswith("http")
+            ]
+            print(f"    discovered: {len(discovered)} entries ({len(web_only)} importable)")
+
+            if web_only:
+                imported = await client.research.import_sources(
+                    nb.id, research_task_id, web_only[:30]
                 )
+                return len(imported)
+            return 0
 
-                discovered = status.get("sources", [])
-                # result_type==1 means web entry; type==5 is the report markdown itself (skip)
-                web_only = [
-                    s for s in discovered if s.get("result_type") in (1, None)
-                    and (s.get("url") or "").startswith("http")
-                ]
-                print(f"  discovered: {len(discovered)} entries ({len(web_only)} importable)")
-
-                if web_only:
-                    imported = await client.research.import_sources(
-                        nb.id, research_task_id, web_only[:30]
-                    )
-                    research_imported = len(imported)
-                    print(f"  ✓ imported {research_imported} web sources")
-                else:
-                    err_log.warn("web_research_import", "no web sources to import")
+        # Attempt 1: deep mode, 30 min timeout
+        try:
+            research_imported = await try_research("deep", timeout=1800)
         except Exception as e:
-            err_log.add("web_research", e)
+            err_log.add("web_research_deep", e)
+            research_imported = 0
+
+        # Attempt 2: fast mode fallback if deep didn't deliver
+        if research_imported < 1:
+            print("→ Deep mode returned 0 — trying fast mode...")
+            try:
+                research_imported = await try_research("fast", timeout=600)
+            except Exception as e:
+                err_log.add("web_research_fast", e)
+                research_imported = 0
+
+        # Attempt 3 (Fallback C): add Rin's pre-curated web URLs directly
+        if research_imported < 5 and web_fallback_urls:
+            print(f"→ Web research insufficient ({research_imported} sources) — "
+                  f"adding {len(web_fallback_urls)} fallback URLs directly...")
+            for url in web_fallback_urls:
+                try:
+                    await client.sources.add_url(nb.id, url, wait=True)
+                    web_fallback_added += 1
+                    print(f"  ✓ {url}")
+                except Exception as e:
+                    err_log.add(f"web_fallback_add[{url}]", e, severity="warning")
+            print(f"  added {web_fallback_added}/{len(web_fallback_urls)} fallback URLs")
+
+        if research_imported == 0 and web_fallback_added == 0:
+            err_log.warn(
+                "no_web_sources",
+                "Neither NotebookLM research nor fallback URLs produced any web sources. "
+                "Notebook will only contain YouTube videos."
+            )
 
         # ── 3. Add YouTube sources ──────────────────────────────────
         yt_added = 0
@@ -242,12 +324,15 @@ async def main() -> int:
         sources_data = []
         for i, s in enumerate(sources, 1):
             url = getattr(s, "url", None)
+            title = getattr(s, "title", "Untitled")
             sources_data.append({
                 "id": i,
-                "title": getattr(s, "title", "Untitled"),
+                "title": title,
                 "url": url,
                 "type": getattr(s, "type", "unknown"),
-                "kind": "youtube" if is_youtube(url) else "web",  # FIX #3: URL-based detection
+                # FIX #3: check BOTH url and title — NotebookLM sometimes stores
+                # YouTube URL in `title` field and leaves `url` as null
+                "kind": "youtube" if is_youtube(url, title) else "web",
             })
         print(f"  total sources in notebook: {len(sources_data)}")
 
@@ -277,22 +362,57 @@ async def main() -> int:
                 answers.append({"q": q, "a": f"_(failed: {type(e).__name__}: {e})_"})
 
         # ── 7. Mind map ─────────────────────────────────────────────
-        # FIX #2: generate_mind_map returns a dict (not GenerationStatus). No polling.
+        # generate_mind_map returns dict (not GenerationStatus). No polling.
+        # Reject null mindmap — NotebookLM returns {"mind_map": null} when the
+        # notebook has insufficient indexed content (e.g. only video sources).
         print("→ Generating mind map...")
         mindmap_path: Path | None = output_dir / "mindmap.json"
+
+        def _is_valid_mindmap(d: dict | None) -> bool:
+            if not d:
+                return False
+            mm = d.get("mind_map")
+            return mm is not None and bool(mm)  # truthy + not None
+
+        async def _generate_mindmap_with_retry(attempts: int = 2) -> dict | None:
+            for i in range(attempts):
+                try:
+                    d = await client.artifacts.generate_mind_map(nb.id)
+                    if _is_valid_mindmap(d):
+                        return d
+                    err_log.warn(
+                        f"mind_map_empty_try{i+1}",
+                        f"got null/empty mind_map (attempt {i+1}/{attempts})"
+                    )
+                    if i + 1 < attempts:
+                        print(f"  retrying mind map in 20s...")
+                        await asyncio.sleep(20)
+                except Exception as e:
+                    err_log.add(f"mind_map_try{i+1}", e)
+                    if i + 1 < attempts:
+                        await asyncio.sleep(10)
+            return None
+
         try:
-            mm_dict = await client.artifacts.generate_mind_map(nb.id)
-            # mm_dict is the inline JSON itself — write it directly, but also try
-            # download_mind_map for the canonical format with metadata
-            try:
-                await client.artifacts.download_mind_map(nb.id, str(mindmap_path))
-                print(f"  ✓ saved (download_mind_map): {mindmap_path}")
-            except Exception as e_dl:
-                # Fall back to writing the dict we already have
-                err_log.warn("mind_map_download", f"download failed, using inline dict: {e_dl}")
-                with mindmap_path.open("w", encoding="utf-8") as f:
-                    json.dump(mm_dict, f, indent=2, ensure_ascii=False)
-                print(f"  ✓ saved (inline dict): {mindmap_path}")
+            mm_dict = await _generate_mindmap_with_retry(attempts=2)
+            if mm_dict is None:
+                # Don't save a useless file — Builder will skip section gracefully
+                mindmap_path = None
+                err_log.warn(
+                    "mind_map_skipped",
+                    "All attempts returned empty mind_map — likely insufficient "
+                    "notebook content. Skipping mindmap.json (Builder will omit section)."
+                )
+            else:
+                # Try canonical download first, fall back to writing the dict
+                try:
+                    await client.artifacts.download_mind_map(nb.id, str(mindmap_path))
+                    print(f"  ✓ saved (download_mind_map): {mindmap_path}")
+                except Exception as e_dl:
+                    err_log.warn("mind_map_download", f"download failed: {e_dl}")
+                    with mindmap_path.open("w", encoding="utf-8") as f:
+                        json.dump(mm_dict, f, indent=2, ensure_ascii=False)
+                    print(f"  ✓ saved (inline dict): {mindmap_path}")
         except Exception as e:
             err_log.add("mind_map", e)
             mindmap_path = None
@@ -344,7 +464,8 @@ async def main() -> int:
             f"**Source:** NotebookLM (via notebooklm-py)",
             f"**Notebook:** {nb.id}",
             f"**Sources:** {len(sources_data)} ({web_count} web · {yt_count} YouTube)",
-            f"**Web research import:** {research_imported} sources from NotebookLM auto-discovery",
+            f"**Web research:** mode={research_mode_used or 'failed'}, "
+            f"imported={research_imported}, fallback_added={web_fallback_added}",
             f"**Artifacts:** {artifacts_listed}",
         ]
         if err_log.entries:
@@ -381,20 +502,56 @@ async def main() -> int:
                     "notebook_id": nb.id,
                     "notebook_title": getattr(nb, "title", ""),
                     "research_task_id": research_task_id,
+                    "research_mode_used": research_mode_used,
                     "research_imported": research_imported,
+                    "web_fallback_added": web_fallback_added,
+                    "youtube_added": yt_added,
+                    "total_sources": len(sources_data),
+                    "web_sources": web_count,
+                    "video_sources": yt_count,
                 },
                 indent=2,
             ),
             encoding="utf-8",
         )
 
-        # ── 12. errors.log (FIX #4) — surface failures ──────────────
-        errors_path = err_log.flush()
+        # Note: errors.log is flushed by the outer main() finally block (P0).
         print()
-        if errors_path:
-            print(f"⚠ {len(err_log.entries)} non-fatal issue(s) logged to {errors_path}")
         print(f"✓ Done. Output in {output_dir}")
         return 0
+
+
+async def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--slug", required=True, help="run slug")
+    parser.add_argument("--brief", required=True, help="path to brief.md")
+    parser.add_argument("--output-dir", required=True, help="where to write outputs")
+    parser.add_argument("--youtube", default="", help="comma-separated YouTube URLs")
+    parser.add_argument("--web-urls", dest="web_urls", default="",
+                        help="comma-separated web URLs (fallback if NotebookLM auto web research fails)")
+    args = parser.parse_args()
+
+    output_dir = Path(args.output_dir)
+    # ErrorLog writes a startup marker IMMEDIATELY — so even instant crashes leave evidence
+    err_log = ErrorLog(output_dir)
+
+    exit_code = 1
+    try:
+        exit_code = await _main_inner(args, err_log)
+    except BaseException as e:
+        # Catch EVERYTHING — including KeyboardInterrupt, SystemExit
+        err_log.add("fatal_uncaught", e, severity="error")
+        exit_code = 99
+        # Re-raise non-Exception (KeyboardInterrupt etc) after flushing
+        if not isinstance(e, Exception):
+            err_log.flush()
+            raise
+    finally:
+        # P0: guaranteed flush — errors.log ALWAYS lands on disk
+        path = err_log.flush()
+        if path and err_log.entries:
+            print(f"\n⚠ {len(err_log.entries)} issue(s) logged to {path}", file=sys.stderr)
+    return exit_code
 
 
 if __name__ == "__main__":

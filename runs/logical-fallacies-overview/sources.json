@@ -1,0 +1,114 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "Fallacies — Internet Encyclopedia of Philosophy",
+      "url": "https://iep.utm.edu/fallacy/",
+      "publisher": "Internet Encyclopedia of Philosophy",
+      "author": "Various academic contributors",
+      "date": "2024",
+      "type": "primary",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 2,
+      "title": "Formal and Informal Fallacy — Summary",
+      "url": "https://www.britannica.com/summary/fallacy",
+      "publisher": "Encyclopaedia Britannica",
+      "author": "Britannica Editors",
+      "date": "2024",
+      "type": "reference",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 3,
+      "title": "Fallacies — Stanford Encyclopedia of Philosophy",
+      "url": "https://plato.stanford.edu/entries/fallacies/",
+      "publisher": "Stanford Encyclopedia of Philosophy",
+      "author": "Hans Hansen",
+      "date": "2023",
+      "type": "primary",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 4,
+      "title": "เหตุผลวิบัติ — วิกิพีเดียภาษาไทย",
+      "url": "https://th.wikipedia.org/wiki/%E0%B9%80%E0%B8%AB%E0%B8%95%E0%B8%B8%E0%B8%9C%E0%B8%A5%E0%B8%A7%E0%B8%B4%E0%B8%9A%E0%B8%B1%E0%B8%95%E0%B8%B4",
+      "publisher": "Wikipedia Thailand",
+      "author": "Various contributors",
+      "date": "2024",
+      "type": "reference",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 5,
+      "title": "Guide to the Most Common Logical Fallacies",
+      "url": "https://thinkingispower.com/logical-fallacies/",
+      "publisher": "Thinking Is Power",
+      "author": "Melanie Trecek-King",
+      "date": "2023",
+      "type": "secondary",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 6,
+      "title": "Fallacies — UNC Writing Center Tips and Tools",
+      "url": "https://writingcenter.unc.edu/tips-and-tools/fallacies/",
+      "publisher": "University of North Carolina Writing Center",
+      "author": "UNC Writing Center Staff",
+      "date": "2023",
+      "type": "secondary",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 7,
+      "title": "Logical Fallacies List: 30+ Common Fallacies with Definitions and Examples",
+      "url": "https://spotfallacy.com/blog/logical-fallacy/logical-fallacies-list",
+      "publisher": "SpotFallacy.com",
+      "author": "SpotFallacy Editorial Team",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 8,
+      "title": "Fallacies in Advertising: 10 Real-World Examples Marketers Still Fall For",
+      "url": "https://bidscube.com/blog/advertising-fallacies-10-real-world-examples-marketers-still-fall-for/",
+      "publisher": "BidsCube",
+      "author": "BidsCube Editorial Team",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 9,
+      "title": "ตรรกะวิบัติ (Fallacy) ที่เรา ๆ ท่าน ๆ มักจะใช้ทั้งที่ตั้งใจ และ ไม่รู้ตัว",
+      "url": "https://mysaara.wordpress.com/2016/10/26/%E0%B8%95%E0%B8%A3%E0%B8%A3%E0%B8%81%E0%B8%B0%E0%B8%A7%E0%B8%B4%E0%B8%9A%E0%B8%B1%E0%B8%95%E0%B8%B4-fallacy-%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B9%80%E0%B8%A3%E0%B8%B2-%E0%B9%86-%E0%B8%97%E0%B9%88/",
+      "publisher": "MySaara (WordPress blog)",
+      "author": "MySaara",
+      "date": "2016-10-26",
+      "type": "opinion",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 10,
+      "title": "10 ข้อ ตรรกะวิบัติ รู้เท่าทัน ไม่ตกเป็นเหยื่อ",
+      "url": "https://thethaiger.com/th/news/1167852/",
+      "publisher": "The Thaiger Thailand",
+      "author": "The Thaiger Editorial Team",
+      "date": "2023",
+      "type": "secondary",
+      "accessed": "2026-06-19"
+    },
+    {
+      "id": 11,
+      "title": "15 Logical Fallacies to Know, With Definitions and Examples",
+      "url": "https://www.grammarly.com/blog/rhetorical-devices/logical-fallacies/",
+      "publisher": "Grammarly Blog",
+      "author": "Grammarly Team",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-19"
+    }
+  ]
+}

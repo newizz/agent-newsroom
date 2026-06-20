@@ -28,23 +28,58 @@ jobs:
           cp -r office/* _site/
           # Copy published dashboards (preview/promote workflow has been removed — all dashboards are published directly)
           [ -d published ] && cp -r published _site/published || mkdir _site/published
-          # Generate a simple manifest of all dashboards for the office UI to read
-          echo "{" > _site/manifest.json
-          echo '  "generated": "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'",' >> _site/manifest.json
-          echo '  "published": [' >> _site/manifest.json
-          if [ -d published ]; then
-            first=1
-            for d in published/*/; do
-              [ -d "$d" ] || continue
-              slug=$(basename "$d")
-              [ $first -eq 0 ] && echo "," >> _site/manifest.json
-              printf '    {"slug": "%s", "url": "published/%s/"}' "$slug" "$slug" >> _site/manifest.json
-              first=0
-            done
-          fi
-          echo "" >> _site/manifest.json
-          echo "  ]" >> _site/manifest.json
-          echo "}" >> _site/manifest.json
+
+          # Build enriched manifest.json by merging each published/<slug>/meta.json
+          # Falls back gracefully if meta.json missing (legacy dashboards).
+          # Sorted by date descending (recent first).
+          python3 << 'PY'
+          import json, os, glob
+          from pathlib import Path
+          from datetime import datetime
+
+          entries = []
+          for meta_path in sorted(glob.glob('published/*/meta.json')):
+              slug = Path(meta_path).parent.name
+              try:
+                  with open(meta_path) as f:
+                      meta = json.load(f)
+                  entry = {
+                      'slug': meta.get('slug', slug),
+                      'url': f'published/{slug}/',
+                      'title': meta.get('title', slug),
+                      'subtitle': meta.get('subtitle', ''),
+                      'template': meta.get('template', 'unknown'),
+                      'mode': meta.get('mode', 'quick'),
+                      'date': meta.get('date', '2000-01-01'),
+                      'tags': meta.get('tags', []),
+                  }
+                  entries.append(entry)
+              except Exception as e:
+                  print(f'  ⚠ meta.json invalid for {slug}: {e}')
+
+          # Also include slugs without meta.json (legacy) with minimal info
+          for d in sorted(glob.glob('published/*/')):
+              slug = Path(d).name
+              if not Path(f'published/{slug}/meta.json').exists():
+                  entries.append({
+                      'slug': slug, 'url': f'published/{slug}/',
+                      'title': slug.replace('-', ' ').title(),
+                      'subtitle': '', 'template': 'unknown', 'mode': 'quick',
+                      'date': '2000-01-01', 'tags': [],
+                  })
+
+          # Sort by date desc (recent first), then by slug for stability
+          entries.sort(key=lambda e: (e.get('date', ''), e.get('slug', '')), reverse=True)
+
+          manifest = {
+              'generated': datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+              'count': len(entries),
+              'published': entries,
+          }
+          with open('_site/manifest.json', 'w') as f:
+              json.dump(manifest, f, indent=2, ensure_ascii=False)
+          print(f'✓ manifest.json written with {len(entries)} entries')
+          PY
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

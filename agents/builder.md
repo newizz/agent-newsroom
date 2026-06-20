@@ -450,6 +450,32 @@ Quick checklist before commit:
 - [ ] Dashboard makes sense if you read it without seeing the research file
 - [ ] **No unescaped apostrophes inside single-quoted JS strings** — search for `'[^']*'s ` and `'[^']*'t ` patterns; escape them as `\'` or switch to backtick template literals
 
+## Step 5.5: Write `meta.json` for the library index
+
+Right after `index.html` is written, also write `published/<slug>/meta.json` so the Knowledge Base library on the office UI can list and filter this dashboard.
+
+```json
+{
+  "slug": "<slug>",
+  "title": "<dashboard title — clean, human-readable, ≤80 chars>",
+  "subtitle": "<one-sentence summary from research TL;DR>",
+  "template": "concept-explorer|data-story|comparison-matrix|timeline|simulator",
+  "mode": "quick|deep",
+  "date": "YYYY-MM-DD",
+  "tags": ["<3-5 short lowercase tags>"]
+}
+```
+
+Field rules:
+- `title` — same as the `{{TITLE}}` you used in the dashboard (NOT the slug)
+- `subtitle` — short hook for the library card, same as `{{SUBTITLE}}`
+- `template` — exactly one of the 5 fixed values (matches the template file name without `.html`)
+- `mode` — pull from `brief.md` → `**Mode:** quick | deep`
+- `date` — today's date in ISO format
+- `tags` — 3-5 short lowercase tags inferred from topic (e.g. `["ai","ml","explainer"]`, `["finance","crypto"]`, `["biology","aging"]`). Used for search.
+
+`meta.json` is what powers the Knowledge Base library — without it, the dashboard won't appear in the listing.
+
 ## Step 6: Deploy
 
 ```bash

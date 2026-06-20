@@ -223,7 +223,7 @@
     </div>
     <nav class="flex items-center gap-4 text-sm">
       <a href="#submit" class="muted hover:text-current transition">Submit topic</a>
-      <a href="#runs" class="muted hover:text-current transition">Past runs</a>
+      <a href="#kb" class="muted hover:text-current transition">Knowledge base</a>
       <a href="https://github.com/newizz/agent-newsroom" class="muted hover:text-current transition flex items-center gap-1">
         <i data-lucide="github" class="w-4 h-4"></i> GitHub
       </a>
@@ -603,20 +603,73 @@
   </div>
 </section>
 
-<!-- Past runs -->
-<section id="runs" class="max-w-6xl mx-auto px-6 mb-16">
-  <div class="flex items-center justify-between mb-6">
+<!-- Knowledge base library -->
+<section id="kb" class="max-w-6xl mx-auto px-6 mb-16">
+  <div class="flex items-center justify-between mb-2">
     <h2 class="text-2xl font-semibold flex items-center gap-2">
-      <i data-lucide="folder-clock" class="w-5 h-5 accent"></i> Past runs
+      <i data-lucide="library" class="w-5 h-5 accent"></i> Knowledge base
     </h2>
-    <div class="flex gap-2 text-xs"></div>
+    <span class="text-xs muted"><span id="kbCount">0</span> dashboard(s)</span>
   </div>
+  <p class="text-sm muted mb-5">Browse every dashboard the newsroom has produced. Filter by mode or template, or search by title / tag.</p>
+
+  <!-- Filter controls -->
+  <div class="surface rounded-xl p-4 mb-5 grid gap-3 md:grid-cols-[auto_1fr] md:items-center">
+    <div class="flex items-center gap-3 flex-wrap">
+      <label class="text-xs font-medium muted">Mode:</label>
+      <div class="kb-pill-group flex gap-1" data-group="mode">
+        <button class="kb-pill active" data-value="all">All</button>
+        <button class="kb-pill" data-value="quick">⚡ Quick</button>
+        <button class="kb-pill" data-value="deep">🔬 Deep</button>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <i data-lucide="search" class="w-4 h-4 muted"></i>
+      <input type="search" id="kbSearch" placeholder="Search title, tag, slug…"
+        class="flex-1 px-3 py-1.5 rounded-md border border-soft bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 transition">
+    </div>
+    <div class="flex items-center gap-3 flex-wrap md:col-span-2">
+      <label class="text-xs font-medium muted">Template:</label>
+      <div class="kb-pill-group flex gap-1 flex-wrap" data-group="template">
+        <button class="kb-pill active" data-value="all">All</button>
+        <button class="kb-pill" data-value="concept-explorer">🧭 Concept</button>
+        <button class="kb-pill" data-value="data-story">📊 Data</button>
+        <button class="kb-pill" data-value="comparison-matrix">⚖️ Compare</button>
+        <button class="kb-pill" data-value="timeline">🕰️ Timeline</button>
+        <button class="kb-pill" data-value="simulator">🎛️ Simulator</button>
+      </div>
+    </div>
+  </div>
+
   <div id="runsList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
   <div id="emptyState" class="surface rounded-xl p-12 text-center muted hidden">
     <i data-lucide="folder-open" class="w-8 h-8 mx-auto mb-2 muted"></i>
-    <p>No dashboards yet. Submit your first topic above.</p>
+    <p>No dashboards match your filters.</p>
   </div>
 </section>
+
+<style>
+  .kb-pill {
+    font-size: 11px; padding: 4px 10px; border-radius: 999px;
+    border: 1px solid #e4e4e7; color: #71717a; background: transparent;
+    cursor: pointer; transition: all .15s ease;
+  }
+  .kb-pill:hover { border-color: var(--accent); color: var(--accent); }
+  .kb-pill.active { background: var(--accent); color: white; border-color: var(--accent); }
+  @media (prefers-color-scheme: dark) {
+    .kb-pill { border-color: #27272a; }
+  }
+  .kb-card-badge {
+    display: inline-block; font-size: 10px; padding: 2px 7px;
+    border-radius: 4px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .kb-card-mode-deep  { background: rgba(20,184,166,.15); color: #0f766e; }
+  .kb-card-mode-quick { background: rgba(99,102,241,.15); color: #4338ca; }
+  @media (prefers-color-scheme: dark) {
+    .kb-card-mode-deep  { color: #5eead4; }
+    .kb-card-mode-quick { color: #a5b4fc; }
+  }
+</style>
 
 <footer class="border-t border-soft py-8">
   <div class="max-w-6xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
@@ -991,48 +1044,123 @@
   });
 
   // ══════════════════════════════════════════════════════════════
-  //  Past runs (manifest.json)
+  //  Knowledge base library (enriched manifest.json + filters + search)
   // ══════════════════════════════════════════════════════════════
-  async function loadRuns() {
+
+  const TEMPLATE_META = {
+    'concept-explorer':   { icon: '🧭', label: 'Concept' },
+    'data-story':         { icon: '📊', label: 'Data Story' },
+    'comparison-matrix':  { icon: '⚖️', label: 'Compare' },
+    'timeline':           { icon: '🕰️', label: 'Timeline' },
+    'simulator':          { icon: '🎛️', label: 'Simulator' },
+    'unknown':            { icon: '📄', label: 'Dashboard' },
+  };
+
+  const kbState = { mode: 'all', template: 'all', search: '' };
+
+  function relativeDate(iso) {
+    if (!iso || iso === '2000-01-01') return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return iso;
+    const diff = Date.now() - d.getTime();
+    const day = 86400000;
+    if (diff < day)        return 'today';
+    if (diff < 2*day)      return 'yesterday';
+    if (diff < 7*day)      return Math.floor(diff/day) + 'd ago';
+    if (diff < 30*day)     return Math.floor(diff/(7*day)) + 'w ago';
+    if (diff < 365*day)    return Math.floor(diff/(30*day)) + 'mo ago';
+    return Math.floor(diff/(365*day)) + 'y ago';
+  }
+
+  async function loadKB() {
     const empty = document.getElementById('emptyState');
     try {
       const r = await fetch('manifest.json?t=' + Date.now(), { cache: 'no-store' });
       if (!r.ok) throw new Error('no manifest');
       const m = await r.json();
-      const all = (m.published || []).map(x => ({ ...x, kind: 'published' }));
-      if (all.length === 0) { empty.classList.remove('hidden'); return; }
-      empty.classList.add('hidden');
-      window.__allRuns = all;
-      renderRuns();
+      window.__kbEntries = m.published || [];
+      document.getElementById('kbCount').textContent = window.__kbEntries.length;
+      renderKB();
     } catch (e) {
       empty.classList.remove('hidden');
     }
   }
-  function renderRuns() {
+
+  function renderKB() {
     const list = document.getElementById('runsList');
+    const empty = document.getElementById('emptyState');
+    const all = window.__kbEntries || [];
+    const q = kbState.search.trim().toLowerCase();
+
+    const filtered = all.filter(e => {
+      if (kbState.mode !== 'all' && e.mode !== kbState.mode) return false;
+      if (kbState.template !== 'all' && e.template !== kbState.template) return false;
+      if (q) {
+        const hay = (e.title + ' ' + e.subtitle + ' ' + e.slug + ' ' + (e.tags||[]).join(' ')).toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+
     list.innerHTML = '';
-    const items = window.__allRuns || [];
-    if (items.length === 0) {
-      list.innerHTML = '<div class="muted text-sm col-span-full">No items in this filter.</div>';
+    if (filtered.length === 0) {
+      empty.classList.remove('hidden');
+      empty.querySelector('p').textContent = all.length === 0
+        ? 'No dashboards yet. Submit your first topic above.'
+        : 'No dashboards match your filters.';
       return;
     }
-    items.forEach(item => {
+    empty.classList.add('hidden');
+
+    filtered.forEach(item => {
+      const tmpl = TEMPLATE_META[item.template] || TEMPLATE_META['unknown'];
+      const tagChips = (item.tags || []).slice(0, 4)
+        .map(t => `<span class="text-[10px] muted">#${t}</span>`).join(' ');
       const card = document.createElement('a');
       card.href = item.url;
       card.className = 'surface rounded-xl p-5 hover:shadow-md transition group block';
       card.innerHTML = `
-        <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-emerald-600">● Published</span>
-          <i data-lucide="arrow-up-right" class="w-4 h-4 muted group-hover:accent transition"></i>
+        <div class="flex items-center justify-between mb-2 gap-2">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="kb-card-badge ${item.mode === 'deep' ? 'kb-card-mode-deep' : 'kb-card-mode-quick'}">
+              ${item.mode === 'deep' ? '🔬 DEEP' : '⚡ QUICK'}
+            </span>
+            <span class="text-xs muted">${tmpl.icon} ${tmpl.label}</span>
+          </div>
+          <i data-lucide="arrow-up-right" class="w-4 h-4 muted group-hover:accent transition flex-shrink-0"></i>
         </div>
-        <div class="font-semibold text-sm mb-1 group-hover:accent transition">${item.slug}</div>
-        <div class="text-xs muted truncate">${item.url}</div>
+        <div class="font-semibold text-sm mb-1 group-hover:accent transition line-clamp-2">${item.title || item.slug}</div>
+        ${item.subtitle ? `<div class="text-xs muted line-clamp-2 mb-2">${item.subtitle}</div>` : ''}
+        <div class="flex items-center justify-between gap-2 mt-3">
+          <div class="flex gap-1 flex-wrap">${tagChips}</div>
+          <div class="text-[11px] muted whitespace-nowrap">${relativeDate(item.date)}</div>
+        </div>
       `;
       list.appendChild(card);
     });
     lucide.createIcons();
   }
-  loadRuns();
+
+  // wire up filter pills
+  document.querySelectorAll('.kb-pill-group').forEach(group => {
+    const dimension = group.dataset.group;
+    group.querySelectorAll('.kb-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        group.querySelectorAll('.kb-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        kbState[dimension] = btn.dataset.value;
+        renderKB();
+      });
+    });
+  });
+
+  // wire up search
+  document.getElementById('kbSearch').addEventListener('input', e => {
+    kbState.search = e.target.value;
+    renderKB();
+  });
+
+  loadKB();
 </script>
 
 <style>

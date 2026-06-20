@@ -1,0 +1,279 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "The FCC Spectrum Auctions: An Early Assessment",
+      "url": "https://cramton.umd.edu/papers1995-1999/97jems-fcc-spectrum-auctions.pdf",
+      "publisher": "Journal of Economics & Management Strategy",
+      "author": "Peter Cramton",
+      "date": "1997-01-01",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "PDF binary — bibliographic data confirmed via search; revenue figures cross-checked against Nobel 2020 citation"
+    },
+    {
+      "id": 2,
+      "title": "Nobel Prize in Economic Sciences 2020 — Press Release (Milgrom & Wilson)",
+      "url": "https://www.nobelprize.org/prizes/economic-sciences/2020/press-release/",
+      "publisher": "Royal Swedish Academy of Sciences",
+      "author": "Nobel Committee",
+      "date": "2020-10-12",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "403 Forbidden on direct fetch; data confirmed via CNN and CNBC coverage"
+    },
+    {
+      "id": 3,
+      "title": "National Kidney Registry Facilitates 10,000th Living Donor Kidney Transplant",
+      "url": "https://www.kidneyregistry.com/news/national-kidney-registry-facilitates-10000th-living-donor-kidney-transplant/",
+      "publisher": "National Kidney Registry",
+      "author": "National Kidney Registry",
+      "date": "2024-01-01",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "2024 annual transplant count (1,744) from same source"
+    },
+    {
+      "id": 4,
+      "title": "Thomas Schelling: the legacy of a master strategist",
+      "url": "https://theconversation.com/thomas-schelling-the-legacy-of-a-master-strategist-70394",
+      "publisher": "The Conversation",
+      "author": "The Conversation",
+      "date": "2016-12-14",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Content fetched and read directly; covers focal points, nuclear deterrence, Strategy of Conflict (1960), policy impact"
+    },
+    {
+      "id": 5,
+      "title": "Game theory and the Cuban missile crisis",
+      "url": "https://plus.maths.org/content/game-theory-and-cuban-missile-crisis",
+      "publisher": "Plus Magazine (University of Cambridge)",
+      "author": "Steven Brams (referenced)",
+      "date": "2014-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Content fetched and read; summarizes Brams's Theory of Moves analysis of the crisis"
+    },
+    {
+      "id": 6,
+      "title": "The Ultimatum Game",
+      "url": "https://imotions.com/blog/learning/research-fundamentals/the-ultimatum-game/",
+      "publisher": "iMotions",
+      "author": "iMotions",
+      "date": "2023-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Content fetched and read; summarizes Güth (1982) original experiment and cross-cultural findings; primary source is Güth et al. JEBO 3(4) 1982"
+    },
+    {
+      "id": 7,
+      "title": "Background to Axelrod's Tournament",
+      "url": "https://axelrod.readthedocs.io/en/fix-documentation/reference/description.html",
+      "publisher": "Axelrod Python Library Documentation",
+      "author": "Robert Axelrod (original research), documentation team",
+      "date": "2020-01-01",
+      "type": "reference",
+      "accessed": "2026-06-13",
+      "notes": "Primary source: Axelrod, R. The Evolution of Cooperation, Basic Books, 1984; tournament details confirmed via PLOS search results"
+    },
+    {
+      "id": 8,
+      "title": "Artificial Intelligence, Algorithmic Pricing, and Collusion",
+      "url": "https://www.aeaweb.org/articles?id=10.1257/aer.20190623",
+      "publisher": "American Economic Review",
+      "author": "Emilio Calvano, Giacomo Calzolari, Vincenzo Denicolò, Sergio Pastorello",
+      "date": "2020-10-01",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "Content fetched and read directly; AER 110(10): 3267–97; landmark study on Q-learning algorithms converging on supracompetitive prices"
+    },
+    {
+      "id": 9,
+      "title": "AI, Algorithmic Pricing, and Collusion",
+      "url": "https://simon.rochester.edu/blog/deans-corner/ai-algorithmic-pricing-and-collusion",
+      "publisher": "Simon Business School, University of Rochester",
+      "author": "Jeanine Miklós-Thal and Catherine Tucker (cited)",
+      "date": "2019-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Content fetched and read directly; distinguishes predictive vs. rule-based algorithms; Amazon pricing statistics cited as industry reporting"
+    },
+    {
+      "id": 10,
+      "title": "Game Theory, Evolutionary Stable Strategies and the Evolution of Biological Interactions",
+      "url": "https://www.nature.com/scitable/knowledge/library/game-theory-evolutionary-stable-strategies-and-the-25953132/",
+      "publisher": "Nature Education (Scitable)",
+      "author": "Nature Education",
+      "date": "2013-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Auth redirect — could not fetch; bibliographic info confirmed via search; underlying science from Maynard Smith & Price, Nature 246, 1973"
+    },
+    {
+      "id": 11,
+      "title": "Game Theory: Climate Talks Destined to Fail",
+      "url": "https://www.scientificamerican.com/article/game-theorist-predicts-failure-at-climate-talks/",
+      "publisher": "Scientific American",
+      "author": "David Biello (reporting)",
+      "date": "2009-12-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Content fetched and read; summarizes Peter Wood (prisoner's dilemma framing) and Bruce Bueno de Mesquita (model predicting treaty failure)"
+    },
+    {
+      "id": 12,
+      "title": "The Winner's Curse — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Winner%27s_curse",
+      "publisher": "Wikipedia",
+      "author": "Multiple contributors",
+      "date": "2024-01-01",
+      "type": "reference",
+      "accessed": "2026-06-13",
+      "notes": "Primary source: Capen, Clapp, Campbell, 'Competitive Bidding in High-Risk Situations,' JPT 23, 1971; Wilson's Nobel citation"
+    },
+    {
+      "id": 13,
+      "title": "Importance of Vickrey Auction shown through Google AdWords",
+      "url": "https://blogs.cornell.edu/info2040/2016/10/24/importance-of-vickery-auction-shown-through-google-adwords/",
+      "publisher": "Cornell Networks Course Blog (INFO 2040)",
+      "author": "Cornell student blog",
+      "date": "2016-10-24",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Single secondary source for Google ad revenue Q2 2016 figure; treat as indicative only"
+    },
+    {
+      "id": 14,
+      "title": "Trump's Tariff Pause and the Game Theory Gamble",
+      "url": "https://intpolicydigest.org/the-platform/trump-s-tariff-pause-and-the-game-theory-gamble/",
+      "publisher": "International Policy Digest",
+      "author": "Vincent James Hooper",
+      "date": "2025-01-01",
+      "type": "opinion",
+      "accessed": "2026-06-13",
+      "notes": "Analysis applying coercive bargaining and signaling game theory to U.S.–China tariff strategy"
+    },
+    {
+      "id": 15,
+      "title": "OPEC and the Geopolitics of Oil: How a Cartel Controls the World's Most Important Commodity",
+      "url": "https://maseconomics.com/opec-and-the-geopolitics-of-oil-how-a-cartel-controls-the-worlds-most-important-commodity/",
+      "publisher": "MAS Economics",
+      "author": "MAS Economics",
+      "date": "2023-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Covers OPEC prisoner's dilemma structure, quota violations by Iraq and Kazakhstan, Saudi Arabia swing-producer role"
+    },
+    {
+      "id": 16,
+      "title": "Analyzing Signaling Games in Labor Market Theories",
+      "url": "https://www.numberanalytics.com/blog/analyzing-signaling-games-labor-market-theories",
+      "publisher": "Number Analytics",
+      "author": "Number Analytics",
+      "date": "2024-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Summary of Spence (1973) job market signaling model; primary source: Spence, QJE 87(3), 1973"
+    },
+    {
+      "id": 17,
+      "title": "Mastering Platform Competition — Ultimate Guide to Algorithmic Game Theory in Platform Markets",
+      "url": "https://www.numberanalytics.com/blog/ultimate-guide-platform-competition-algorithmic-game-theory",
+      "publisher": "Number Analytics",
+      "author": "Number Analytics",
+      "date": "2024-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Covers Katz-Shapiro network effects, winner-take-all dynamics, multi-homing, interoperability; primary sources: Katz & Shapiro AER 1985, Rochet & Tirole"
+    },
+    {
+      "id": 18,
+      "title": "Mechanism Design for Large Language Models",
+      "url": "https://research.google/blog/mechanism-design-for-large-language-models/",
+      "publisher": "Google Research",
+      "author": "Paul Duetting et al.",
+      "date": "2024-01-01",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "Best Paper Award, ACM Web Conference 2024; explores incentive-compatible aggregation of LLM outputs for advertising"
+    },
+    {
+      "id": 19,
+      "title": "Organ transplants exceeded 48,000 in 2024; a 3.3 percent increase from 2023",
+      "url": "https://www.hrsa.gov/optn/news-events/news/organ-transplants-exceeded-48000-2024-33-percent-increase-transplants-performed-2023",
+      "publisher": "HRSA (Health Resources & Services Administration)",
+      "author": "HRSA / OPTN",
+      "date": "2025-01-01",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "Official U.S. organ transplant statistics; 48,149 total transplants in 2024; 27,759 kidney transplants"
+    },
+    {
+      "id": 20,
+      "title": "Self-enforcing strategies to deter free-riding in the climate change mitigation game and other repeated public good games",
+      "url": "https://www.pnas.org/doi/10.1073/pnas.1106265108",
+      "publisher": "Proceedings of the National Academy of Sciences",
+      "author": "Multiple authors",
+      "date": "2011-12-01",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "Proposes Linear Compensation (LinC) as self-enforcing game-theoretic strategy for climate agreements"
+    },
+    {
+      "id": 21,
+      "title": "The Game Theory of OPEC",
+      "url": "http://large.stanford.edu/courses/2017/ph240/wilcockson1/",
+      "publisher": "Stanford University (course paper)",
+      "author": "Wilcockson (student paper, PH 240)",
+      "date": "2017-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "ECONNREFUSED on fetch; cited as secondary analysis of OPEC prisoner's dilemma; data cross-checked against MAS Economics source"
+    },
+    {
+      "id": 22,
+      "title": "Mutually Assured Destruction: Game Theory in the Cold War",
+      "url": "https://blogs.cornell.edu/info2040/2017/09/11/mutually-assured-destruction-game-theory-in-the-cold-war/",
+      "publisher": "Cornell Networks Course Blog (INFO 2040)",
+      "author": "Cornell student blog",
+      "date": "2017-09-11",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Describes MAD as Nash equilibrium structure; Schelling's role; cross-referenced with Schelling legacy article"
+    },
+    {
+      "id": 23,
+      "title": "Nobel Prize in Economic Sciences 2005 — Popular Information (Schelling & Aumann)",
+      "url": "https://www.nobelprize.org/prizes/economic-sciences/2005/popular-information/",
+      "publisher": "Royal Swedish Academy of Sciences",
+      "author": "Nobel Committee",
+      "date": "2005-10-01",
+      "type": "primary",
+      "accessed": "2026-06-13",
+      "notes": "Confirms Schelling won for game-theory analysis of conflict and cooperation; confirms 2005 award year"
+    },
+    {
+      "id": 24,
+      "title": "Prisoner's dilemma — Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Prisoner%27s_dilemma",
+      "publisher": "Wikipedia",
+      "author": "Multiple contributors",
+      "date": "2024-01-01",
+      "type": "reference",
+      "accessed": "2026-06-13",
+      "notes": "Standard reference for payoff structure, Nash equilibrium, and real-world applications including arms race"
+    },
+    {
+      "id": 25,
+      "title": "Alvin Roth & the Kidney Exchange Program (Nobel Perspectives)",
+      "url": "https://www.ubs.com/microsites/nobel-perspectives/en/laureates/alvin-roth.html",
+      "publisher": "UBS Nobel Perspectives",
+      "author": "UBS / Alvin Roth (interview)",
+      "date": "2013-01-01",
+      "type": "secondary",
+      "accessed": "2026-06-13",
+      "notes": "Content fetched and read; covers Roth's matching market design: kidney exchange, NRMP, school choice; 2012 Nobel Prize shared with Shapley"
+    }
+  ]
+}

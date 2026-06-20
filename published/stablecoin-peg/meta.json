@@ -1,0 +1,9 @@
+{
+  "slug": "stablecoin-peg",
+  "title": "How Stablecoins Maintain Their Peg",
+  "subtitle": "Four mechanisms — reserves, redemption, arbitrage, and algorithmic supply — keep stablecoins anchored to $1.",
+  "template": "data-story",
+  "mode": "quick",
+  "date": "2026-06-01",
+  "tags": ["finance", "crypto", "stablecoins"]
+}

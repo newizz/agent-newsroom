@@ -1,6 +1,140 @@
 {
-  "generated": "2026-06-11T00:00:00Z",
+  "generated": "2026-06-20T01:30:57Z",
+  "count": 9,
   "published": [
-    { "slug": "llm-explained", "url": "published/llm-explained/" }
+    {
+      "slug": "logical-fallacies-overview",
+      "url": "published/logical-fallacies-overview/",
+      "title": "ภาพรวมตรรกะวิบัติ (Logical Fallacies Overview)",
+      "subtitle": "Definitions, taxonomy, and real-world examples of 18 common fallacies — in politics, advertising, social media, and everyday arguments.",
+      "template": "concept-explorer",
+      "mode": "deep",
+      "date": "2026-06-19",
+      "tags": [
+        "logic",
+        "critical-thinking",
+        "thai",
+        "explainer"
+      ]
+    },
+    {
+      "slug": "game-theory-in-practice",
+      "url": "published/game-theory-in-practice/",
+      "title": "Game Theory in Practice",
+      "subtitle": "Equilibrium concepts and strategy across real-world situations — auctions, negotiations, biology, and politics.",
+      "template": "concept-explorer",
+      "mode": "deep",
+      "date": "2026-06-13",
+      "tags": [
+        "math",
+        "economics",
+        "decision-theory",
+        "strategy"
+      ]
+    },
+    {
+      "slug": "industrial-ai-with-agentic-ai",
+      "url": "published/industrial-ai-with-agentic-ai/",
+      "title": "Industrial AI with Agentic AI",
+      "subtitle": "Shift from reactive copilots to autonomous systems-of-systems in manufacturing, semiconductors, logistics and energy.",
+      "template": "data-story",
+      "mode": "deep",
+      "date": "2026-06-11",
+      "tags": [
+        "ai",
+        "agents",
+        "manufacturing",
+        "industry"
+      ]
+    },
+    {
+      "slug": "dog-life",
+      "url": "published/dog-life/",
+      "title": "Dog Life Stages and Care",
+      "subtitle": "How dogs progress from puppy to senior, with breed-size-specific timelines.",
+      "template": "timeline",
+      "mode": "quick",
+      "date": "2026-06-08",
+      "tags": [
+        "biology",
+        "pets",
+        "dogs",
+        "aging"
+      ]
+    },
+    {
+      "slug": "agentic-ai-industry-use-cases",
+      "url": "published/agentic-ai-industry-use-cases/",
+      "title": "Agentic AI — Industry Use Cases",
+      "subtitle": "Where agentic AI is being deployed across sectors, what works, and what's still hype.",
+      "template": "data-story",
+      "mode": "deep",
+      "date": "2026-06-05",
+      "tags": [
+        "ai",
+        "agents",
+        "business",
+        "industry"
+      ]
+    },
+    {
+      "slug": "llm-explained",
+      "url": "published/llm-explained/",
+      "title": "How Large Language Models Work",
+      "subtitle": "An LLM is, at heart, a very large statistical next-token predictor. The magic is six mechanisms combined at massive scale.",
+      "template": "concept-explorer",
+      "mode": "quick",
+      "date": "2026-06-03",
+      "tags": [
+        "ai",
+        "ml",
+        "llm",
+        "explainer"
+      ]
+    },
+    {
+      "slug": "coffee-history-and-facts",
+      "url": "published/coffee-history-and-facts/",
+      "title": "Coffee — History, Beans, and Brewing",
+      "subtitle": "A 600-year journey from Ethiopian highlands to the global $100B+ industry it is today.",
+      "template": "timeline",
+      "mode": "quick",
+      "date": "2026-06-03",
+      "tags": [
+        "history",
+        "food",
+        "coffee",
+        "culture"
+      ]
+    },
+    {
+      "slug": "cat-life-stories",
+      "url": "published/cat-life-stories/",
+      "title": "Cat Life Stages Across the Lifespan",
+      "subtitle": "From kitten to senior — biology, behaviour and care across a cat's five life stages.",
+      "template": "timeline",
+      "mode": "quick",
+      "date": "2026-06-03",
+      "tags": [
+        "biology",
+        "pets",
+        "cats",
+        "aging"
+      ]
+    },
+    {
+      "slug": "stablecoin-peg",
+      "url": "published/stablecoin-peg/",
+      "title": "How Stablecoins Maintain Their Peg",
+      "subtitle": "Four mechanisms — reserves, redemption, arbitrage, and algorithmic supply — keep stablecoins anchored to $1.",
+      "template": "data-story",
+      "mode": "quick",
+      "date": "2026-06-01",
+      "tags": [
+        "finance",
+        "crypto",
+        "stablecoins"
+      ]
+    }
   ]
 }

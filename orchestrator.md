@@ -73,8 +73,12 @@ Use the `Task` tool. Wait for `runs/<slug>/brief.md` to be written.
 - Spawn Ravi (researcher) via `Task` → wait for `runs/<slug>/research.md` + `sources.json`
 
 #### Deep mode (parallel)
+
+**IMPORTANT — fresh prompt read:** Before spawning Rin, **always Read `agents/deep-researcher.md` fresh** in this turn so you pass the current prompt to the Task tool. Do NOT rely on a cached version from earlier in the session — the prompt evolves and old versions miss arguments like `--web-urls` (added 2026-06-19).
+
+- Read `agents/deep-researcher.md` fresh
 - Spawn Ravi (researcher) via `Task` tool
-- Spawn Rin (deep-researcher) via `Task` tool — this in turn invokes `./scripts/deep-research.sh <slug> "<youtube_csv>"`
+- Spawn Rin (deep-researcher) via `Task` tool — this in turn invokes `./scripts/deep-research.sh <slug> "<youtube_csv>" "<web_urls_csv>"`
 - **Both Task calls in the same message** so Claude Code may parallelize them
 - Wait for BOTH outputs:
   - `runs/<slug>/research.md` (Ravi)

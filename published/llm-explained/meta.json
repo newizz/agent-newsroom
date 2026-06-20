@@ -1,0 +1,9 @@
+{
+  "slug": "llm-explained",
+  "title": "How Large Language Models Work",
+  "subtitle": "An LLM is, at heart, a very large statistical next-token predictor. The magic is six mechanisms combined at massive scale.",
+  "template": "concept-explorer",
+  "mode": "quick",
+  "date": "2026-06-03",
+  "tags": ["ai", "ml", "llm", "explainer"]
+}
