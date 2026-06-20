@@ -1,15 +1,15 @@
 {
-  "currentRun": null,
-  "currentSlug": null,
-  "currentMode": null,
-  "lastUpdate": "2026-06-20T01:18:47Z",
+  "currentRun": "bias-overview-all-forms",
+  "currentSlug": "bias-overview-all-forms",
+  "currentMode": "deep",
+  "lastUpdate": "2026-06-20T03:58:45Z",
   "agents": [
     {
       "id": "intake",
       "name": "Iris",
       "role": "Intake Specialist",
       "emoji": "🎙️",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -17,7 +17,7 @@
       "name": "Ravi",
       "role": "Research Analyst",
       "emoji": "🔍",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
@@ -33,8 +33,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "offline",
-      "task": ""
+      "status": "busy",
+      "task": "Building interactive dashboard"
     },
     {
       "id": "reporter",
