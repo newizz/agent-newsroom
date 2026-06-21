@@ -2,7 +2,7 @@
   "currentRun": null,
   "currentSlug": null,
   "currentMode": null,
-  "lastUpdate": "2026-06-21T01:18:00Z",
+  "lastUpdate": "2026-06-21T04:23:35Z",
   "agents": [
     {
       "id": "intake",
@@ -34,7 +34,7 @@
       "role": "Dashboard Builder",
       "emoji": "🎨",
       "status": "busy",
-      "task": "Building Thai dashboard for game-theory-in-practice"
+      "task": "Building Thai dashboard for bias-overview-all-forms"
     },
     {
       "id": "reporter",

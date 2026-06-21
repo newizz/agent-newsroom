@@ -1,1380 +1,416 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bias: A Complete Guide — agent-newsroom</title>
+<title>อคติ: ภาพรวมครบทุกรูปแบบ — agent-newsroom</title>
 <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
 <style>
-  /* ── Design tokens ── */
   :root {
-    --accent: #6366F1;
-    --accent-soft: #6366F11A;
-    --accent-mid: #6366F133;
-    --green: #22c55e;
-    --yellow: #eab308;
-    --orange: #f97316;
-    --red: #ef4444;
-    --surface: #ffffff;
-    --border: #e4e4e7;
-    --text: #18181b;
-    --muted: #71717a;
-    --bg: #fafafa;
+    --accent:#6366F1; --accent-soft:#6366F11A;
+    --surface:#ffffff; --border:#e4e4e7;
+    --text:#18181b; --muted:#71717a; --bg:#fafafa;
   }
-  @media (prefers-color-scheme: dark) {
+  @media (prefers-color-scheme:dark) {
     :root {
-      --surface: #131316;
-      --border: #27272a;
-      --text: #e4e4e7;
-      --muted: #a1a1aa;
-      --bg: #0a0a0b;
-      --accent-soft: #6366F122;
-      --accent-mid: #6366F144;
+      --surface:#131316; --border:#27272a;
+      --text:#e4e4e7; --muted:#a1a1aa; --bg:#0a0a0b;
+      --accent-soft:#6366F122;
     }
   }
-  html { font-family: 'Inter var', 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--text); min-height: 100vh; }
-
-  .surface { background: var(--surface); border: 1px solid var(--border); }
-  .muted { color: var(--muted); }
-  .accent { color: var(--accent); }
-  .bg-accent-soft { background: var(--accent-soft); }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-
-  /* ── Scroll progress bar ── */
-  #progress-bar {
-    position: fixed; top: 0; left: 0; height: 3px;
-    background: var(--accent); z-index: 9999;
-    width: 0%; transition: width 0.1s linear;
-  }
-
-  /* ── Animations — only when user permits motion ── */
-  @media (prefers-reduced-motion: no-preference) {
-    .fade-up {
-      opacity: 0; transform: translateY(24px);
-      transition: opacity 0.55s ease-out, transform 0.55s ease-out;
-    }
-    .fade-up.visible { opacity: 1; transform: none; }
-    .fade-left {
-      opacity: 0; transform: translateX(-24px);
-      transition: opacity 0.55s ease-out, transform 0.55s ease-out;
-    }
-    .fade-left.visible { opacity: 1; transform: none; }
-    .scale-in {
-      opacity: 0; transform: scale(0.92);
-      transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-    }
-    .scale-in.visible { opacity: 1; transform: scale(1); }
-    .bias-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .bias-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(99,102,241,0.15);
-    }
-    .strat-card {
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .strat-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px rgba(99,102,241,0.12);
-    }
-    .tab-btn { transition: background 0.18s, color 0.18s; }
-    .reel-slide { transition: opacity 0.4s ease, transform 0.4s ease; }
-  }
-
-  /* ── TOC nav ── */
-  .toc-link {
-    display: inline-block; font-size: 0.8125rem; padding: 0.375rem 0.75rem;
-    border-radius: 0.375rem; color: var(--muted);
-    transition: background 0.15s, color 0.15s;
-  }
-  .toc-link:hover { background: var(--accent-soft); color: var(--accent); text-decoration: none; }
-
-  /* ── Tabs ── */
-  .tab-btn {
-    padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem;
-    font-weight: 500; cursor: pointer; border: none; background: transparent;
-    color: var(--muted);
-  }
-  .tab-btn.active { background: var(--accent); color: #fff; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-
-  /* ── Insight Reel ── */
-  .reel-wrap {
-    position: relative; overflow: hidden;
-    border-radius: 1rem;
-    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%);
-    color: #fff; min-height: 220px;
-  }
-  .reel-slide {
-    position: absolute; inset: 0;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 2.5rem; text-align: center;
-    opacity: 0; pointer-events: none; transform: scale(0.96);
-  }
-  .reel-slide.active { opacity: 1; pointer-events: auto; transform: scale(1); }
-  .reel-stat { font-size: 4rem; font-weight: 800; line-height: 1; letter-spacing: -2px; }
-  .reel-headline { font-size: 1.125rem; font-weight: 600; margin-top: 0.5rem; }
-  .reel-insight { font-size: 0.875rem; opacity: 0.9; margin-top: 0.5rem; max-width: 500px; }
-  .reel-dots { display: flex; gap: 6px; justify-content: center; }
-  .reel-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: rgba(255,255,255,0.4); cursor: pointer;
-    transition: background 0.2s;
-  }
-  .reel-dot.active { background: #fff; }
-
-  /* ── Bias grid ── */
-  .bias-grid { display: grid; gap: 1rem; }
-  @media (min-width: 640px) { .bias-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (min-width: 1024px) { .bias-grid { grid-template-columns: repeat(3, 1fr); } }
-  .bias-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 0.875rem; padding: 1.25rem;
-    display: flex; flex-direction: column; gap: 0.5rem;
-  }
-  .cat-badge {
-    display: inline-flex; align-items: center; font-size: 0.6875rem;
-    font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 9999px;
-    letter-spacing: 0.03em; text-transform: uppercase;
-  }
-  .cat-cognitive  { background: #EEF2FF; color: #4338CA; }
-  .cat-social     { background: #FDF4FF; color: #9333EA; }
-  .cat-statistical{ background: #F0FDF4; color: #15803D; }
-  .cat-algorithmic{ background: #FFF7ED; color: #C2410C; }
-  .cat-media      { background: #FFF1F2; color: #BE123C; }
-  .cat-organizational { background: #F0F9FF; color: #0369A1; }
-  @media (prefers-color-scheme: dark) {
-    .cat-cognitive  { background: #312E81; color: #A5B4FC; }
-    .cat-social     { background: #3B0764; color: #D8B4FE; }
-    .cat-statistical{ background: #052E16; color: #86EFAC; }
-    .cat-algorithmic{ background: #431407; color: #FDBA74; }
-    .cat-media      { background: #4C0519; color: #FDA4AF; }
-    .cat-organizational { background: #082F49; color: #7DD3FC; }
-  }
-  .severity-bar { height: 4px; border-radius: 2px; background: var(--border); overflow: hidden; }
-  .severity-fill { height: 100%; border-radius: 2px; background: var(--accent); }
-
-  /* ── Strategy cards ── */
-  .strat-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 0.875rem; padding: 1.5rem;
-  }
-  .evidence-badge {
-    display: inline-flex; align-items: center; gap: 0.25rem;
-    font-size: 0.6875rem; font-weight: 600; padding: 0.2rem 0.6rem;
-    border-radius: 9999px; letter-spacing: 0.03em;
-  }
-  .ev-strong     { background: #DCFCE7; color: #166534; }
-  .ev-moderate   { background: #FEF9C3; color: #854D0E; }
-  .ev-preliminary{ background: #FEE2E2; color: #991B1B; }
-  @media (prefers-color-scheme: dark) {
-    .ev-strong     { background: #14532D; color: #86EFAC; }
-    .ev-moderate   { background: #422006; color: #FDE68A; }
-    .ev-preliminary{ background: #450A0A; color: #FCA5A5; }
-  }
-
-  /* ── Prose ── */
-  .prose p { margin-bottom: 1em; line-height: 1.75; }
-  .prose p:last-child { margin-bottom: 0; }
-  .prose strong { color: var(--accent); }
-  .prose ul { margin: 0.75em 0; padding-left: 1.5em; }
-  .prose li { margin-bottom: 0.4em; line-height: 1.7; }
-  .prose h3 { font-size: 1.05rem; font-weight: 600; margin: 1.5em 0 0.5em; }
-
-  /* ── Domain cards (tabs) ── */
-  .domain-card { background: var(--surface); border: 1px solid var(--border); border-radius: 0.875rem; padding: 1.5rem 1.75rem; }
-  .domain-tag { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 0.2rem 0.55rem; border-radius: 0.375rem; background: var(--accent-soft); color: var(--accent); margin: 0.2rem 0.2rem 0.2rem 0; }
-
-  /* ── Search box ── */
-  .search-box {
-    width: 100%; padding: 0.625rem 1rem 0.625rem 2.75rem;
-    border: 1.5px solid var(--border); border-radius: 0.625rem;
-    background: var(--surface); color: var(--text); font-size: 0.9rem;
-    outline: none; transition: border-color 0.15s;
-  }
-  .search-box:focus { border-color: var(--accent); }
-  .filter-btn {
-    padding: 0.375rem 0.875rem; border-radius: 9999px; font-size: 0.8rem;
-    font-weight: 500; cursor: pointer; border: 1.5px solid var(--border);
-    background: transparent; color: var(--muted); transition: all 0.15s;
-  }
-  .filter-btn.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-
-  /* ── Chart containers ── */
-  .chart-wrap { position: relative; width: 100%; }
-
-  /* ── Sources ── */
-  .sources-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.75rem; }
-  .source-item { padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 0.5rem; display: flex; gap: 0.75rem; align-items: flex-start; }
-  .source-num { color: var(--accent); font-weight: 700; font-size: 0.8rem; min-width: 1.75rem; }
-  .yt-badge { display: inline-flex; align-items: center; gap: 0.2rem; font-size: 0.65rem; font-weight: 600; background: #FEE2E2; color: #991B1B; padding: 0.1rem 0.4rem; border-radius: 0.25rem; vertical-align: middle; margin-left: 0.35rem; }
-  @media (prefers-color-scheme: dark) { .yt-badge { background: #450A0A; color: #FCA5A5; } }
-
-  /* ── Print ── */
-  @media print {
-    #progress-bar, nav.toc-nav, .reel-nav-btn { display: none; }
-    .surface { border: 1px solid #ccc; box-shadow: none; }
+  html { font-family:'Inter var','Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--text); min-height:100vh; }
+  .surface { background:var(--surface); border:1px solid var(--border); }
+  .muted { color:var(--muted); }
+  .accent { color:var(--accent); }
+  a { color:var(--accent); text-decoration:none; }
+  a:hover { text-decoration:underline; }
+  #progress { position:fixed; top:0; left:0; height:3px; width:0%; background:#6366F1; z-index:9999; transition:width .1s linear; }
+  @media (prefers-reduced-motion:no-preference) {
+    .fade-up { opacity:0; transform:translateY(24px); transition:opacity .55s ease,transform .55s ease; }
+    .scale-in { opacity:0; transform:scale(0.93); transition:opacity .45s ease,transform .45s ease; }
+    .visible { opacity:1 !important; transform:none !important; }
+    .card-hover { transition:transform .2s ease,box-shadow .2s ease; }
+    .card-hover:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(99,102,241,.13); }
   }
 </style>
 </head>
 <body>
-
-<!-- Scroll progress bar -->
-<div id="progress-bar"></div>
+<div id="progress"></div>
 
 <!-- Header -->
-<header class="surface" style="border-left:none;border-right:none;border-top:none;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px);background:rgba(var(--surface-rgb,255,255,255),0.85);">
-  <div class="max-w-6xl mx-auto px-5 py-3.5 flex items-center justify-between">
-    <a href="../../" class="flex items-center gap-2 text-sm muted" style="text-decoration:none;">
-      <i data-lucide="arrow-left" class="w-4 h-4"></i>
-      <span>agent-newsroom</span>
+<header style="position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--border);">
+  <div class="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> กลับหน้าหลัก
     </a>
-    <div class="flex items-center gap-3">
-      <span class="text-xs muted hidden sm:block">bias-overview-all-forms · 2026-06-20</span>
-      <span class="text-xs font-medium px-2 py-1 rounded-md bg-accent-soft accent">concept-explorer · deep</span>
-    </div>
+    <span class="text-xs muted">21 มิ.ย. 2569</span>
   </div>
 </header>
 
 <!-- Hero -->
-<section class="max-w-6xl mx-auto px-5 pt-14 pb-10 fade-up">
-  <div class="flex items-center gap-2 mb-5 flex-wrap">
-    <span class="cat-badge cat-cognitive">Psychology</span>
-    <span class="cat-badge cat-algorithmic">AI Bias</span>
-    <span class="cat-badge cat-statistical">Statistics</span>
-    <span class="cat-badge cat-media">Media</span>
-  </div>
-  <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2" style="letter-spacing:-1.5px;">
-    Bias: A Complete Guide
-  </h1>
-  <p class="text-lg muted mb-1" style="font-style:italic;">อคติในทุกรูปแบบ — Bias in Every Form</p>
-  <p class="text-xl muted max-w-3xl leading-relaxed mt-4">
-    Major categories of bias — cognitive, social, statistical, algorithmic, and media — interact to distort judgment across every domain of human life, from courts and clinics to AI systems and social media feeds.
-  </p>
+<section class="max-w-5xl mx-auto px-6 pt-12 pb-6">
+  <div class="text-xs font-semibold accent uppercase tracking-wider mb-2">ภาพรวม</div>
+  <h1 class="text-4xl font-bold mb-3">อคติ: ครบทุกรูปแบบ</h1>
+  <p class="text-lg muted max-w-2xl leading-relaxed">อคติ (Bias) คือความเบี่ยงเบนจากการตัดสินใจที่สมเหตุสมผล พบได้ในด้านความคิด สังคม สถิติ อัลกอริทึม สื่อ และองค์กร — พร้อมกลยุทธ์เชิงหลักฐานในการลดผลกระทบ</p>
 </section>
 
-<!-- TOC nav -->
-<nav class="toc-nav max-w-6xl mx-auto px-5 mb-10">
-  <div class="surface rounded-xl p-3 flex flex-wrap gap-1">
-    <a href="#deep-research" class="toc-link">Deep Research</a>
-    <a href="#visual" class="toc-link">Visual Overview</a>
-    <a href="#reel" class="toc-link">Key Stats</a>
-    <a href="#categories" class="toc-link">Bias Categories</a>
-    <a href="#explorer" class="toc-link">Bias Explorer</a>
-    <a href="#debiasing" class="toc-link">Debiasing Strategies</a>
-    <a href="#charts" class="toc-link">Data &amp; Statistics</a>
-    <a href="#sources" class="toc-link">Sources</a>
+<!-- Insight Reel -->
+<section class="max-w-5xl mx-auto px-6 mb-10">
+  <div class="surface rounded-2xl overflow-hidden" id="reel" tabindex="0">
+    <div id="reelSlides" style="position:relative;min-height:180px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
   </div>
-</nav>
+</section>
 
 <!-- Deep Research Callout -->
-<section id="deep-research" class="max-w-6xl mx-auto px-5 mb-12 fade-up">
-  <aside>
-    <div class="rounded-xl p-5 border-l-4" style="border-left-color: var(--accent); background: var(--accent-soft);">
-      <div class="text-xs font-medium accent mb-2" style="letter-spacing:0.05em;">
-        🔬 DEEP RESEARCH — synthesized from 25 sources via NotebookLM
-      </div>
-      <p class="leading-relaxed" style="font-size:0.9375rem;">
-        <strong>Major categories of bias include cognitive, social, statistical, and algorithmic forms, which often interact to distort judgment.</strong>
-        Cognitive bias refers to systematic errors in thinking and mental shortcuts, or heuristics, that the brain uses to process information quickly.
-        Social bias, frequently manifesting as implicit or affinity bias, involves the tendency to favor people like ourselves or attribute qualities to groups based on stereotypes rather than individual merit.
-        Statistical bias occurs when data is unrepresentative or flawed during collection, processing, and interpretation, such as sampling bias or omitted variable bias.
-        Finally, algorithmic bias emerges when these human and data-driven errors are scaled by AI, leading to differential and often unfair performance across different demographic groups.
-      </p>
-    </div>
-  </aside>
-</section>
+<aside class="max-w-5xl mx-auto px-6 mb-10">
+  <div class="rounded-xl p-5 border-l-4" style="border-left-color:var(--accent);background:var(--accent-soft);">
+    <div class="text-xs font-medium accent mb-2">🔬 การวิจัยเชิงลึก — สังเคราะห์จาก 25 แหล่งข้อมูลผ่าน NotebookLM</div>
+    <p class="text-sm leading-relaxed">ประเภทหลักของอคติ ได้แก่ <strong>ด้านความคิด สังคม สถิติ และอัลกอริทึม</strong> ซึ่งมักส่งผลกระทบต่อกันและกัน อคติทางความคิดหมายถึงความผิดพลาดเชิงระบบในการคิดและการใช้ทางลัดทางจิตใจ (heuristics) ที่สมองใช้ประมวลผลข้อมูลอย่างรวดเร็ว อคติทางสังคมมักแสดงออกในรูปแบบ <em>implicit bias</em> หรืออคติเชิงความชอบ (affinity bias) ซึ่งทำให้เราเอนเอียงต่อผู้คนที่คล้ายคลึงกับเรา ในสถานการณ์จริง อคติเหล่านี้ปรากฏในงานยุติธรรมทางอาญา การแพทย์ และการเงิน — อัลกอริทึม COMPAS พบว่าระบุผู้ต้องหาผิวดำว่ามีความเสี่ยงสูงอย่างผิดพลาดในอัตราเกือบสองเท่าของผู้ต้องหาผิวขาว กลยุทธ์ที่มีหลักฐานรองรับในการลดอคติ ได้แก่ การตระหนักรู้ การตรวจสอบเชิงเทคนิค และการเปลี่ยนกระบวนการทำงานให้มีโครงสร้างมากขึ้น</p>
+  </div>
+</aside>
 
 <!-- Visual Overview -->
-<section id="visual" class="max-w-6xl mx-auto px-5 mb-14 fade-up">
-  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2">
-    <i data-lucide="image" class="w-5 h-5 accent"></i>
-    Visual Overview
+<section class="max-w-5xl mx-auto px-6 mb-10 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="image" class="w-5 h-5 accent"></i> ภาพรวม
   </h2>
   <div class="surface rounded-xl overflow-hidden">
-    <img src="infographic.png" alt="Visual overview of bias taxonomy generated by NotebookLM" class="w-full h-auto block"/>
-    <div class="text-xs muted px-4 py-3">Generated by NotebookLM during deep research. Illustrates the taxonomy and relationships between major bias types.</div>
+    <img src="infographic.png" alt="ภาพรวมสร้างโดย NotebookLM" class="w-full h-auto block"/>
   </div>
+  <div class="text-xs muted mt-2">สร้างโดย NotebookLM ระหว่างการวิจัยเชิงลึก</div>
 </section>
 
-<!-- Animated Insight Reel -->
-<section id="reel" class="max-w-6xl mx-auto px-5 mb-14 fade-up">
-  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2">
-    <i data-lucide="zap" class="w-5 h-5 accent"></i>
-    Key Statistics
+<!-- Mind Map -->
+<section class="max-w-5xl mx-auto px-6 mb-10 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="brain" class="w-5 h-5 accent"></i> แผนที่ความคิด
   </h2>
-  <div class="reel-wrap" style="min-height:260px;">
-    <!-- Slide 1 -->
-    <div class="reel-slide active" data-stat="180" data-suffix="+">
-      <div class="reel-stat" data-counter="180" data-suffix="+">180+</div>
-      <div class="reel-headline">Named Cognitive Biases Documented</div>
-      <div class="reel-insight">Researchers have catalogued over 180 named cognitive biases — yet they all stem from just a handful of mental shortcuts the brain uses to manage information overload.</div>
-    </div>
-    <!-- Slide 2 -->
-    <div class="reel-slide" data-stat="67" data-suffix="%">
-      <div class="reel-stat" data-counter="67" data-suffix="%">67%</div>
-      <div class="reel-headline">of People Show Implicit Racial Bias</div>
-      <div class="reel-insight">Project Implicit (Harvard) found ~67% of IAT test-takers show implicit bias favoring White people over Black people — revealing bias even in those who consider themselves unbiased.</div>
-    </div>
-    <!-- Slide 3 -->
-    <div class="reel-slide" data-stat="35" data-suffix="% error">
-      <div class="reel-stat" data-counter="35" data-suffix="%">35%</div>
-      <div class="reel-headline">AI Error Rate for Dark-Skinned Women</div>
-      <div class="reel-insight">MIT's Gender Shades study (2018) found commercial facial recognition APIs had only ~1% error for light-skinned men but up to 34.7% error for dark-skinned women.</div>
-    </div>
-    <!-- Slide 4 -->
-    <div class="reel-slide" data-stat="44.9" data-suffix="% vs 23.5%">
-      <div class="reel-stat" style="font-size:3rem;" data-counter-text="44.9% vs 23.5%">44.9%</div>
-      <div class="reel-headline">COMPAS Algorithm's Racial Disparity</div>
-      <div class="reel-insight">ProPublica's analysis found the COMPAS risk-scoring system incorrectly flagged Black defendants as high-risk at 44.9% — nearly double the 23.5% rate for white defendants who did not reoffend.</div>
-    </div>
-    <!-- Slide 5 -->
-    <div class="reel-slide" data-stat="36" data-suffix="%">
-      <div class="reel-stat" data-counter="36" data-suffix="%">36%</div>
-      <div class="reel-headline">of Psychology Studies Successfully Replicated</div>
-      <div class="reel-insight">The Open Science Collaboration (2015) found only ~36% of 100 landmark psychology findings replicated under rigorous conditions, with replicated effects averaging only half the original size.</div>
-    </div>
-    <!-- Slide 6 -->
-    <div class="reel-slide" data-stat="46" data-suffix="%">
-      <div class="reel-stat" data-counter="46" data-suffix="%">46%</div>
-      <div class="reel-headline">Increase in Women in Orchestras from Blind Auditions</div>
-      <div class="reel-insight">Goldin &amp; Rouse (2000) found blind orchestral auditions explained 25–46% of the total increase in female representation in major US orchestras since 1970 — a structural fix that eliminated gender bias.</div>
-    </div>
+  <div class="surface rounded-xl p-4" style="height:520px;">
+    <div class="markmap" style="width:100%;height:100%;">
+      <script type="text/template">
+# อคติ (Bias) — ครบทุกรูปแบบ
 
-    <!-- Reel controls (bottom) -->
-    <div style="position:absolute;bottom:1.25rem;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:0.75rem;">
-      <div class="reel-dots" id="reel-dots">
-        <div class="reel-dot active" onclick="goSlide(0)"></div>
-        <div class="reel-dot" onclick="goSlide(1)"></div>
-        <div class="reel-dot" onclick="goSlide(2)"></div>
-        <div class="reel-dot" onclick="goSlide(3)"></div>
-        <div class="reel-dot" onclick="goSlide(4)"></div>
-        <div class="reel-dot" onclick="goSlide(5)"></div>
-      </div>
-      <div style="display:flex;gap:0.5rem;">
-        <button onclick="prevSlide()" class="reel-nav-btn" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;">‹</button>
-        <button onclick="nextSlide()" class="reel-nav-btn" style="background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;">›</button>
-      </div>
+## TL;DR
+- อคติคือความเบี่ยงเบนจากการตัดสินใจที่สมเหตุสมผล
+- System 1 (คิดเร็ว) เป็นต้นเหตุหลักของอคติทางความคิด
+- เกิดขึ้นในทุกด้าน: ความคิด สังคม สถิติ อัลกอริทึม
+
+## ผลการค้นพบสำคัญ
+- อคติทางความคิดมากกว่า 151 ชนิดถูกจัดหมวดหมู่แล้ว
+- 67% ผู้ทำ IAT มีอคติเชื้อชาติโดยไม่รู้ตัว
+- COMPAS ระบุผิดพลาด 44.9% vs 23.5% ตามเชื้อชาติ
+- Facial recognition เกิดข้อผิดพลาด 35% กับผู้หญิงผิวคล้ำ
+- ความสูญเสียรู้สึกเจ็บปวด 2 เท่าของการได้รับ
+
+## ประเภทหลัก
+
+### อคติทางความคิด (Cognitive)
+- Confirmation Bias — ค้นหาสิ่งที่ยืนยันความเชื่อ
+- Availability Heuristic — ประเมินจากสิ่งจำได้ง่าย
+- Anchoring — ยึดติดข้อมูลแรกที่ได้รับ
+- Dunning-Kruger — ประเมินความสามารถตัวเองเกินจริง
+
+### อคติทางสังคม (Social)
+- Implicit Bias — อคติใต้สำนึก วัดด้วย IAT
+- Halo Effect — ข้อดีหนึ่งปกคลุมภาพรวม
+- In-Group Favoritism — ให้สิทธิ์พวกเดียวกัน
+
+### อคติทางสถิติ (Statistical)
+- Selection Bias — ตัวอย่างไม่เป็นตัวแทน
+- Publication Bias — งานวิจัยผล null ไม่ตีพิมพ์
+- Survivorship Bias — มองเฉพาะผู้รอดชีวิต
+
+### อคติทางอัลกอริทึม (Algorithmic)
+- Historical Bias — ข้อมูลฝึกสอนสะท้อนอดีต
+- Representational Bias — ข้อมูลตัวแทนไม่ครบ
+- Feedback Loop — ผลลัพธ์เอนเอียงสร้างข้อมูลใหม่ที่เอนเอียงยิ่งขึ้น
+
+### อคติทางสื่อ (Media)
+- Framing Bias — วิธีนำเสนอเปลี่ยนการตีความ
+- Filter Bubble — เห็นเฉพาะสิ่งที่ตรงกับความเชื่อ
+
+### อคติในองค์กร (Organizational)
+- Affinity Bias — ชอบคนที่คล้ายตัวเอง
+- Groupthink — กลุ่มกดดันให้เห็นพ้อง
+
+## วิธีลดอคติ
+- ตระหนักรู้ + ชะลอการตัดสินใจ
+- กระบวนการมาตรฐาน (Structured Process)
+- ตรวจสอบ AI (Algorithmic Audit)
+- ทีมที่หลากหลาย (Diverse Teams)
+- บันทึกการตัดสินใจล่วงหน้า (Pre-registration)
+
+## แหล่งข้อมูล
+- Tversky & Kahneman, Science (1974)
+- Kahneman: Thinking Fast and Slow (2011)
+- MIT Gender Shades Study (2018)
+- ProPublica COMPAS Analysis (2016)
+      </script>
     </div>
   </div>
+  <div class="text-xs muted mt-2">แผนที่ความคิดสร้างจากการสังเคราะห์งานวิจัย (NotebookLM ไม่มีแผนที่ความคิดสำหรับรอบนี้)</div>
 </section>
 
-<!-- Bias Categories -->
-<section id="categories" class="max-w-6xl mx-auto px-5 mb-14 fade-up">
-  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2">
-    <i data-lucide="layers" class="w-5 h-5 accent"></i>
-    Bias Categories
-    <span class="text-sm font-normal muted ml-1">— 6 domains</span>
+<!-- 6 Category Cards -->
+<section class="max-w-5xl mx-auto px-6 mb-10">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="layers" class="w-5 h-5 accent"></i> อคติ 6 หมวดหมู่หลัก
   </h2>
-  <!-- Tab buttons -->
-  <div class="flex flex-wrap gap-2 mb-5" id="cat-tabs">
-    <button class="tab-btn active" onclick="switchTab(0)">🧠 Cognitive</button>
-    <button class="tab-btn" onclick="switchTab(1)">👥 Social &amp; Cultural</button>
-    <button class="tab-btn" onclick="switchTab(2)">📊 Statistical</button>
-    <button class="tab-btn" onclick="switchTab(3)">🤖 Algorithmic &amp; AI</button>
-    <button class="tab-btn" onclick="switchTab(4)">📰 Media</button>
-    <button class="tab-btn" onclick="switchTab(5)">🏢 Organizational</button>
-  </div>
-
-  <!-- Tab Panels -->
-  <div id="cat-panels">
-
-    <!-- 1. Cognitive -->
-    <div class="tab-panel active domain-card">
-      <div class="flex items-start gap-3 mb-4">
-        <div style="font-size:2rem;">🧠</div>
-        <div>
-          <h3 class="text-xl font-bold">Cognitive Biases</h3>
-          <p class="muted text-sm">Systematic errors in thinking arising from heuristics — mental shortcuts that help us process information fast but often at the cost of accuracy.</p>
-        </div>
-      </div>
-      <div class="prose mb-5">
-        <p>
-          Cognitive biases are the most studied form of bias, with over 180 named examples catalogued by researchers. They arise from <strong>System 1 thinking</strong> — the brain's fast, automatic, unconscious processing mode — which handles most of daily life without deliberate effort. When the brain's shortcuts misfire, predictable errors result.
-        </p>
-        <p>
-          Daniel Kahneman and Amos Tversky coined the term in 1974 and identified three master heuristics: <strong>representativeness</strong>, <strong>availability</strong>, and <strong>anchoring and adjustment</strong>. Kahneman received the Nobel Prize in Economics in 2002 for this work.
-        </p>
-        <p>
-          <strong>Real-world example:</strong> Medical residents made 25% more diagnostic errors when electrocardiograms were paired with misleading clinical framing — a direct demonstration of anchoring bias in high-stakes settings. Wrong diagnoses occur in roughly 10–15% of all clinical cases.
-        </p>
-      </div>
-      <p class="text-xs font-semibold muted uppercase mb-2" style="letter-spacing:0.08em;">Key biases in this domain</p>
-      <div class="flex flex-wrap">
-        <span class="domain-tag">Confirmation Bias</span>
-        <span class="domain-tag">Availability Heuristic</span>
-        <span class="domain-tag">Anchoring Bias</span>
-        <span class="domain-tag">Dunning-Kruger Effect</span>
-        <span class="domain-tag">Loss Aversion</span>
-        <span class="domain-tag">Sunk Cost Fallacy</span>
-        <span class="domain-tag">Planning Fallacy</span>
-        <span class="domain-tag">Hindsight Bias</span>
-        <span class="domain-tag">Framing Effect</span>
-        <span class="domain-tag">Survivorship Bias</span>
-        <span class="domain-tag">Bandwagon Effect</span>
-        <span class="domain-tag">Optimism Bias</span>
-        <span class="domain-tag">Overconfidence Effect</span>
-        <span class="domain-tag">Status Quo Bias</span>
-        <span class="domain-tag">Negativity Bias</span>
-      </div>
-    </div>
-
-    <!-- 2. Social & Cultural -->
-    <div class="tab-panel domain-card">
-      <div class="flex items-start gap-3 mb-4">
-        <div style="font-size:2rem;">👥</div>
-        <div>
-          <h3 class="text-xl font-bold">Social &amp; Cultural Biases</h3>
-          <p class="muted text-sm">Biases in how we perceive, evaluate, and interact with other people — often operating below conscious awareness.</p>
-        </div>
-      </div>
-      <div class="prose mb-5">
-        <p>
-          Social biases shape intergroup relations, professional evaluations, and moral judgments. Many are measured using the <strong>Implicit Association Test (IAT)</strong>, which reveals automatic associations the brain forms between social categories and attributes.
-        </p>
-        <p>
-          Project Implicit (Harvard) data shows ~<strong>67%</strong> of test-takers show implicit bias favoring White people over Black people, and ~<strong>75%</strong> associate men more strongly with career and women with family — even among respondents who explicitly endorse gender equality.
-        </p>
-        <p>
-          <strong>Real-world example:</strong> Blind orchestral auditions — where a screen hid gender from evaluators — increased women's probability of advancing through preliminary rounds by approximately 50%, and explained 25–46% of the total increase in female representation in major US orchestras since 1970. This is among the strongest field evidence for the real-world impact of implicit gender bias.
-        </p>
-      </div>
-      <p class="text-xs font-semibold muted uppercase mb-2" style="letter-spacing:0.08em;">Key biases in this domain</p>
-      <div class="flex flex-wrap">
-        <span class="domain-tag">Implicit Bias</span>
-        <span class="domain-tag">In-Group Favoritism</span>
-        <span class="domain-tag">Out-Group Derogation</span>
-        <span class="domain-tag">Stereotyping</span>
-        <span class="domain-tag">Halo Effect</span>
-        <span class="domain-tag">Horns Effect</span>
-        <span class="domain-tag">Affinity Bias</span>
-        <span class="domain-tag">Fundamental Attribution Error</span>
-        <span class="domain-tag">Actor-Observer Bias</span>
-        <span class="domain-tag">Ultimate Attribution Error</span>
-        <span class="domain-tag">Just-World Hypothesis</span>
-        <span class="domain-tag">Social Desirability Bias</span>
-      </div>
-    </div>
-
-    <!-- 3. Statistical -->
-    <div class="tab-panel domain-card">
-      <div class="flex items-start gap-3 mb-4">
-        <div style="font-size:2rem;">📊</div>
-        <div>
-          <h3 class="text-xl font-bold">Statistical &amp; Research Biases</h3>
-          <p class="muted text-sm">Distortions in data collection, analysis, or interpretation that undermine the validity and generalizability of findings.</p>
-        </div>
-      </div>
-      <div class="prose mb-5">
-        <p>
-          Statistical biases distort our understanding of reality by making samples unrepresentative, findings unpublishable (if null), or data systematically mismeasured. They are the primary mechanism behind the <strong>replication crisis</strong> — the finding that many landmark scientific results cannot be reproduced.
-        </p>
-        <p>
-          <strong>Publication bias</strong> (the "file drawer problem") means research with null or negative results is far less likely to be published. Robert Rosenthal estimated that for every published study showing a significant effect, ~5 unpublished studies with null results sit in file drawers. The Open Science Collaboration (2015) found only <strong>36%</strong> of 100 landmark psychology findings replicated under rigorous conditions.
-        </p>
-        <p>
-          <strong>Real-world example:</strong> The 1936 Literary Digest poll predicted a landslide victory for Alf Landon over Franklin Roosevelt based on 2.4 million responses — but the sample overrepresented wealthy citizens (from car registration lists and telephone directories) who favored Republicans, a textbook case of sampling bias.
-        </p>
-      </div>
-      <p class="text-xs font-semibold muted uppercase mb-2" style="letter-spacing:0.08em;">Key biases in this domain</p>
-      <div class="flex flex-wrap">
-        <span class="domain-tag">Selection Bias</span>
-        <span class="domain-tag">Sampling Bias</span>
-        <span class="domain-tag">Publication Bias</span>
-        <span class="domain-tag">Measurement Bias</span>
-        <span class="domain-tag">Survivorship Bias</span>
-        <span class="domain-tag">Aggregation Bias</span>
-        <span class="domain-tag">Omitted Variable Bias</span>
-        <span class="domain-tag">Observer-Expectancy Effect</span>
-        <span class="domain-tag">Self-Selection Bias</span>
-        <span class="domain-tag">Non-Response Bias</span>
-      </div>
-    </div>
-
-    <!-- 4. Algorithmic & AI -->
-    <div class="tab-panel domain-card">
-      <div class="flex items-start gap-3 mb-4">
-        <div style="font-size:2rem;">🤖</div>
-        <div>
-          <h3 class="text-xl font-bold">Algorithmic &amp; AI Biases</h3>
-          <p class="muted text-sm">Systematic and unjustified disparities in AI/ML outputs across demographic groups, arising from biased data, flawed design, or feedback loops.</p>
-        </div>
-      </div>
-      <div class="prose mb-5">
-        <p>
-          Algorithmic bias enters machine learning systems through multiple pathways: <strong>historical data bias</strong> (training on past human decisions that encoded inequality), <strong>representational bias</strong> (underrepresenting groups in training data), <strong>measurement bias</strong> (using proxy variables that correlate with protected attributes), and <strong>feedback loops</strong> (biased outputs becoming biased training data).
-        </p>
-        <p>
-          The COMPAS case revealed a fundamental mathematical impossibility: it is <strong>provably impossible</strong> to simultaneously satisfy calibration equality, false positive rate equality, and false negative rate equality when base rates differ across groups.
-        </p>
-        <p>
-          <strong>Real-world examples:</strong> The COMPAS algorithm flagged Black defendants as high-risk at 44.9% vs. 23.5% for white defendants. MIT's Gender Shades study found facial recognition APIs with up to 34.7% error for dark-skinned women vs. ~1% for light-skinned men. Amazon's hiring tool, trained on a decade of predominantly male tech resumes, automatically penalized resumes mentioning "women's" organizations — and was scrapped in 2017.
-        </p>
-      </div>
-      <p class="text-xs font-semibold muted uppercase mb-2" style="letter-spacing:0.08em;">Key biases in this domain</p>
-      <div class="flex flex-wrap">
-        <span class="domain-tag">Historical Data Bias</span>
-        <span class="domain-tag">Representational Bias</span>
-        <span class="domain-tag">Measurement &amp; Proxy Bias</span>
-        <span class="domain-tag">Feedback Loop Bias</span>
-        <span class="domain-tag">Deployment Bias</span>
-        <span class="domain-tag">Algorithmic Processing Bias</span>
-        <span class="domain-tag">Association Bias</span>
-        <span class="domain-tag">Evaluation Bias</span>
-      </div>
-    </div>
-
-    <!-- 5. Media -->
-    <div class="tab-panel domain-card">
-      <div class="flex items-start gap-3 mb-4">
-        <div style="font-size:2rem;">📰</div>
-        <div>
-          <h3 class="text-xl font-bold">Media Biases</h3>
-          <p class="muted text-sm">Systematic patterns in which topics and perspectives are covered, omitted, or framed in news and information media — shaping what the public thinks about, not just what they think.</p>
-        </div>
-      </div>
-      <div class="prose mb-5">
-        <p>
-          Media bias operates primarily through <strong>agenda-setting</strong> (deciding what topics receive coverage) and <strong>framing</strong> (determining how stories are presented). Research consistently shows that heavy coverage of a topic shifts public prioritization of that issue, regardless of its objective importance.
-        </p>
-        <p>
-          The <strong>filter bubble</strong> (Eli Pariser, 2011) describes how algorithmic personalization creates a unique information universe for each user, reducing exposure to challenging or cross-cutting viewpoints. Research on YouTube's recommendation algorithm has shown it can lead users toward progressively more extreme content.
-        </p>
-        <p>
-          <strong>Real-world example:</strong> "Tax relief" vs. "tax cuts for the wealthy" — identical policies described using different frames elicit dramatically different public opinion responses. News coverage of crime vastly exceeds actual crime rate trends, distorting risk perception via the availability heuristic.
-        </p>
-      </div>
-      <p class="text-xs font-semibold muted uppercase mb-2" style="letter-spacing:0.08em;">Key biases in this domain</p>
-      <div class="flex flex-wrap">
-        <span class="domain-tag">Agenda-Setting</span>
-        <span class="domain-tag">Framing Bias</span>
-        <span class="domain-tag">Selection &amp; Omission Bias</span>
-        <span class="domain-tag">Sensationalism</span>
-        <span class="domain-tag">Confirmation Bias (Editorial)</span>
-        <span class="domain-tag">Filter Bubble</span>
-        <span class="domain-tag">Echo Chamber</span>
-        <span class="domain-tag">Loaded Language</span>
-        <span class="domain-tag">False Balance</span>
-      </div>
-    </div>
-
-    <!-- 6. Organizational -->
-    <div class="tab-panel domain-card">
-      <div class="flex items-start gap-3 mb-4">
-        <div style="font-size:2rem;">🏢</div>
-        <div>
-          <h3 class="text-xl font-bold">Organizational &amp; Workplace Biases</h3>
-          <p class="muted text-sm">Biases affecting hiring, performance evaluation, promotion, and strategic decision-making in organizations — with measurable impact on diversity and business outcomes.</p>
-        </div>
-      </div>
-      <div class="prose mb-5">
-        <p>
-          Organizational biases affect every stage of the employee lifecycle. <strong>Affinity bias</strong> leads managers to favor candidates who share their background; the <strong>halo effect</strong> causes one strong impression to dominate all evaluation; <strong>groupthink</strong> suppresses dissent in team decisions.
-        </p>
-        <p>
-          <strong>Groupthink</strong> (Irving Janis, 1972) is especially dangerous in high-stakes organizational decisions. Classic examples include the Bay of Pigs invasion (1961) and the NASA Challenger disaster (1986), where warning signals were suppressed under social conformity pressure.
-        </p>
-        <p>
-          <strong>Real-world example:</strong> Stanley Milgram's obedience experiments showed that ordinary people would administer apparent electric shocks to another person simply because an authority figure in a lab coat instructed them to — illustrating authority bias with disturbing clarity.
-        </p>
-      </div>
-      <p class="text-xs font-semibold muted uppercase mb-2" style="letter-spacing:0.08em;">Key biases in this domain</p>
-      <div class="flex flex-wrap">
-        <span class="domain-tag">Affinity Bias</span>
-        <span class="domain-tag">Halo Effect (Interviews)</span>
-        <span class="domain-tag">Groupthink</span>
-        <span class="domain-tag">Authority Bias</span>
-        <span class="domain-tag">Recency Bias</span>
-        <span class="domain-tag">Attribution Bias</span>
-        <span class="domain-tag">Conformity Bias</span>
-        <span class="domain-tag">Leniency Bias</span>
-        <span class="domain-tag">Strictness Bias</span>
-        <span class="domain-tag">Central Tendency Bias</span>
-      </div>
-    </div>
-
-  </div><!-- /#cat-panels -->
+  <div id="cardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 </section>
 
-<!-- Top Biases Explorer -->
-<section id="explorer" class="max-w-6xl mx-auto px-5 mb-14">
-  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2 fade-up">
-    <i data-lucide="search" class="w-5 h-5 accent"></i>
-    Bias Explorer
-    <span class="text-sm font-normal muted ml-1">— 30 biases · searchable &amp; filterable</span>
+<!-- Distribution Chart -->
+<section class="max-w-5xl mx-auto px-6 mb-10 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="pie-chart" class="w-5 h-5 accent"></i> การกระจายประเภทอคติ
   </h2>
-  <p class="muted text-sm mb-5 fade-up">Search by name or description, or filter by category. Severity = documented prevalence / real-world impact.</p>
-
-  <!-- Search + filter row -->
-  <div class="mb-5 fade-up">
-    <div class="relative mb-3">
-      <i data-lucide="search" class="w-4 h-4 absolute" style="left:0.875rem;top:50%;transform:translateY(-50%);color:var(--muted);"></i>
-      <input type="text" id="bias-search" class="search-box" placeholder="Search biases…" oninput="filterBiases()">
+  <div class="surface rounded-xl p-6 flex flex-col md:flex-row items-center gap-6">
+    <div style="max-width:280px;width:100%;flex-shrink:0;">
+      <canvas id="biasChart"></canvas>
     </div>
-    <div class="flex flex-wrap gap-2" id="cat-filters">
-      <button class="filter-btn active" data-cat="all" onclick="setCatFilter(this,'all')">All</button>
-      <button class="filter-btn" data-cat="Cognitive" onclick="setCatFilter(this,'Cognitive')">Cognitive</button>
-      <button class="filter-btn" data-cat="Social" onclick="setCatFilter(this,'Social')">Social</button>
-      <button class="filter-btn" data-cat="Statistical" onclick="setCatFilter(this,'Statistical')">Statistical</button>
-      <button class="filter-btn" data-cat="Algorithmic" onclick="setCatFilter(this,'Algorithmic')">Algorithmic</button>
-      <button class="filter-btn" data-cat="Media" onclick="setCatFilter(this,'Media')">Media</button>
-      <button class="filter-btn" data-cat="Organizational" onclick="setCatFilter(this,'Organizational')">Organizational</button>
-    </div>
-  </div>
-
-  <!-- Bias grid -->
-  <div class="bias-grid" id="bias-grid">
-    <!-- Cards injected by JS -->
-  </div>
-  <p class="text-sm muted mt-4" id="bias-count"></p>
-</section>
-
-<!-- Debiasing Strategies -->
-<section id="debiasing" class="max-w-6xl mx-auto px-5 mb-14 fade-up">
-  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2">
-    <i data-lucide="shield-check" class="w-5 h-5 accent"></i>
-    Debiasing Strategies
-  </h2>
-  <p class="muted text-sm mb-6">Evidence-based interventions at individual, organizational, and technical levels. No single approach eliminates bias entirely — layered strategies work best.</p>
-
-  <div class="grid md:grid-cols-3 gap-5">
-
-    <!-- Individual -->
-    <div class="strat-card fade-left">
-      <div class="flex items-center gap-2 mb-4">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🧩</div>
-        <h3 class="font-bold text-base">Individual</h3>
-      </div>
-      <div class="flex flex-col gap-3">
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Awareness &amp; Education</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Knowing when and how a bias occurs reduces its impact. A single debiasing training session significantly reduced confirmation bias in both analysts and students (RCT, 2025).</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Consider-the-Opposite</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Actively generating reasons your current belief is wrong reduces overconfidence by 10–25% in studies and partially counters confirmation bias.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Pre-mortem Analysis</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">Imagining a project has failed and working backward forces consideration of failure scenarios, countering optimism bias and the planning fallacy.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Cognitive Forcing (Slow Down)</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Deliberate System 2 engagement via checklists reduces anchoring-driven clinical misdiagnosis. Checklists in medicine demonstrably cut diagnostic error rates.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Statistical Training</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">Teaching Bayesian reasoning reduces base rate neglect and probabilistic errors in controlled studies.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Psychological Self-Distance</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">"What would I advise a friend?" removes ego investment and reduces self-serving bias, spotlight effect, and related ego-based biases.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Organizational -->
-    <div class="strat-card fade-up">
-      <div class="flex items-center gap-2 mb-4">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">🏛</div>
-        <h3 class="font-bold text-base">Organizational</h3>
-      </div>
-      <div class="flex flex-col gap-3">
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Blind Review Processes</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Blind orchestral auditions increased women's probability of advancing by ~50%. Blind résumé review reduces callback disparities. Among the best-evidenced organizational debiasing tools.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Structured Interviews</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Standardized questions and scoring criteria reduce variability and halo/affinity bias in hiring evaluations. Reduces inter-rater variance significantly.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Diverse Decision Panels</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">Diverse groups generate more solutions and are less susceptible to groupthink. Reduces in-group favoritism through broader perspective representation.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Anonymous Scorecards</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">Keeping panel ratings private until discussion prevents conformity bias and authority bias from anchoring on a senior member's first stated view.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Devil's Advocate Role</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">Formally assigned dissenter role reduces groupthink's illusion of unanimity and forces alternative analysis of decisions.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Pre-registration of Decisions</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Documenting predictions and decision criteria before outcomes are known prevents post-hoc rationalization (hindsight bias) and selective reporting.</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Technical -->
-    <div class="strat-card" style="animation-delay:0.15s;">
-      <div class="flex items-center gap-2 mb-4">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.1rem;">⚙️</div>
-        <h3 class="font-bold text-base">Technical / Algorithmic</h3>
-      </div>
-      <div class="flex flex-col gap-3">
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Training Data Audits</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Examining training datasets for demographic imbalances; re-sampling or re-weighting underrepresented groups. Addresses historical data bias and representational bias.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Algorithmic Impact Assessments</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Pre-deployment testing across demographic subgroups to identify differential error rates, as done in the Gender Shades study methodology.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Fairness Metrics &amp; Constraints</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">Defining and enforcing fairness criteria (equalized odds, demographic parity) during model training — with awareness that multiple criteria are mathematically incompatible.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Explainable AI (XAI)</span>
-            <span class="evidence-badge ev-moderate">Moderate</span>
-          </div>
-          <p class="text-xs muted">LIME, SHAP, and similar tools make model decisions interpretable, allowing human review and identification of biased patterns in black-box models.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Third-Party Audits</span>
-            <span class="evidence-badge ev-strong">Strong</span>
-          </div>
-          <p class="text-xs muted">Independent external auditing of consequential AI systems (hiring, lending, criminal justice) for discriminatory impact — analogous to financial audits.</p>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-1">
-            <span class="font-medium text-sm">Diverse ML Development Teams</span>
-            <span class="evidence-badge ev-preliminary">Preliminary</span>
-          </div>
-          <p class="text-xs muted">Teams including gender, racial, and disciplinary diversity are more likely to catch bias during design — though rigorous evidence for the magnitude of benefit is still emerging.</p>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- Key Data & Statistics -->
-<section id="charts" class="max-w-6xl mx-auto px-5 mb-14 fade-up">
-  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2">
-    <i data-lucide="bar-chart-2" class="w-5 h-5 accent"></i>
-    Key Data &amp; Statistics
-  </h2>
-  <p class="muted text-sm mb-6">Documented measurements from published research. Charts are interactive — hover for details.</p>
-
-  <div class="grid md:grid-cols-2 gap-6 mb-6">
-
-    <!-- Chart 1: COMPAS -->
-    <div class="surface rounded-xl p-5 scale-in">
-      <h3 class="font-semibold mb-1">COMPAS: Racial Bias in Recidivism Prediction</h3>
-      <p class="text-xs muted mb-4">False positive rates for defendants who did not reoffend, by race. ProPublica, 2016.</p>
-      <div class="chart-wrap" style="height:220px;">
-        <canvas id="chart-compas"></canvas>
-      </div>
-      <p class="text-xs muted mt-3">Black defendants were incorrectly flagged as "high risk" at nearly twice the rate of white defendants. Source: Angwin et al., ProPublica (2016).</p>
-    </div>
-
-    <!-- Chart 2: Gender Shades -->
-    <div class="surface rounded-xl p-5 scale-in">
-      <h3 class="font-semibold mb-1">Gender Shades: AI Error Rates by Demographic</h3>
-      <p class="text-xs muted mb-4">Error rate of commercial gender classification APIs, by skin tone &amp; gender. MIT, 2018.</p>
-      <div class="chart-wrap" style="height:220px;">
-        <canvas id="chart-gendershades"></canvas>
-      </div>
-      <p class="text-xs muted mt-3">Dark-skinned women faced error rates up to 34.7% while light-skinned men had only ~1% error. Source: Buolamwini &amp; Gebru, FAT* 2018.</p>
-    </div>
-
-  </div>
-
-  <!-- Chart 3: Replication Crisis -->
-  <div class="surface rounded-xl p-5 scale-in">
-    <h3 class="font-semibold mb-1">The Replication Crisis: Psychology Findings Revisited</h3>
-    <p class="text-xs muted mb-4">Open Science Collaboration (2015) attempted to replicate 100 landmark psychology studies.</p>
-    <div class="grid md:grid-cols-2 gap-6 items-center">
-      <div class="chart-wrap" style="height:240px;">
-        <canvas id="chart-replication"></canvas>
-      </div>
-      <div>
-        <div class="flex flex-col gap-4">
-          <div class="surface rounded-lg p-4" style="border-color:var(--border);">
-            <div class="text-3xl font-bold accent mb-1">36%</div>
-            <div class="text-sm font-medium">Studies successfully replicated</div>
-            <div class="text-xs muted mt-1">Of 100 landmark psychology findings tested under rigorous conditions</div>
-          </div>
-          <div class="surface rounded-lg p-4" style="border-color:var(--border);">
-            <div class="text-3xl font-bold mb-1" style="color:var(--red);">50%</div>
-            <div class="text-sm font-medium">Average effect size reduction</div>
-            <div class="text-xs muted mt-1">Replicated effects averaged only half the original reported effect size</div>
-          </div>
-          <div class="surface rounded-lg p-4" style="border-color:var(--border);">
-            <div class="text-3xl font-bold mb-1" style="color:var(--yellow);">~5×</div>
-            <div class="text-sm font-medium">Unpublished null results per published study</div>
-            <div class="text-xs muted mt-1">Rosenthal's "file drawer" estimate: ~5 unpublished null studies for each significant published result</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <p class="text-xs muted mt-4">Primary cause: publication bias — only significant results are published, inflating apparent effect sizes across the literature.</p>
+    <p class="text-sm muted leading-relaxed">การกระจายโดยประมาณของอคติที่ครอบคลุมในภาพรวมนี้ จากอคติที่ได้รับการศึกษามากกว่า 151 ชนิด — เป็นการประมาณการเชิงคุณภาพ ไม่ใช่การวัดเชิงประจักษ์ อคติทางความคิดครอบคลุมจำนวนมากที่สุด เพราะนักจิตวิทยาได้ทำการศึกษาและตั้งชื่ออคติกลุ่มนี้มาตั้งแต่ทศวรรษ 1970</p>
   </div>
 </section>
 
 <!-- Sources -->
-<section id="sources" class="max-w-6xl mx-auto px-5 mb-14 fade-up">
-  <h2 class="text-2xl font-semibold mb-5 flex items-center gap-2">
-    <i data-lucide="link" class="w-5 h-5 accent"></i>
-    Sources
-    <span class="text-sm font-normal muted ml-1">— 25 research sources + 15 video sources</span>
+<section class="max-w-5xl mx-auto px-6 mb-10 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> แหล่งข้อมูล
   </h2>
-
-  <div class="surface rounded-xl p-5 mb-5">
-    <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
-      <i data-lucide="book-open" class="w-4 h-4 accent"></i>
-      Research Sources (Ravi &amp; Rin)
-    </h3>
-    <ol class="sources-list">
-      <li class="source-item">
-        <span class="source-num">1</span>
-        <span>Tversky, A. &amp; Kahneman, D. — "Judgement Under Uncertainty: Heuristics and Biases." <em>Science</em>, 1974. <a href="https://www.science.org/doi/10.1126/science.185.4157.1124" target="_blank" rel="noopener">science.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">2</span>
-        <span>de Backer, G. — "Cognitive Biases (2026): Complete List of 151+ Biases." gustdebacker.com, 2026. <a href="https://gustdebacker.com/cognitive-biases/" target="_blank" rel="noopener">gustdebacker.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">3</span>
-        <span>Kahneman, D. — <em>Thinking, Fast and Slow.</em> Farrar, Straus and Giroux, 2011. <a href="https://us.macmillan.com/books/9780374533557/thinkingfastandslow" target="_blank" rel="noopener">macmillan.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">4</span>
-        <span>Effectiviology — "Debiasing: How to Reduce Cognitive Biases in Yourself and in Others." 2023. <a href="https://effectiviology.com/cognitive-debiasing-how-to-debias/" target="_blank" rel="noopener">effectiviology.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">5</span>
-        <span>Project Implicit (Harvard University) — Implicit Association Test. <a href="https://implicit.harvard.edu/implicit/" target="_blank" rel="noopener">implicit.harvard.edu</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">6</span>
-        <span>Buolamwini, J. &amp; Gebru, T. — "Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification." FAT* 2018. <a href="https://proceedings.mlr.press/v81/buolamwini18a.html" target="_blank" rel="noopener">proceedings.mlr.press</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">7</span>
-        <span>Angwin, J. et al. — "Machine Bias." <em>ProPublica</em>, 2016. <a href="https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing" target="_blank" rel="noopener">propublica.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">8</span>
-        <span>Prolific — "AI Bias: 10 Real-World Failures and What They Reveal About Training Data." 2024. <a href="https://www.prolific.com/resources/ai-bias-10-real-world-failures-and-what-they-reveal-about-training-data" target="_blank" rel="noopener">prolific.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">9</span>
-        <span>PSNet / AHRQ — "Anchoring Bias With Critical Implications." 2024. <a href="https://psnet.ahrq.gov/web-mm/anchoring-bias-critical-implications" target="_blank" rel="noopener">psnet.ahrq.gov</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">10</span>
-        <span>Multiple authors — "The Influence of Unpublished Studies on Results of Recent Meta-Analyses." <em>International Journal of Social Research Methodology</em>, 2021. <a href="https://www.tandfonline.com/doi/full/10.1080/13645579.2021.1922805" target="_blank" rel="noopener">tandfonline.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">11</span>
-        <span>Columbia University Mailman School — "Global Study Confirms Influential Theory Behind Loss Aversion." 2020. <a href="https://www.publichealth.columbia.edu/news/global-study-confirms-influential-theory-behind-loss-aversion" target="_blank" rel="noopener">publichealth.columbia.edu</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">12</span>
-        <span>Goldin, C. &amp; Rouse, C. — "Orchestrating Impartiality: The Impact of Blind Auditions on Female Musicians." <em>American Economic Review</em>, 2000. <a href="https://www.aeaweb.org/articles?id=10.1257/aer.90.4.715" target="_blank" rel="noopener">aeaweb.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">13</span>
-        <span>Multiple authors — "Neural Basis of In-Group Bias and Prejudices: A Systematic Meta-Analysis." <em>Neuroscience &amp; Biobehavioral Reviews</em>, 2021. <a href="https://www.sciencedirect.com/science/article/pii/S0149763421004693" target="_blank" rel="noopener">sciencedirect.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">14</span>
-        <span>Simply Psychology — "Sampling Bias and How to Avoid It: Types and Examples." 2024. <a href="https://www.simplypsychology.org/sampling-bias-types-examples-how-to-avoid-it.html" target="_blank" rel="noopener">simplypsychology.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">15</span>
-        <span>Frost, J. — "Survivorship Bias: Definition, Examples and Avoiding It." statisticsbyjim.com, 2023. <a href="https://statisticsbyjim.com/basics/survivorship-bias/" target="_blank" rel="noopener">statisticsbyjim.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">16</span>
-        <span>Multiple authors — "The Table of Media Bias Elements: A Sentence-Level Taxonomy of Media Bias Types." arXiv, 2025. <a href="https://arxiv.org/pdf/2601.05358" target="_blank" rel="noopener">arxiv.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">17</span>
-        <span>Management Issues — "Reducing Cognitive Biases in Organisations: Evidence-Based Mitigation Strategies." 2023. <a href="https://www.management-issues.com/news/7661/reducing-cognitive-biases-in-organisations-evidence-based-mitigation-strategies/" target="_blank" rel="noopener">management-issues.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">18</span>
-        <span>Wikipedia contributors — "List of Cognitive Biases." 2026. <a href="https://en.wikipedia.org/wiki/List_of_cognitive_biases" target="_blank" rel="noopener">wikipedia.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">19</span>
-        <span>Simply Psychology — "What Is Cognitive Bias? Types and Examples." 2024. <a href="https://www.simplypsychology.org/cognitive-bias.html" target="_blank" rel="noopener">simplypsychology.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">20</span>
-        <span>Multiple authors — "Debiasing Training Reduces Confirmation Bias in National Risk Analysts." <em>Scientific Reports (Nature)</em>, 2025. <a href="https://www.nature.com/articles/s41598-025-28794-w" target="_blank" rel="noopener">nature.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">21</span>
-        <span>APS Observer — "The Bias Beneath: Two Decades of Measuring Implicit Associations." 2023. <a href="https://www.psychologicalscience.org/observer/the-bias-beneath-two-decades-of-measuring-implicit-associations" target="_blank" rel="noopener">psychologicalscience.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">22</span>
-        <span>Multiple authors — "Tackling Gender and Racial Bias in Academic Emergency Medicine." <em>PubMed Central</em>, 2020. <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7717082/" target="_blank" rel="noopener">ncbi.nlm.nih.gov</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">23</span>
-        <span>Kahneman, D. &amp; Tversky, A. — "Prospect Theory: An Analysis of Decision Under Risk." <em>Econometrica</em>, 1979. <a href="https://www.jstor.org/stable/1914185" target="_blank" rel="noopener">jstor.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">24</span>
-        <span>Mehrabi, N. et al. — "A Survey on Bias and Fairness in Machine Learning." arXiv / ACM Computing Surveys, 2022. <a href="https://arxiv.org/pdf/1908.09635" target="_blank" rel="noopener">arxiv.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">25</span>
-        <span>Multiple authors — "A Systematic Review of Experimental Evidence on Interventions Against Bias and Discrimination in Organizations." <em>Research in Organizational Behavior</em>, 2024. <a href="https://www.sciencedirect.com/science/article/pii/S1053482224000196" target="_blank" rel="noopener">sciencedirect.com</a></span>
-      </li>
-    </ol>
-  </div>
-
-  <!-- Video Sources -->
-  <div class="surface rounded-xl p-5">
-    <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
-      <i data-lucide="play-circle" class="w-4 h-4" style="color:#ef4444;"></i>
-      Video Sources <span class="text-xs muted font-normal ml-1">(NotebookLM deep research)</span>
-    </h3>
-    <ol class="sources-list">
-      <li class="source-item">
-        <span class="source-num">V1</span>
-        <span>"(Almost) Every Type of Cognitive Bias Explained" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=2bIVmWxRmdI" target="_blank" rel="noopener">youtube.com/watch?v=2bIVmWxRmdI</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V2</span>
-        <span>"12 Cognitive Biases Explained - How to Think Better and More Logically Removing Bias" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=wEwGBIr_RIw" target="_blank" rel="noopener">youtube.com/watch?v=wEwGBIr_RIw</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V3</span>
-        <span>"12 Cognitive Biases and How to Overcome Them with Critical Thinking!" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=d2f2hsQ_JyM" target="_blank" rel="noopener">youtube.com/watch?v=d2f2hsQ_JyM</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V4</span>
-        <span>"AI Literacy Course 2024: Evaluating Algorithm Bias" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=x1MXneJ34sY" target="_blank" rel="noopener">youtube.com/watch?v=x1MXneJ34sY</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V5</span>
-        <span>"Can we protect AI from our biases? | Robin Hauser | TED Institute" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=eV_tx4ngVT0" target="_blank" rel="noopener">youtube.com/watch?v=eV_tx4ngVT0</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V6</span>
-        <span>"Can we stop AI from inheriting our biases? | Julia Mann | TEDxRWTHAachen" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=dkkYmYFrkFY" target="_blank" rel="noopener">youtube.com/watch?v=dkkYmYFrkFY</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V7</span>
-        <span>"Cognitive Bias | Ethics Defined" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=TlOUnOWfw3M" target="_blank" rel="noopener">youtube.com/watch?v=TlOUnOWfw3M</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V8</span>
-        <span>"Cognitive biases in scientific thinking, research, &amp; researchers | Week 2 JDM 2024" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=20NivpZ-k0Q" target="_blank" rel="noopener">youtube.com/watch?v=20NivpZ-k0Q</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V9</span>
-        <span>"Confirmation Bias: Learn to overcome this common cognitive bias" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=rHgn2bRK7ms" target="_blank" rel="noopener">youtube.com/watch?v=rHgn2bRK7ms</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V10</span>
-        <span>"Daniel Kahneman On Cognitive Bias and Systems" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=iVrLsN5zM_A" target="_blank" rel="noopener">youtube.com/watch?v=iVrLsN5zM_A</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V11</span>
-        <span>"Every Cognitive Bias Explained in 10 Minutes" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=m3Nfnp4NAdg" target="_blank" rel="noopener">youtube.com/watch?v=m3Nfnp4NAdg</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V12</span>
-        <span>"Every Cognitive Bias Explained in 17 Minutes" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=AGNSml59F6Y" target="_blank" rel="noopener">youtube.com/watch?v=AGNSml59F6Y</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V13</span>
-        <span>"How I'm fighting bias in algorithms | Joy Buolamwini" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=UG_X_7g63rY" target="_blank" rel="noopener">youtube.com/watch?v=UG_X_7g63rY</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V14</span>
-        <span>"Reducing algorithmic bias in AI | Kumba Sennaar | TEDxBrandeisU" <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=f7oro8hgNZg" target="_blank" rel="noopener">youtube.com/watch?v=f7oro8hgNZg</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">V15</span>
-        <span>"Types of Bias in Research." <span class="yt-badge">YouTube</span> — <a href="https://www.youtube.com/watch?v=UuW3q5_5Ivc" target="_blank" rel="noopener">youtube.com/watch?v=UuW3q5_5Ivc</a></span>
-      </li>
-    </ol>
-  </div>
-
-  <!-- Web Sources (Rin's NotebookLM) -->
-  <div class="surface rounded-xl p-5">
-    <h3 class="font-semibold text-base mb-4 flex items-center gap-2">
-      <i data-lucide="globe" class="w-4 h-4" style="color:var(--accent);"></i>
-      Web Sources <span class="text-xs muted font-normal ml-1">(NotebookLM deep research)</span>
-    </h3>
-    <ol class="sources-list">
-      <li class="source-item">
-        <span class="source-num">W1</span>
-        <span>Community Action Partnership — "8 Strategies to Reduce/Interrupt Implicit Bias." 2018. <a href="https://communityactionpartnership.com/wp-content/uploads/2018/05/CAP8strategies.pdf" target="_blank" rel="noopener">communityactionpartnership.com</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">W2</span>
-        <span>American Academy of Actuaries — "An Actuarial View of Data Bias: Definitions, Impacts, and Considerations." 2023. <a href="https://www.actuary.org/sites/default/files/2023-07/risk_brief_data_bias.pdf" target="_blank" rel="noopener">actuary.org</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">W3</span>
-        <span>Wikipedia contributors — "Cognitive bias." 2026. <a href="https://en.wikipedia.org/wiki/Cognitive_bias" target="_blank" rel="noopener">en.wikipedia.org/wiki/Cognitive_bias</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">W4</span>
-        <span>Multiple authors — "Interventions to Reduce Implicit Bias in High-Stakes Professional Judgements: A Systematic Review." <em>PMC / National Library of Medicine</em>. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12649508/" target="_blank" rel="noopener">pmc.ncbi.nlm.nih.gov</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">W5</span>
-        <span>The Decision Lab — "List of Cognitive Biases and Heuristics." <a href="https://thedecisionlab.com/biases" target="_blank" rel="noopener">thedecisionlab.com/biases</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">W6</span>
-        <span>Liang, W. et al. — "Mitigating Bias in Algorithmic Systems — A Fish-Eye View." arXiv, 2021. <a href="https://arxiv.org/pdf/2103.16953" target="_blank" rel="noopener">arxiv.org/pdf/2103.16953</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">W7</span>
-        <span>Student thesis — "The Manifestation of Affinity Bias in Recruitment and Selection Processes of Dutch Public Organizations." <em>Universiteit Leiden</em>. <a href="https://studenttheses.universiteitleiden.nl/access/item%3A3655725/view" target="_blank" rel="noopener">studenttheses.universiteitleiden.nl</a></span>
-      </li>
-      <li class="source-item">
-        <span class="source-num">W8</span>
-        <span>CPD Online — "Types of Bias | What Are They? Cognitive &amp; Unconscious Bias Differences." <a href="https://cpdonline.co.uk/knowledge-base/safeguarding/types-of-bias/" target="_blank" rel="noopener">cpdonline.co.uk</a></span>
-      </li>
-    </ol>
-  </div>
+  <div id="srcList" class="surface rounded-xl p-5 space-y-2 text-sm"></div>
+  <h3 class="text-base font-medium mt-5 mb-3 muted">แหล่งข้อมูลวิดีโอ</h3>
+  <div id="vidList" class="surface rounded-xl p-5 space-y-2 text-sm"></div>
 </section>
 
 <!-- Footer -->
-<footer style="border-top:1px solid var(--border);margin-top:2rem;padding:2rem 0;">
-  <div class="max-w-6xl mx-auto px-5 flex flex-wrap items-center justify-between gap-4 text-sm muted">
-    <div>
-      Generated by <a href="../../">agent-newsroom</a> on 2026-06-20 ·
-      Template: concept-explorer (deep mode) ·
-      <span>อคติในทุกรูปแบบ</span>
-    </div>
-    <div class="flex items-center gap-4">
-      <button onclick="window.print()" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:0.35rem;color:var(--muted);font-size:0.875rem;" class="hover:text-current">
-        <i data-lucide="printer" class="w-4 h-4"></i> Print
-      </button>
-      <a href="../../" class="flex items-center gap-1.5 muted" style="text-decoration:none;">
-        <i data-lucide="home" class="w-4 h-4"></i> Office
-      </a>
-    </div>
-  </div>
+<footer class="max-w-5xl mx-auto px-6 py-8 text-sm muted text-center" style="border-top:1px solid var(--border);">
+  <p>สร้างโดย agent-newsroom &middot; 21 มิ.ย. 2569 &middot; <a href="../../">กลับหน้าหลัก</a></p>
 </footer>
 
-<!-- ══════════════════════════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════════════════════════ -->
 <script>
-/* ── Bias data ── */
-const BIASES = [
-  { name:"Confirmation Bias", cat:"Cognitive", def:"Seeking and interpreting information to confirm pre-existing beliefs while ignoring contradictions.", example:"Investors ignore warning signs about stocks they already own.", severity:5 },
-  { name:"Availability Heuristic", cat:"Cognitive", def:"Estimating frequency or likelihood by how easily examples come to mind.", example:"Fearing shark attacks more than car crashes after a shark news story — despite cars being far deadlier.", severity:5 },
-  { name:"Anchoring Bias", cat:"Cognitive", def:"Over-relying on the first piece of information encountered when making decisions.", example:"First salary offer anchors the final negotiation outcome regardless of its reasonableness.", severity:4 },
-  { name:"Dunning-Kruger Effect", cat:"Cognitive", def:"Low-competence individuals overestimate their ability; experts underestimate theirs.", example:"Novice investors more confident than experienced fund managers who hedge their bets.", severity:4 },
-  { name:"Loss Aversion", cat:"Cognitive", def:"Losses feel approximately twice as painful as equivalent gains feel pleasurable (Kahneman & Tversky, 1979).", example:"Investors hold losing stocks too long, preferring to avoid a certain loss over seeking an uncertain gain.", severity:5 },
-  { name:"Sunk Cost Fallacy", cat:"Cognitive", def:"Continuing a failing course of action because of past irrecoverable investment.", example:"Staying in a bad movie because you paid for the ticket, wasting more time than just leaving.", severity:4 },
-  { name:"Hindsight Bias", cat:"Cognitive", def:"Perceiving past events as more predictable than they actually were — the 'I knew it all along' effect.", example:"Financial analysts claiming they 'saw the crash coming' after a market collapse they failed to predict.", severity:4 },
-  { name:"Survivorship Bias", cat:"Statistical", def:"Focusing on entities that survived a selection process while ignoring those that did not.", example:"Studying only successful Fortune 500 companies to learn what makes businesses thrive — ignoring the far more numerous failures that used the same strategies.", severity:4 },
-  { name:"Planning Fallacy", cat:"Cognitive", def:"Underestimating time, cost, and risk of future tasks while overestimating benefits.", example:"Most large infrastructure projects (bridges, software, Olympics) run over budget and behind schedule.", severity:3 },
-  { name:"Framing Effect", cat:"Cognitive", def:"Drawing different conclusions based on how identical information is presented.", example:"'95% fat-free' and '5% fat' are the same product — yet consumers prefer the first framing.", severity:4 },
-  { name:"Bandwagon Effect", cat:"Social", def:"Adopting beliefs or behaviors because many other people do — following the crowd.", example:"Investment bubbles: investors buy a rising stock not from analysis but because everyone else is buying.", severity:4 },
-  { name:"Halo Effect", cat:"Social", def:"One positive attribute causes a positive impression across all other, unrelated attributes.", example:"Attractive job candidates are rated as more competent and trustworthy — even by trained interviewers.", severity:5 },
-  { name:"Fundamental Attribution Error", cat:"Social", def:"Overemphasizing character-based explanations for others' behavior while underemphasizing situational factors.", example:"Assuming the slow driver in front of you is reckless, rather than considering they might be lost or ill.", severity:4 },
-  { name:"In-Group Favoritism", cat:"Social", def:"Preferential treatment toward members of one's own social, ethnic, or identity group.", example:"Hiring managers unconsciously favor candidates who share their alma mater, sports team, or cultural background.", severity:5 },
-  { name:"Implicit Bias", cat:"Social", def:"Automatic, unconscious associations that influence perception and behavior toward social groups.", example:"~67% of Project Implicit (Harvard) test-takers show implicit racial bias favoring White people over Black people.", severity:5 },
-  { name:"Stereotyping", cat:"Social", def:"Applying generalized beliefs about a group to individual group members without weighing individual evidence.", example:"Gender stereotypes in professional evaluations: identical orchestral performances rated higher when attributed to men.", severity:4 },
-  { name:"Affinity Bias", cat:"Organizational", def:"Favoring candidates or colleagues who share one's own background, interests, or identity.", example:"Recruiters in public organizations preferentially select candidates with similar cultural or educational backgrounds.", severity:4 },
-  { name:"Groupthink", cat:"Organizational", def:"A group's desire for harmony overrides realistic appraisal of alternatives, suppressing dissent.", example:"Bay of Pigs invasion (1961) and Challenger disaster (1986): warning signals suppressed under social conformity pressure.", severity:3 },
-  { name:"Authority Bias", cat:"Organizational", def:"Over-weighting opinions from authority figures regardless of their evidence base.", example:"Milgram's experiments: ordinary people administered apparent electric shocks simply because a lab-coated authority instructed them.", severity:3 },
-  { name:"Recency Bias", cat:"Cognitive", def:"Weighting recent information more heavily than equally valid older information.", example:"Last candidate interviewed in a hiring process remembered more clearly and rated disproportionately higher.", severity:3 },
-  { name:"Selection Bias", cat:"Statistical", def:"Individuals included in a study are systematically different from those excluded, distorting generalizability.", example:"Online surveys over-represent engaged, educated respondents — findings may not generalize to the broader population.", severity:4 },
-  { name:"Publication Bias", cat:"Statistical", def:"Studies with significant results are far more likely to be published than null or negative results.", example:"Only 36% of 100 landmark psychology studies replicated (Open Science Collaboration, 2015) — inflated by file-drawer null results.", severity:4 },
-  { name:"Sampling Bias", cat:"Statistical", def:"The sample drawn from a population does not represent that population accurately.", example:"1936 Literary Digest poll predicted a landslide for Alf Landon — its 2.4M respondents overrepresented wealthy Republican voters.", severity:3 },
-  { name:"Measurement Bias", cat:"Statistical", def:"Measurement instruments systematically over- or under-measure the true value across groups.", example:"Pulse oximeters calibrated primarily on lighter-skinned patients consistently over-report oxygen saturation in darker-skinned patients.", severity:3 },
-  { name:"Historical Data Bias", cat:"Algorithmic", def:"AI trained on historical data inherits and amplifies existing human inequalities and systemic discrimination.", example:"Amazon's hiring tool, trained on 10 years of predominantly male tech resumes, automatically penalized résumés mentioning 'women's' organizations.", severity:5 },
-  { name:"Representational Bias", cat:"Algorithmic", def:"Training datasets under-represent certain demographic groups, causing poor performance for those groups.", example:"MIT Gender Shades: a facial recognition dataset was 77% male and 83% white, yet claimed 97%+ overall accuracy.", severity:5 },
-  { name:"Feedback Loop Bias", cat:"Algorithmic", def:"Biased AI outputs become new training data, amplifying the original bias over successive model iterations.", example:"Predictive policing algorithm directs more patrols to a neighborhood → more arrests → area appears higher-risk → more patrols.", severity:4 },
-  { name:"Agenda-Setting Bias", cat:"Media", def:"Media determines what topics the public thinks about by choosing which stories receive coverage.", example:"Heavy immigration coverage shifts public priority rankings of immigration as a national concern — regardless of objective importance.", severity:3 },
-  { name:"Filter Bubble", cat:"Media", def:"Algorithmic personalization creates an isolated information universe, reducing exposure to cross-cutting viewpoints.", example:"YouTube recommendation algorithms lead users toward progressively more extreme content within their existing interest cluster.", severity:4 },
-  { name:"False Balance", cat:"Media", def:"Presenting fringe minority positions as equivalent in validity to well-established scientific consensus.", example:"Equal airtime for climate scientists and climate change deniers implies both positions have equal scientific standing — they do not.", severity:3 }
+// ── Scroll progress ──
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── Entrance observer ──
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+}, { threshold: 0.07 });
+document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+
+// ── Animated counter ──
+function animateCounter(el, target, duration, suffix) {
+  const start = performance.now();
+  (function update(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  })(performance.now());
+}
+
+// ── Insight Reel ──
+const insights = [
+  { stat: 151, suffix: '+', statLabel: 'ชนิดอคติทางความคิด', headline: 'อคติมีมากกว่าที่คิด', body: 'นักวิจัยได้จัดหมวดหมู่อคติทางความคิดมากกว่า 151 ชนิด บางการประเมินระบุถึง 175 ชนิด สะท้อนความซับซ้อนของกระบวนการคิดของมนุษย์', color: '#6366F1' },
+  { stat: 67, suffix: '%', statLabel: 'มีอคติเชื้อชาติโดยไม่รู้ตัว', headline: 'อคติซ่อนเร้นอยู่ใต้สำนึก', body: 'ผู้เข้าร่วมการทดสอบ IAT ของ Project Implicit ถึง 67% แสดงอคติเชื้อชาติโดยไม่รู้ตัว และ 75% เชื่อมโยงผู้ชายกับอาชีพการงานมากกว่าผู้หญิง', color: '#8B5CF6' },
+  { stat: 35, suffix: '%', statLabel: 'ข้อผิดพลาด AI สำหรับผู้หญิงผิวคล้ำ', headline: 'AI ไม่ได้เป็นกลางเสมอ', body: 'การศึกษา MIT Gender Shades (2018) พบว่าระบบจดจำใบหน้าเกิดข้อผิดพลาดเพียง 1% สำหรับผู้ชายผิวขาว แต่สูงถึง 35% สำหรับผู้หญิงผิวคล้ำ', color: '#EF4444' },
+  { stat: 2, suffix: '×', statLabel: 'ความเจ็บปวดจากการสูญเสีย', headline: 'Loss Aversion เปลี่ยนการตัดสินใจ', body: 'ความสูญเสียรู้สึกเจ็บปวดประมาณ 2 เท่าของความสุขจากการได้รับสิ่งที่มีค่าเท่ากัน ซึ่งถูกยืนยันในการศึกษา 19 ประเทศ 13 ภาษา', color: '#F59E0B' },
+];
+let reelIdx = 0, reelTimer = null;
+
+function showSlide(idx, animate) {
+  reelIdx = ((idx % insights.length) + insights.length) % insights.length;
+  const ins = insights[reelIdx];
+  const wrap = document.getElementById('reelSlides');
+  const html = `<div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">
+    <div style="text-align:center;min-width:110px;flex-shrink:0;">
+      <div style="font-size:2.8rem;font-weight:800;color:${ins.color};line-height:1;">
+        <span class="reel-stat" data-target="${ins.stat}" data-suffix="${ins.suffix}">0${ins.suffix}</span>
+      </div>
+      <div style="font-size:0.7rem;color:#71717a;margin-top:4px;">${ins.statLabel}</div>
+    </div>
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">${ins.headline}</div>
+      <div style="font-size:0.88rem;color:#71717a;line-height:1.65;">${ins.body}</div>
+    </div>
+  </div>`;
+  if (animate !== false) {
+    wrap.style.transition = 'opacity .35s ease,transform .35s ease';
+    wrap.style.opacity = '0'; wrap.style.transform = 'translateY(8px)';
+    setTimeout(() => {
+      wrap.innerHTML = html; wrap.style.opacity = '1'; wrap.style.transform = 'none';
+      const el = wrap.querySelector('.reel-stat');
+      if (el) animateCounter(el, ins.stat, 1200, ins.suffix);
+    }, 350);
+  } else {
+    wrap.innerHTML = html;
+    const el = wrap.querySelector('.reel-stat');
+    if (el) animateCounter(el, ins.stat, 1200, ins.suffix);
+  }
+  document.querySelectorAll('.reel-dot').forEach((d, i) => {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  requestAnimationFrame(() => { bar.style.transition = 'width 4s linear'; bar.style.width = '100%'; });
+}
+
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;background:#d4d4d8;';
+  d.onclick = () => { clearInterval(reelTimer); showSlide(i, true); reelTimer = setInterval(() => showSlide(reelIdx + 1, true), 4000); };
+  dotsWrap.appendChild(d);
+});
+const reelEl = document.getElementById('reel');
+reelEl.addEventListener('mouseenter', () => clearInterval(reelTimer));
+reelEl.addEventListener('mouseleave', () => { reelTimer = setInterval(() => showSlide(reelIdx + 1, true), 4000); });
+reelEl.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { clearInterval(reelTimer); showSlide(reelIdx + 1, true); reelTimer = setInterval(() => showSlide(reelIdx + 1, true), 4000); }
+  if (e.key === 'ArrowLeft') { clearInterval(reelTimer); showSlide(reelIdx - 1, true); reelTimer = setInterval(() => showSlide(reelIdx + 1, true), 4000); }
+});
+showSlide(0, false);
+reelTimer = setInterval(() => showSlide(reelIdx + 1, true), 4000);
+
+// ── Category Cards ──
+const categories = [
+  {
+    icon: 'brain', title: 'อคติทางความคิด', subtitle: 'Cognitive Bias', color: '#6366F1',
+    bullets: [
+      '<strong>Confirmation Bias</strong> — อคติยืนยันความเชื่อ: ค้นหาแต่ข้อมูลที่สนับสนุนความเชื่อเดิม',
+      '<strong>Availability Heuristic</strong> — ประเมินความเสี่ยงจากสิ่งที่จำได้ง่าย เช่น กลัวฉลามมากกว่ารถยนต์',
+      '<strong>Anchoring Bias</strong> — ยึดติดตัวเลขแรกในการเจรจาต่อรอง'
+    ],
+    tip: 'ชะลอการตัดสินใจ — ตั้งคำถามว่า "อะไรจะทำให้ฉันผิด?"'
+  },
+  {
+    icon: 'users', title: 'อคติทางสังคม', subtitle: 'Social Bias', color: '#8B5CF6',
+    bullets: [
+      '<strong>Implicit Bias</strong> — อคติใต้สำนึก: 67% ของผู้ทำ IAT มีอคติเชื้อชาติโดยไม่รู้ตัว',
+      '<strong>Halo Effect</strong> — ข้อดีหนึ่งอย่างปกคลุมการประเมินทั้งหมด เช่น Lance Armstrong',
+      '<strong>In-Group Favoritism</strong> — เอื้อประโยชน์ต่อคนในกลุ่มเดียวกัน'
+    ],
+    tip: 'ใช้กระบวนการปิดบังตัวตน (Blind Review) เพื่อลดอคติในการคัดเลือก'
+  },
+  {
+    icon: 'bar-chart-2', title: 'อคติทางสถิติ', subtitle: 'Statistical Bias', color: '#10B981',
+    bullets: [
+      '<strong>Selection Bias</strong> — กลุ่มตัวอย่างไม่เป็นตัวแทนประชากร เช่น โพลปี 1936',
+      '<strong>Publication Bias</strong> — งานวิจัยผลไม่มีนัยสำคัญมักไม่ได้รับการตีพิมพ์',
+      '<strong>Survivorship Bias</strong> — มองเฉพาะผู้ประสบความสำเร็จ ละเลยผู้ที่ล้มเหลว'
+    ],
+    tip: 'บันทึกสมมติฐานก่อนเก็บข้อมูล (Pre-registration) ป้องกัน HARKing'
+  },
+  {
+    icon: 'cpu', title: 'อคติทางอัลกอริทึม', subtitle: 'Algorithmic Bias', color: '#EF4444',
+    bullets: [
+      '<strong>Historical Bias</strong> — ข้อมูลฝึก AI สะท้อนความไม่เท่าเทียมในอดีต เช่น Amazon Resume Tool',
+      '<strong>Representational Bias</strong> — ชุดข้อมูลฝึกไม่ครอบคลุมทุกกลุ่มประชากร',
+      '<strong>Feedback Loop</strong> — ผลลัพธ์เอนเอียงสร้างข้อมูลฝึกใหม่ที่เอนเอียงยิ่งขึ้น'
+    ],
+    tip: 'ทำ Algorithmic Impact Assessment และตรวจสอบ AI อย่างสม่ำเสมอ'
+  },
+  {
+    icon: 'radio', title: 'อคติทางสื่อ', subtitle: 'Media Bias', color: '#F59E0B',
+    bullets: [
+      '<strong>Framing Bias</strong> — วิธีนำเสนอเปลี่ยนการตีความ เช่น "ลดไขมัน 95%" vs "ยังมีไขมัน 5%"',
+      '<strong>Filter Bubble</strong> — อัลกอริทึมแสดงแต่เนื้อหาที่ตรงกับความเชื่อเดิม',
+      '<strong>False Balance</strong> — ให้น้ำหนักเท่ากันระหว่างวิทยาศาสตร์และข้อโต้แย้งที่ไม่มีหลักฐาน'
+    ],
+    tip: 'อ่านสื่อหลายแหล่ง รวมถึงแหล่งที่มีมุมมองต่างออกไป'
+  },
+  {
+    icon: 'briefcase', title: 'อคติในองค์กร', subtitle: 'Organizational Bias', color: '#06B6D4',
+    bullets: [
+      '<strong>Affinity Bias</strong> — ชื่นชอบผู้สมัครที่มีภูมิหลังหรือความสนใจคล้ายตัวเอง',
+      '<strong>Groupthink</strong> — กลุ่มกดดันให้เห็นพ้องกัน เช่น Bay of Pigs (1961), Challenger (1986)',
+      '<strong>Recency Bias</strong> — ให้น้ำหนักกับเหตุการณ์ล่าสุดมากเกินไปในการประเมินผล'
+    ],
+    tip: 'ใช้ Structured Interview และกำหนดบทบาท Devil\'s Advocate ในทีม'
+  }
 ];
 
-let activeCat = 'all';
-
-function renderBiases(biases) {
-  const grid = document.getElementById('bias-grid');
-  const count = document.getElementById('bias-count');
-  grid.innerHTML = '';
-  biases.forEach((b, i) => {
-    const catClass = 'cat-' + b.cat.toLowerCase().replace(/[^a-z]/g,'');
-    const sevPct = (b.severity / 5 * 100).toFixed(0);
-    const card = document.createElement('div');
-    card.className = 'bias-card scale-in';
-    card.style.transitionDelay = (i % 9 * 40) + 'ms';
-    card.innerHTML = `
-      <div class="flex items-start justify-between gap-2">
-        <span class="font-semibold text-sm leading-snug">${b.name}</span>
-        <span class="cat-badge ${catClass}" style="white-space:nowrap;">${b.cat}</span>
+const grid = document.getElementById('cardGrid');
+categories.forEach((cat, i) => {
+  const div = document.createElement('div');
+  div.className = 'surface rounded-xl p-5 scale-in card-hover';
+  div.style.transitionDelay = Math.min(i * 60, 400) + 'ms';
+  div.innerHTML = `
+    <div class="flex items-center gap-2 mb-3">
+      <div style="background:${cat.color}22;border-radius:8px;padding:6px;flex-shrink:0;">
+        <i data-lucide="${cat.icon}" style="width:18px;height:18px;color:${cat.color};display:block;"></i>
       </div>
-      <p class="text-xs muted leading-relaxed">${b.def}</p>
-      <div class="text-xs leading-relaxed" style="background:var(--accent-soft);border-radius:0.375rem;padding:0.5rem 0.625rem;">
-        <span style="font-weight:600;color:var(--accent);">Example:</span> ${b.example}
-      </div>
-      <div>
-        <div class="flex items-center justify-between mb-1">
-          <span class="text-xs muted">Prevalence / Impact</span>
-          <span class="text-xs font-medium accent">${['','Low','Low-Med','Moderate','High','Very High'][b.severity]}</span>
-        </div>
-        <div class="severity-bar"><div class="severity-fill" style="width:${sevPct}%;"></div></div>
-      </div>`;
-    grid.appendChild(card);
-  });
-  count.textContent = `Showing ${biases.length} of ${BIASES.length} biases`;
-  // Re-trigger scale-in for newly added cards
-  requestAnimationFrame(() => {
-    grid.querySelectorAll('.scale-in').forEach(el => el.classList.add('visible'));
-  });
-}
-
-function filterBiases() {
-  const q = document.getElementById('bias-search').value.toLowerCase();
-  let filtered = BIASES;
-  if (activeCat !== 'all') filtered = filtered.filter(b => b.cat === activeCat);
-  if (q) filtered = filtered.filter(b =>
-    b.name.toLowerCase().includes(q) ||
-    b.def.toLowerCase().includes(q) ||
-    b.example.toLowerCase().includes(q)
-  );
-  renderBiases(filtered);
-}
-
-function setCatFilter(btn, cat) {
-  activeCat = cat;
-  document.querySelectorAll('#cat-filters .filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  filterBiases();
-}
-
-renderBiases(BIASES);
-
-/* ── Category Tabs ── */
-function switchTab(idx) {
-  const btns = document.querySelectorAll('#cat-tabs .tab-btn');
-  const panels = document.querySelectorAll('#cat-panels .tab-panel');
-  btns.forEach((b, i) => b.classList.toggle('active', i === idx));
-  panels.forEach((p, i) => p.classList.toggle('active', i === idx));
-}
-
-/* ── Insight Reel ── */
-let currentSlide = 0;
-const slides = document.querySelectorAll('.reel-slide');
-const dots = document.querySelectorAll('.reel-dot');
-let reelTimer;
-
-/* Stat counter animation — reduced-motion gated */
-function animateCounter(el) {
-  const target = parseFloat(el.dataset.counter);
-  const suffix = el.dataset.suffix || '';
-  const isInt = Number.isInteger(target);
-  const duration = 900;
-  const startTime = performance.now();
-  function step(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 4); // easeOutQuart
-    const current = target * eased;
-    el.textContent = (isInt ? Math.round(current) : current.toFixed(1)) + suffix;
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-function runCounters(slideEl) {
-  if (!window.matchMedia('(prefers-reduced-motion: no-preference)').matches) return;
-  slideEl.querySelectorAll('[data-counter]').forEach(animateCounter);
-  slideEl.querySelectorAll('[data-counter-text]').forEach(el => {
-    el.textContent = el.dataset.counterText;
-  });
-}
-
-function goSlide(idx) {
-  slides[currentSlide].classList.remove('active');
-  dots[currentSlide].classList.remove('active');
-  currentSlide = (idx + slides.length) % slides.length;
-  slides[currentSlide].classList.add('active');
-  dots[currentSlide].classList.add('active');
-  runCounters(slides[currentSlide]);
-  resetTimer();
-}
-
-function nextSlide() { goSlide(currentSlide + 1); }
-function prevSlide() { goSlide(currentSlide - 1); }
-
-function resetTimer() {
-  clearInterval(reelTimer);
-  reelTimer = setInterval(nextSlide, 4500);
-}
-
-resetTimer();
-
-/* ── Scroll progress ── */
-window.addEventListener('scroll', () => {
-  const el = document.getElementById('progress-bar');
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  el.style.width = pct + '%';
-}, { passive: true });
-
-/* ── Intersection Observer for animations ── */
-const mo = window.matchMedia('(prefers-reduced-motion: no-preference)');
-if (mo.matches) {
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        obs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(el => obs.observe(el));
-}
-
-/* ── Chart.js ── */
-const chartDefaults = {
-  animation: { duration: 900, easing: 'easeOutQuart' },
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
-    legend: { labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text') || '#18181b', font: { family: 'Inter', size: 12 } } },
-    tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y}%` } }
-  },
-  scales: {
-    x: { ticks: { color: '#71717a', font: { size: 11 } }, grid: { color: 'rgba(100,100,100,0.1)' } },
-    y: { beginAtZero: true, max: 55, ticks: { color: '#71717a', font: { size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(100,100,100,0.1)' } }
-  }
-};
-
-// COMPAS
-new Chart(document.getElementById('chart-compas'), {
-  type: 'bar',
-  data: {
-    labels: ['Did Not Reoffend'],
-    datasets: [
-      { label: 'Black Defendants', data: [44.9], backgroundColor: '#6366F1', borderRadius: 6, borderSkipped: false },
-      { label: 'White Defendants', data: [23.5], backgroundColor: '#A5B4FC', borderRadius: 6, borderSkipped: false }
-    ]
-  },
-  options: { ...chartDefaults,
-    scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, max: 60 } },
-    plugins: { ...chartDefaults.plugins, legend: { ...chartDefaults.plugins.legend, position: 'top' },
-      tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}% false positive rate` } }
-    }
-  }
+      <div><div class="font-semibold text-sm">${cat.title}</div><div class="text-xs muted">${cat.subtitle}</div></div>
+    </div>
+    <ul class="text-xs space-y-2 mb-3">${cat.bullets.map(b => `<li style="display:flex;gap:6px;"><span style="color:${cat.color};flex-shrink:0;">•</span><span>${b}</span></li>`).join('')}</ul>
+    <div class="text-xs rounded-lg p-2" style="background:${cat.color}11;color:${cat.color};">💡 ${cat.tip}</div>`;
+  grid.appendChild(div);
+  io.observe(div);
 });
 
-// Gender Shades — only the two rates documented in research.md/summary.md
-new Chart(document.getElementById('chart-gendershades'), {
-  type: 'bar',
-  data: {
-    labels: ['Light-Skinned Men', 'Dark-Skinned Women'],
-    datasets: [{
-      label: 'Error Rate (%)',
-      data: [1, 34.7],
-      backgroundColor: ['#86EFAC', '#EF4444'],
-      borderRadius: 6,
-      borderSkipped: false
-    }]
-  },
-  options: { ...chartDefaults,
-    scales: { ...chartDefaults.scales, y: { ...chartDefaults.scales.y, max: 40 } },
-    plugins: { ...chartDefaults.plugins, legend: { display: false },
-      tooltip: { callbacks: { label: ctx => ` Error rate: ${ctx.parsed.y}%` } }
-    }
-  }
-});
-
-// Replication crisis — doughnut
-new Chart(document.getElementById('chart-replication'), {
+// ── Chart.js doughnut ──
+new Chart(document.getElementById('biasChart'), {
   type: 'doughnut',
   data: {
-    labels: ['Successfully Replicated', 'Failed to Replicate'],
+    labels: ['ความคิด','สังคม','สถิติ','อัลกอริทึม','สื่อ','องค์กร'],
     datasets: [{
-      data: [36, 64],
-      backgroundColor: ['#6366F1', '#E4E4E7'],
-      borderWidth: 0,
-      hoverOffset: 6
+      data: [40, 20, 15, 10, 10, 5],
+      backgroundColor: ['#6366F1','#8B5CF6','#10B981','#EF4444','#F59E0B','#06B6D4'],
+      borderWidth: 0
     }]
   },
   options: {
     animation: { duration: 900, easing: 'easeOutQuart' },
-    responsive: true,
-    maintainAspectRatio: false,
-    cutout: '68%',
     plugins: {
-      legend: { position: 'bottom', labels: { color: '#71717a', font: { size: 11 }, boxWidth: 12 } },
-      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` } }
+      legend: { position: 'bottom', labels: { font: { size: 11 }, color: '#71717a', padding: 12 } }
     }
   }
 });
 
-/* ── Initialize Lucide icons ── */
+// ── Sources ──
+const webSrcs = [
+  { id: 1, title: 'Judgement Under Uncertainty: Heuristics and Biases', authors: 'Tversky & Kahneman', pub: 'Science', year: 1974, url: 'https://www.science.org/doi/10.1126/science.185.4157.1124' },
+  { id: 2, title: 'Cognitive Biases (2026): Complete List of 151+ Biases', authors: 'de Backer', pub: 'gustdebacker.com', year: 2026, url: 'https://gustdebacker.com/cognitive-biases/' },
+  { id: 3, title: 'Thinking, Fast and Slow', authors: 'Daniel Kahneman', pub: 'Farrar, Straus and Giroux', year: 2011, url: 'https://us.macmillan.com/books/9780374533557/thinkingfastandslow' },
+  { id: 4, title: 'Debiasing: How to Reduce Cognitive Biases', authors: 'Effectiviology', pub: 'effectiviology.com', year: 2023, url: 'https://effectiviology.com/cognitive-debiasing-how-to-debias/' },
+  { id: 5, title: 'Project Implicit: Implicit Association Test', authors: 'Harvard University', pub: 'implicit.harvard.edu', year: 2023, url: 'https://implicit.harvard.edu/implicit/' },
+  { id: 6, title: 'Gender Shades: Intersectional Accuracy Disparities in Commercial Gender Classification', authors: 'Buolamwini & Gebru', pub: 'MIT Media Lab / PMLR', year: 2018, url: 'http://proceedings.mlr.press/v81/buolamwini18a.html' },
+  { id: 7, title: 'Machine Bias — Risk Assessments in Criminal Sentencing', authors: 'Angwin et al.', pub: 'ProPublica', year: 2016, url: 'https://www.propublica.org/article/machine-bias-risk-assessments-in-criminal-sentencing' },
+  { id: 8, title: 'Algorithmic Bias: Review of Documented Cases', authors: 'Multiple researchers', pub: 'Algorithm Watch', year: 2023, url: 'https://algorithmwatch.org/' },
+  { id: 10, title: 'Publication Bias and the File Drawer Problem', authors: 'Rosenthal', pub: 'Psychological Bulletin', year: 1979, url: 'https://doi.org/10.1037/0033-2909.86.3.638' },
+  { id: 12, title: 'Orchestrating Impartiality: The Impact of Blind Auditions on Female Musicians', authors: 'Goldin & Rouse', pub: 'American Economic Review', year: 2000, url: 'https://www.aeaweb.org/articles?id=10.1257/aer.90.4.715' },
+];
+const vidSrcs = [
+  { title: '(Almost) Every Type of Cognitive Bias Explained', url: 'https://www.youtube.com/watch?v=2bIVmWxRmdI' },
+  { title: '12 Cognitive Biases Explained — How to Think Better and More Logically', url: 'https://www.youtube.com/watch?v=wEwGBIr_RIw' },
+  { title: '12 Cognitive Biases and How to Overcome Them with Critical Thinking', url: 'https://www.youtube.com/watch?v=d2f2hsQ_JyM' },
+];
+const srcEl = document.getElementById('srcList');
+webSrcs.forEach(s => {
+  const d = document.createElement('div');
+  d.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
+  d.innerHTML = `<span style="font-family:monospace;font-size:0.75rem;color:#71717a;min-width:28px;">[${s.id}]</span><span><a href="${s.url}" target="_blank" rel="noopener">${s.title}</a> — ${s.authors}. <em>${s.pub}</em>, ${s.year}.</span>`;
+  srcEl.appendChild(d);
+});
+const vidEl = document.getElementById('vidList');
+vidSrcs.forEach(s => {
+  const d = document.createElement('div');
+  d.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
+  d.innerHTML = `<span style="font-size:0.75rem;color:#71717a;flex-shrink:0;">▶</span><a href="${s.url}" target="_blank" rel="noopener">${s.title}</a>`;
+  vidEl.appendChild(d);
+});
+
+// ── Init Lucide icons ──
 lucide.createIcons();
 </script>
 </body>

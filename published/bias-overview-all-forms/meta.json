@@ -1,9 +1,9 @@
 {
   "slug": "bias-overview-all-forms",
-  "title": "Bias: A Complete Guide",
-  "subtitle": "An interactive exploration of cognitive, social, statistical, algorithmic, and media biases with real-world examples and debiasing strategies",
+  "title": "อคติ: ภาพรวมครบทุกรูปแบบ",
+  "subtitle": "อคติทางความคิด สังคม สถิติ อัลกอริทึม สื่อ และองค์กร — พร้อมตัวอย่างจริงและกลยุทธ์ลดอคติเชิงหลักฐาน",
   "template": "concept-explorer",
   "mode": "deep",
-  "date": "2026-06-20",
-  "tags": ["psychology", "cognitive-bias", "ai-bias", "critical-thinking", "decision-making"]
+  "date": "2026-06-21",
+  "tags": ["อคติ", "จิตวิทยา", "ai-bias", "การตัดสินใจ", "ความคิดเชิงวิพากษ์", "thai"]
 }
