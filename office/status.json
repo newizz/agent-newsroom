@@ -1,15 +1,15 @@
 {
-  "currentRun": "bias-overview-all-forms",
-  "currentSlug": "bias-overview-all-forms",
-  "currentMode": "deep",
-  "lastUpdate": "2026-06-20T03:58:45Z",
+  "currentRun": null,
+  "currentSlug": null,
+  "currentMode": null,
+  "lastUpdate": "2026-06-20T22:58:21Z",
   "agents": [
     {
       "id": "intake",
       "name": "Iris",
       "role": "Intake Specialist",
       "emoji": "🎙️",
-      "status": "idle",
+      "status": "offline",
       "task": ""
     },
     {
@@ -17,7 +17,7 @@
       "name": "Ravi",
       "role": "Research Analyst",
       "emoji": "🔍",
-      "status": "idle",
+      "status": "offline",
       "task": ""
     },
     {
@@ -25,7 +25,7 @@
       "name": "Rin",
       "role": "Deep Researcher",
       "emoji": "🧬",
-      "status": "idle",
+      "status": "offline",
       "task": ""
     },
     {
@@ -34,7 +34,7 @@
       "role": "Dashboard Builder",
       "emoji": "🎨",
       "status": "busy",
-      "task": "Building interactive dashboard"
+      "task": "Building Thai dashboard for skills-21st-century"
     },
     {
       "id": "reporter",

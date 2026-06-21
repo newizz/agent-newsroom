@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทักษะแห่งศตวรรษที่ 21 — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', -apple-system, 'Segoe UI', Tahoma, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .card { background: #131316 !important; border-color: #27272a !important; }
+    .skill-card .skill-detail { border-top-color: #27272a !important; }
+    dd { color: #a1a1aa !important; }
+    table td, table th { border-color: #27272a !important; }
+    .tab-row { border-color: #27272a !important; }
+    .tab-btn { border-color: #27272a !important; }
+  }
+  .surface { background: #ffffff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .card { padding: 1.5rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,.13); }
+  dl { display: grid; gap: 1em; }
+  dt { font-weight: 600; }
+  dd { margin-left: 0; color: #71717a; line-height: 1.6; }
+  .prose-content p { margin-bottom: 1em; line-height: 1.8; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.8; }
+  sup a { font-size: 0.7em; color: var(--accent); }
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .55s ease, transform .55s ease; }
+    .scale-in  { opacity: 0; transform: scale(0.93); transition: opacity .45s ease, transform .45s ease; }
+    .visible   { opacity: 1 !important; transform: none !important; }
+  }
+  .tab-btn { transition: background .2s, color .2s; }
+  .tab-btn.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .skill-card { cursor: pointer; }
+  .skill-card .skill-detail { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e4e4e7; }
+  .skill-card.open .skill-detail { display: block; }
+  @media print {
+    nav, footer button { display: none; }
+    .surface { border: 1px solid #ccc; box-shadow: none; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Scroll progress bar -->
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Header -->
+<header style="border-bottom:1px solid #e4e4e7;">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      กลับหน้าหลัก
+    </a>
+    <div class="text-xs muted">skills-21st-century · 2026-06-21</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-12">
+  <div class="flex flex-wrap gap-2 mb-4">
+    <span class="bg-accent-soft accent text-xs font-medium px-2 py-1 rounded-md">Concept Explainer</span>
+    <span class="bg-accent-soft accent text-xs font-medium px-2 py-1 rounded-md">การวิจัยเชิงลึก</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">ทักษะแห่งศตวรรษที่ 21</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">กรอบทักษะจาก P21, OECD, WEF 2025 และ UNESCO ยืนยันตรงกัน: Analytical Thinking, AI Literacy, ความคิดสร้างสรรค์ และ EQ คือทักษะที่มนุษย์ต้องมีในยุคที่ 39% ของทักษะจะล้าสมัยภายในปี 2030</p>
+</section>
+
+<!-- TOC / สารบัญ -->
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-4">
+    <div class="text-xs font-semibold accent uppercase tracking-wide mb-2">สารบัญ</div>
+    <div class="flex flex-wrap gap-1">
+      <a href="#infographic" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ภาพรวม</a>
+      <a href="#mindmap" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แผนที่ความคิด</a>
+      <a href="#overview" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">บริบท</a>
+      <a href="#findings" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ผลการค้นพบสำคัญ</a>
+      <a href="#frameworks" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">กรอบหลัก</a>
+      <a href="#skills" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ทักษะสำคัญ</a>
+      <a href="#data" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ข้อมูล</a>
+      <a href="#ai" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ยุค AI</a>
+      <a href="#develop" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">วิธีพัฒนา</a>
+      <a href="#thailand" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">บริบทไทย</a>
+      <a href="#examples" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ตัวอย่าง</a>
+      <a href="#glossary" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">อภิธานศัพท์</a>
+      <a href="#sources" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แหล่งข้อมูล</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── Deep mode A: Visual Overview ─── -->
+<section id="infographic" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="image" class="w-5 h-5 accent"></i> ภาพรวม
+  </h2>
+  <div class="surface rounded-xl overflow-hidden scale-in">
+    <img src="infographic.png" alt="Visual overview generated by NotebookLM" class="w-full h-auto block"/>
+  </div>
+  <div class="text-xs muted mt-2">สร้างโดย NotebookLM ระหว่างการวิจัยเชิงลึก</div>
+</section>
+
+<!-- ─── Deep mode B: Mind Map ─── -->
+<section id="mindmap" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="brain" class="w-5 h-5 accent"></i> แผนที่ความคิด
+  </h2>
+  <div class="surface rounded-xl p-4" style="height:520px;">
+    <div class="markmap" style="width:100%;height:100%;">
+      <script type="text/template">
+# ทักษะแห่งศตวรรษที่ 21
+
+## TL;DR
+- กรอบหลัก P21, OECD, WEF, UNESCO เน้นทักษะกลุ่มเดียวกัน
+- 39% ของทักษะจะล้าสมัยภายในปี 2030
+
+## ผลการค้นพบสำคัญ
+- Analytical Thinking อันดับ 1 (WEF 2025)
+- AI Literacy ทักษะที่ต้องการมากที่สุด (LinkedIn 2025)
+- SEL ROI: $11 ต่อทุก $1 ลงทุน
+- ไทย PISA 2022 ต่ำกว่า OECD ทุกวิชา
+- Meta-skills คือรากฐานของทุกทักษะ
+
+## กรอบทักษะหลัก
+### P21 / 4Cs (2007)
+- Critical Thinking
+- Communication
+- Collaboration
+- Creativity
+### OECD Learning Compass 2030
+- Transformative Competencies
+- Student Agency
+### WEF Future of Jobs 2025
+- Analytical Thinking อันดับ 1
+- AI and Big Data เติบโตเร็วสุด
+### UNESCO Delors (1996)
+- Learning to Know
+- Learning to Do
+- Learning to Live Together
+- Learning to Be
+
+## หมวดทักษะสำคัญ
+### การเรียนรู้และนวัตกรรม
+- Critical Thinking
+- Creativity and Innovation
+- Problem-Solving
+### ดิจิทัลและเทคโนโลยี
+- Digital Literacy 7 องค์ประกอบ
+- AI Literacy
+- Media Literacy
+### สังคมและอารมณ์ SEL
+- CASEL 5 Competencies
+- Emotional Intelligence EQ
+- Resilience and Adaptability
+### Meta-Skills
+- Growth Mindset (Carol Dweck)
+- Metacognition
+- Learning Agility
+
+## ข้อมูลสำคัญ
+- 39% ทักษะล้าสมัยภายใน 2030 (WEF)
+- 57% ชั่วโมงงาน US automate ได้ (McKinsey)
+- SEL +11 percentile; ROI $11 ต่อ $1
+- AI Fluency เพิ่ม 7x ใน 2 ปี (McKinsey)
+- ไทย PISA คณิต 394 (OECD avg 472)
+
+## แหล่งข้อมูล
+- WEF Future of Jobs 2025
+- CASEL Meta-analysis 2023
+- OECD PISA 2022
+- LinkedIn Workplace Learning 2025
+- McKinsey Skill Shift Report
+      </script>
+    </div>
+  </div>
+  <div class="text-xs muted mt-2">แผนที่ความคิดสร้างจากการสังเคราะห์งานวิจัย (NotebookLM ไม่มีแผนที่ความคิดสำหรับรอบนี้)</div>
+</section>
+
+<!-- ─── Deep mode C: Deep Synthesis Callout ─── -->
+<aside class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="rounded-xl p-5 border-l-4 fade-up" style="border-left-color:var(--accent);background:var(--accent-soft);">
+    <div class="text-xs font-medium accent mb-2">🔬 การวิจัยเชิงลึก — สังเคราะห์จาก 22 แหล่งข้อมูลผ่าน NotebookLM</div>
+    <p class="text-sm leading-relaxed">Essential 21st-century skills are broadly categorized into learning, literacy, and life skills designed to help individuals thrive in the information age. The foundational <strong style="color:var(--accent);">"Four Cs"</strong>—critical thinking, creativity, collaboration, and communication—are core learning skills that empower people to solve problems and innovate in a modern work environment. <strong style="color:var(--accent);">Literacy skills</strong> (IMT) include information, media, and technology literacy, essential for discerning facts from misinformation and mastering the machines that drive the digital economy. <strong style="color:var(--accent);">Life skills</strong> (FLIPS) focus on personal and professional qualities such as flexibility, leadership, initiative, productivity, and social skills. Additionally, <strong style="color:var(--accent);">emotional intelligence (EQ)</strong>—comprising self-awareness, self-regulation, motivation, empathy, and social skills—is increasingly viewed as a "workplace superpower" for building trust and managing team dynamics.</p>
+  </div>
+</aside>
+
+<!-- ─── Insight Reel ─── -->
+<section class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="surface rounded-2xl overflow-hidden" id="reel" tabindex="0">
+    <div id="reelSlides" style="position:relative;min-height:180px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- ─── Background & Context ─── -->
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> บริบทและความเป็นมา
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content fade-up">
+    <p>ปลายศตวรรษที่ 20 โลกเริ่มตระหนักว่าการศึกษาแบบ "3Rs" (Reading, wRiting, aRithmetic) ไม่เพียงพอสำหรับโลกที่เปลี่ยนแปลงเร็วขึ้น นำไปสู่การพัฒนากรอบทักษะใหม่จากองค์กรระดับโลกหลายแห่ง ทักษะศตวรรษที่ 21 ไม่ได้แยกขาดจากทักษะพื้นฐาน (literacy, numeracy) แต่ต้องถูกสร้างบนรากฐานเหล่านั้น และเชื่อมโยงกับบริบทโลกที่เปลี่ยนแปลงตลอดเวลา</p>
+    <p><strong>เส้นทางสำคัญของกรอบทักษะศตวรรษที่ 21:</strong></p>
+    <ul>
+      <li><strong>1996</strong> — UNESCO เผยแพร่ "Delors Report" เสนอ 4 Pillars of Education: Learning to Know, Learning to Do, Learning to Live Together, Learning to Be<sup><a href="#source-14">[14]</a></sup></li>
+      <li><strong>2007</strong> — P21 (Partnership for 21st Century Learning) เสนอกรอบ 4Cs ในสหรัฐอเมริกา<sup><a href="#source-1">[1]</a></sup></li>
+      <li><strong>2019</strong> — OECD เปิดตัว Learning Compass 2030 ในงาน Vancouver เน้น Student Agency และ Transformative Competencies<sup><a href="#source-15">[15]</a></sup></li>
+      <li><strong>2025</strong> — WEF เผยแพร่ Future of Jobs Report 2025 สะท้อนผลกระทบของ AI ต่อทักษะและอาชีพ<sup><a href="#source-3">[3]</a></sup></li>
+    </ul>
+    <p>รายงาน WEF Future of Jobs 2025 ระบุว่า <strong>39%</strong> ของทักษะที่คนทำงานมีจะล้าสมัยภายในปี 2030<sup><a href="#source-5">[5]</a></sup> และ AI Literacy กลายเป็นทักษะที่มีความต้องการสูงสุดตาม LinkedIn Workplace Learning Report 2025<sup><a href="#source-11">[11]</a></sup> ขณะที่ McKinsey ระบุว่า 57% ของชั่วโมงทำงานในสหรัฐฯ สามารถ automate ได้ด้วยเทคโนโลยีปัจจุบัน<sup><a href="#source-10">[10]</a></sup></p>
+  </div>
+</section>
+
+<!-- ─── Key Findings ─── -->
+<section id="findings" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="star" class="w-5 h-5 accent"></i> ผลการค้นพบสำคัญ
+  </h2>
+  <div class="grid gap-4" id="findings-grid"></div>
+</section>
+
+<!-- ─── Frameworks ─── -->
+<section id="frameworks" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="layers" class="w-5 h-5 accent"></i> กรอบทักษะหลัก
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4 mb-8" id="frameworks-grid"></div>
+  <!-- Comparison table -->
+  <div class="surface rounded-xl overflow-hidden fade-up">
+    <div class="p-4 border-b border-soft">
+      <h3 class="font-semibold">การเปรียบเทียบกรอบทักษะหลัก</h3>
+      <p class="text-xs muted mt-1">แหล่งข้อมูล: <sup><a href="#source-1">[1]</a></sup><sup><a href="#source-3">[3]</a></sup><sup><a href="#source-14">[14]</a></sup><sup><a href="#source-15">[15]</a></sup></p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-accent-soft">
+            <th class="text-left p-3 font-semibold">ทักษะ</th>
+            <th class="text-center p-3 font-semibold">P21 (4Cs)</th>
+            <th class="text-center p-3 font-semibold">OECD 2030</th>
+            <th class="text-center p-3 font-semibold">WEF 2025</th>
+            <th class="text-center p-3 font-semibold">UNESCO</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-top:1px solid #e4e4e7;"><td class="p-3">Critical / Analytical Thinking</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓ #1</td><td class="text-center p-3 accent font-bold">✓</td></tr>
+          <tr style="border-top:1px solid #e4e4e7;"><td class="p-3">Creativity</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓ #4</td><td class="text-center p-3 accent font-bold">✓</td></tr>
+          <tr style="border-top:1px solid #e4e4e7;"><td class="p-3">Communication</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓ #7</td><td class="text-center p-3 accent font-bold">✓</td></tr>
+          <tr style="border-top:1px solid #e4e4e7;"><td class="p-3">Collaboration</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓ #3</td><td class="text-center p-3 accent font-bold">✓</td></tr>
+          <tr style="border-top:1px solid #e4e4e7;"><td class="p-3">Digital / Tech Literacy</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓ #6</td><td class="text-center p-3 accent font-bold">✓</td></tr>
+          <tr style="border-top:1px solid #e4e4e7;"><td class="p-3">SEL / EQ</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓ #7</td><td class="text-center p-3 accent font-bold">✓</td></tr>
+          <tr style="border-top:1px solid #e4e4e7;"><td class="p-3">Meta-learning / Lifelong Learning</td><td class="text-center p-3 muted">—</td><td class="text-center p-3 accent font-bold">✓</td><td class="text-center p-3 accent font-bold">✓ #8</td><td class="text-center p-3 accent font-bold">✓</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Skill Categories ─── -->
+<section id="skills" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="grid-3x3" class="w-5 h-5 accent"></i> ทักษะสำคัญแห่งศตวรรษที่ 21
+  </h2>
+  <p class="muted text-sm mb-6 fade-up">คลิกที่การ์ดเพื่อดูรายละเอียด นิยาม และวิธีพัฒนา</p>
+  <div class="grid md:grid-cols-2 gap-4" id="skills-grid"></div>
+</section>
+
+<!-- ─── Employer Data ─── -->
+<section id="data" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="bar-chart-2" class="w-5 h-5 accent"></i> ข้อมูลความต้องการของนายจ้าง
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-1 text-sm">WEF Top 10 Core Skills 2025</h3>
+      <p class="text-xs muted mb-4">แหล่งข้อมูล: WEF Future of Jobs 2025<sup><a href="#source-3">[3]</a></sup><sup><a href="#source-4">[4]</a></sup></p>
+      <canvas id="wefChart"></canvas>
+    </div>
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-1 text-sm">WEF Fastest Growing Skills 2025</h3>
+      <p class="text-xs muted mb-4">แหล่งข้อมูล: WEF Future of Jobs 2025<sup><a href="#source-4">[4]</a></sup></p>
+      <canvas id="wefGrowthChart"></canvas>
+    </div>
+  </div>
+  <!-- Key stat badges -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="stats-grid"></div>
+</section>
+
+<!-- ─── AI Era ─── -->
+<section id="ai" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="cpu" class="w-5 h-5 accent"></i> AI กับทักษะมนุษย์
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-4" style="color:#10B981;">🟢 ทักษะที่ AI ยังทำแทนได้ยาก (Human Edge)</h3>
+      <div id="human-edge-list"></div>
+    </div>
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-4" style="color:#EF4444;">🔴 ทักษะ/งานที่ AI กำลังทดแทน (Automation Risk)</h3>
+      <div id="automation-risk-list"></div>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-6 fade-up">
+    <h3 class="font-semibold mb-4 accent">⚡ ทักษะที่ยิ่งสำคัญขึ้นเพราะ AI</h3>
+    <div id="ai-boosted-list" class="grid md:grid-cols-3 gap-3"></div>
+    <p class="text-xs muted mt-4">McKinsey: ความต้องการ "AI Fluency" เพิ่ม <strong>7 เท่า</strong> ในสองปี เร็วกว่าทักษะอื่นๆ<sup><a href="#source-10">[10]</a></sup></p>
+  </div>
+</section>
+
+<!-- ─── Development Strategies ─── -->
+<section id="develop" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="compass" class="w-5 h-5 accent"></i> วิธีพัฒนาทักษะ
+  </h2>
+  <div class="surface rounded-xl overflow-hidden fade-up">
+    <div class="flex tab-row" style="border-bottom:1px solid #e4e4e7;">
+      <button class="tab-btn active px-5 py-3 text-sm flex-1" data-tab="school">🏫 ในโรงเรียน</button>
+      <button class="tab-btn px-5 py-3 text-sm flex-1" data-tab="work" style="border-left:1px solid #e4e4e7;">💼 ที่ทำงาน</button>
+      <button class="tab-btn px-5 py-3 text-sm flex-1" data-tab="self" style="border-left:1px solid #e4e4e7;">📚 พัฒนาตนเอง</button>
+    </div>
+    <div class="p-6">
+      <div class="tab-content active" id="tab-school">
+        <div class="grid md:grid-cols-2 gap-3" id="dev-school-grid"></div>
+      </div>
+      <div class="tab-content" id="tab-work">
+        <div class="grid md:grid-cols-2 gap-3" id="dev-work-grid"></div>
+      </div>
+      <div class="tab-content" id="tab-self">
+        <div class="grid md:grid-cols-2 gap-3" id="dev-self-grid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Thailand Context ─── -->
+<section id="thailand" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="flag" class="w-5 h-5 accent"></i> บริบทไทย
+  </h2>
+  <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="surface rounded-xl p-5 text-center scale-in card-hover">
+      <div class="text-xs muted mb-1">คณิตศาสตร์ (เฉลี่ย OECD: 472)</div>
+      <div class="text-4xl font-bold accent" data-target="394" data-suffix="">394</div>
+      <div class="text-xs muted mt-1">PISA 2022 · อันดับ 58/81<sup><a href="#source-8">[8]</a></sup></div>
+    </div>
+    <div class="surface rounded-xl p-5 text-center scale-in card-hover">
+      <div class="text-xs muted mb-1">การอ่าน (เฉลี่ย OECD: 476)</div>
+      <div class="text-4xl font-bold accent" data-target="379" data-suffix="">379</div>
+      <div class="text-xs muted mt-1">PISA 2022 · อันดับ 64/81<sup><a href="#source-8">[8]</a></sup></div>
+    </div>
+    <div class="surface rounded-xl p-5 text-center scale-in card-hover">
+      <div class="text-xs muted mb-1">วิทยาศาสตร์ (เฉลี่ย OECD: 485)</div>
+      <div class="text-4xl font-bold accent" data-target="409" data-suffix="">409</div>
+      <div class="text-xs muted mt-1">PISA 2022 · อันดับ 58/81<sup><a href="#source-8">[8]</a></sup></div>
+    </div>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-3" style="color:#EF4444;">⚠️ ความท้าทายหลัก</h3>
+      <ul class="space-y-2 text-sm leading-relaxed">
+        <li>• มีเพียง <strong>32%</strong> ของนักเรียนไทยที่ถึง Baseline Proficiency ในคณิตศาสตร์ (เทียบ OECD 69%)<sup><a href="#source-8">[8]</a></sup></li>
+        <li>• การสอนยังเน้น rote learning มากกว่า critical thinking</li>
+        <li>• ขาดแคลนครูที่ได้รับการฝึกอบรม 21st-century pedagogy</li>
+        <li>• ความเหลื่อมล้ำระหว่างโรงเรียนในเมืองและชนบท</li>
+        <li>• UNICEF ระบุว่าระบบการศึกษาไทย "ต้องการการปฏิรูปอย่างเร่งด่วน"<sup><a href="#source-21">[21]</a></sup></li>
+      </ul>
+    </div>
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-3" style="color:#10B981;">✅ ความหวังและการปฏิรูป</h3>
+      <ul class="space-y-2 text-sm leading-relaxed">
+        <li>• กระทรวงศึกษาฯ กำหนด 5 สมรรถนะหลัก: การสื่อสาร การคิด การแก้ปัญหา ทักษะชีวิต และเทคโนโลยี<sup><a href="#source-19">[19]</a></sup></li>
+        <li>• EEF (กองทุนเพื่อความเสมอภาคทางการศึกษา) ขยาย PISA-Based Test for Schools</li>
+        <li>• Education Sandbox ทดลองรูปแบบการเรียนรู้ใหม่<sup><a href="#source-22">[22]</a></sup></li>
+        <li>• โรงเรียนเอกชนและนานาชาตินำ PBL และ Design Thinking มาใช้แล้ว</li>
+        <li>• ปฏิรูปหลักสูตร 6 ด้าน: Life Skills, STEM, Language, Media Skills, Society, ASEAN<sup><a href="#source-20">[20]</a></sup></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Examples ─── -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> ตัวอย่างในชีวิตจริง
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4" id="examples-grid"></div>
+</section>
+
+<!-- ─── Glossary ─── -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> อภิธานศัพท์
+  </h2>
+  <div class="surface rounded-xl p-8 fade-up">
+    <div class="grid md:grid-cols-2 gap-x-8 gap-y-4" id="glossary-grid"></div>
+  </div>
+</section>
+
+<!-- ─── Sources ─── -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> แหล่งข้อมูล
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm fade-up">
+    <h3 class="font-semibold mb-4 accent">บทความและเว็บไซต์</h3>
+    <ol class="space-y-2 leading-relaxed">
+      <li id="source-1"><span class="font-mono text-xs muted mr-2">1.</span>P21 Framework for 21st Century Learning — Battelle for Kids / P21 (<a href="https://www.battelleforkids.org/wp-content/uploads/2023/11/P21_framework_0816_2pgs.pdf" target="_blank" rel="noopener">ลิงก์</a>) · 2007</li>
+      <li id="source-2"><span class="font-mono text-xs muted mr-2">2.</span>A Guide to The 4 Cs of 21st Century Skills — Kids Park Education (<a href="https://kidsparkeducation.org/blog/a-guide-to-the-4-cs-of-21st-century-skills" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-3"><span class="font-mono text-xs muted mr-2">3.</span>Future of Jobs Report 2025 — Digest — World Economic Forum (<a href="https://www.weforum.org/publications/the-future-of-jobs-report-2025/digest/" target="_blank" rel="noopener">ลิงก์</a>) · 2025</li>
+      <li id="source-4"><span class="font-mono text-xs muted mr-2">4.</span>10 Future-Proof Workplace Skills Your Organization Needs by 2030 — Lepaya (<a href="https://www.lepaya.com/blog/top-10-skills-of-the-future" target="_blank" rel="noopener">ลิงก์</a>) · 2025</li>
+      <li id="source-5"><span class="font-mono text-xs muted mr-2">5.</span>39% Of Skills May Be Obsolete By 2030, WEF Jobs Report Warns — Search Engine Journal (<a href="https://www.searchenginejournal.com/39-of-skills-may-be-obsolete-by-2030-wef-jobs-report-warns/537248/" target="_blank" rel="noopener">ลิงก์</a>) · 2025</li>
+      <li id="source-6"><span class="font-mono text-xs muted mr-2">6.</span>What Does the Research Say? — CASEL (<a href="https://casel.org/fundamentals-of-sel/what-does-the-research-say/" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-7"><span class="font-mono text-xs muted mr-2">7.</span>Fundamentals of SEL — CASEL Framework (<a href="https://casel.org/fundamentals-of-sel/" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-8"><span class="font-mono text-xs muted mr-2">8.</span>PISA 2022 Results — Country Notes: Thailand — OECD (<a href="https://www.oecd.org/en/publications/pisa-2022-results-volume-i-and-ii-country-notes_ed6fbcc5-en/thailand_6138f4af-en.html" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-9"><span class="font-mono text-xs muted mr-2">9.</span>Thai students ranked lower on every PISA index — The Nation Thailand (<a href="https://www.nationthailand.com/thailand/40033530" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-10"><span class="font-mono text-xs muted mr-2">10.</span>Skill Shift: Automation and the Future of the Workforce — McKinsey Global Institute (<a href="https://www.mckinsey.com/featured-insights/future-of-work/skill-shift-automation-and-the-future-of-the-workforce" target="_blank" rel="noopener">ลิงก์</a>) · 2018</li>
+      <li id="source-11"><span class="font-mono text-xs muted mr-2">11.</span>2025 Workplace Learning Report — LinkedIn Learning (<a href="https://learning.linkedin.com/resources/workplace-learning-report" target="_blank" rel="noopener">ลิงก์</a>) · 2025</li>
+      <li id="source-12"><span class="font-mono text-xs muted mr-2">12.</span>Carol Dweck: A Summary of Growth and Fixed Mindsets — Farnam Street (<a href="https://fs.blog/carol-dweck-mindset/" target="_blank" rel="noopener">ลิงก์</a>) · 2015</li>
+      <li id="source-13"><span class="font-mono text-xs muted mr-2">13.</span>Mindsets and Metacognition — Learning Zone (<a href="https://archive.imascientist.org.uk/learning-zone/mindsets-and-metacognition/index.html" target="_blank" rel="noopener">ลิงก์</a>) · 2022</li>
+      <li id="source-14"><span class="font-mono text-xs muted mr-2">14.</span>Global Education for the 21st Century: Insights from the Delors Report — Teachers Institute (<a href="https://teachers.institute/education-nature-purposes/global-education-21st-century-delors-report/" target="_blank" rel="noopener">ลิงก์</a>) · อ้างอิง UNESCO 1996</li>
+      <li id="source-15"><span class="font-mono text-xs muted mr-2">15.</span>OECD Learning Compass 2030: Future of Education and Skills — ERIC/OECD (<a href="https://eric.ed.gov/?id=ED673508" target="_blank" rel="noopener">ลิงก์</a>) · 2019</li>
+      <li id="source-16"><span class="font-mono text-xs muted mr-2">16.</span>Why Digital Literacy Is Essential for Students in the 21st Century — ICDL Global (<a href="https://icdl.org/empowering-students-with-essential-digital-skills-for-future-success/" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-17"><span class="font-mono text-xs muted mr-2">17.</span>What Are the 7 Essential Digital Literacy Skills? — eSchool News (<a href="https://www.eschoolnews.com/digital-learning/2024/01/03/what-are-the-7-essential-digital-literacy-skills/" target="_blank" rel="noopener">ลิงก์</a>) · 2024</li>
+      <li id="source-18"><span class="font-mono text-xs muted mr-2">18.</span>Financial Literacy in School: Skills for the 21st Century — Stanford GSE (<a href="https://ed.stanford.edu/news/financial-literacy-school-skills-21st-century" target="_blank" rel="noopener">ลิงก์</a>) · 2022</li>
+      <li id="source-19"><span class="font-mono text-xs muted mr-2">19.</span>Ministry of Education Thailand Basic Education Core Curriculum — MOE Thailand / UNESCO Bangkok (<a href="https://neqmap.bangkok.unesco.org/wp-content/uploads/2019/06/Basic-Education-Core-Curriculum.pdf" target="_blank" rel="noopener">ลิงก์</a>) · 2008</li>
+      <li id="source-20"><span class="font-mono text-xs muted mr-2">20.</span>Competency-Based Education Reform of Thailand Basic Education System — SAGE Journals (<a href="https://journals.sagepub.com/doi/10.1177/20965311241240486" target="_blank" rel="noopener">ลิงก์</a>) · 2024</li>
+      <li id="source-21"><span class="font-mono text-xs muted mr-2">21.</span>Fix Thailand Education Before It Is Too Late — UNICEF Thailand (<a href="https://www.unicef.org/thailand/stories/fix-thailands-education-its-too-late" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-22"><span class="font-mono text-xs muted mr-2">22.</span>Education Sandbox: Reforming the Way to Reform — TDRI (<a href="https://tdri.or.th/en/2018/06/education-sandbox/" target="_blank" rel="noopener">ลิงก์</a>) · 2018</li>
+      <li id="source-23"><span class="font-mono text-xs muted mr-2">23.</span>WEF Future of Jobs Report 2025: Net Increase of 78 Million Jobs — Coursera Blog (<a href="https://blog.coursera.org/wef-future-of-jobs-report-2025/" target="_blank" rel="noopener">ลิงก์</a>) · 2025</li>
+      <li id="source-24"><span class="font-mono text-xs muted mr-2">24.</span>Creativity, Critical Thinking, Communication, and Collaboration: Assessment and Promotion of 21st Century Skills — Frontiers in Psychology / PMC (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10054602/" target="_blank" rel="noopener">ลิงก์</a>) · 2023</li>
+      <li id="source-25"><span class="font-mono text-xs muted mr-2">25.</span>A Comprehensive Guide to 21st Century Skills — Panorama Education (<a href="https://www.panoramaed.com/blog/comprehensive-guide-21st-century-skills" target="_blank" rel="noopener">ลิงก์</a>) · 2022</li>
+      <li id="source-26"><span class="font-mono text-xs muted mr-2">26.</span>Critical Thinking in Everyday Life: 9 Strategies — CriticalThinking.Org (<a href="https://www.criticalthinking.org/pages/critical-thinking-in-everyday-life-9-strategies/512" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li id="source-27"><span class="font-mono text-xs muted mr-2">27.</span>Framework for 21st Century Learning Definitions — Battelle for Kids (<a href="https://static.battelleforkids.org/documents/p21/p21_framework_definitionsbfk.pdf" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li id="source-28"><span class="font-mono text-xs muted mr-2">28.</span>How to Improve Emotional Intelligence in the Workplace — The Silicon Review (<a href="https://thesiliconreview.com/2026/01/how-to-improve-emotional-intelligence-in-the-workplace-a-guide-for-leaders-and-managers" target="_blank" rel="noopener">ลิงก์</a>) · 2026</li>
+      <li id="source-29"><span class="font-mono text-xs muted mr-2">29.</span>Job Skills Report 2026 — Coursera (<a href="https://www.coursera.org/skills-reports/job-skills" target="_blank" rel="noopener">ลิงก์</a>) · 2026</li>
+      <li id="source-30"><span class="font-mono text-xs muted mr-2">30.</span>Dos and Don'ts of Cross-Cultural Communication — University of Pittsburgh OIS (<a href="https://www.ois.pitt.edu/sites/default/files/docs/CrossCulturalCommunicationAdvice.pdf" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li id="source-31"><span class="font-mono text-xs muted mr-2">31.</span>Promoting Divergent Thinking to Foster Students Creativity — Edutopia (<a href="https://www.edutopia.org/article/divergent-thinking-fosters-creativity/" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li id="source-32"><span class="font-mono text-xs muted mr-2">32.</span>Self-directed Learning for Higher Education — OAsis / COL (<a href="https://oasis.col.org/bitstreams/507fd387-5824-4d04-9b46-083a14b69957/download" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li id="source-33"><span class="font-mono text-xs muted mr-2">33.</span>What Are 21st Century Skills? — iCEV (<a href="https://www.icevonline.com/blog/what-are-21st-century-skills" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li id="source-34"><span class="font-mono text-xs muted mr-2">34.</span>Creativity and Adaptability in 21st Century Learning — Tandfonline (doi:10.1080/23311983.2022.2037229)</li>
+    </ol>
+
+    <h3 class="font-semibold mt-8 mb-4 accent">แหล่งข้อมูลวิดีโอ</h3>
+    <ol class="space-y-2 leading-relaxed">
+      <li><span class="font-mono text-xs muted mr-2">V1.</span>21st Century Learning (Explained in 3 Minutes) — YouTube (<a href="https://www.youtube.com/watch?v=aisOouTDATM" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V2.</span>21st century skills that should be taught in High Schools | Bob Smeets | TEDxRWTHAachen — YouTube (<a href="https://www.youtube.com/watch?v=7ENxeSRJHFc" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V3.</span>Adaptability and Learning Agility Webinar | Future Skills for Workplace Success — YouTube (<a href="https://www.youtube.com/watch?v=1HsWbVyRfhY" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V4.</span>Collaborative Problem Solving Framework — YouTube (<a href="https://www.youtube.com/watch?v=10QWCtheFes" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V5.</span>Future of Education: Do we really need 21st century skills in the 21st century? — YouTube (<a href="https://www.youtube.com/watch?v=JyguhYoaOkI" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V6.</span>Introduction to the 21st century skills — YouTube (<a href="https://www.youtube.com/watch?v=_Cf4yTl5ams" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V7.</span>Preparing students for the workforce in 2025 and beyond: Resilience and adaptability — YouTube (<a href="https://www.youtube.com/watch?v=hVXUV7G1JVI" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V8.</span>Tech Skills That Will Survive AI Automation — YouTube (<a href="https://www.youtube.com/watch?v=XsInbjsGrBM" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V9.</span>The Ten Essential Skills Ep.5: Adaptability — YouTube (<a href="https://www.youtube.com/watch?v=LgUiJrNILG0" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V10.</span>This tool will help improve your critical thinking — Erick Wilberding — YouTube (<a href="https://www.youtube.com/watch?v=vNDYUlxNIAA" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V11.</span>Top 5 Future-Proof Skills for 2030 (AI Cannot Replace These) — YouTube (<a href="https://www.youtube.com/watch?v=jkv_XYzGQp8" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V12.</span>What are 21st Century skills? — YouTube (<a href="https://www.youtube.com/watch?v=FROIoaXJldw" target="_blank" rel="noopener">ลิงก์</a>)</li>
+      <li><span class="font-mono text-xs muted mr-2">V13.</span>21st Century Learning Discussion (youtube.com/watch?v=BXT2STtm_54)</li>
+    </ol>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="border-top:1px solid #e4e4e7;" class="mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>สร้างโดย <a href="../../">agent-newsroom</a> เมื่อ 2026-06-21</div>
+    <div class="flex items-center gap-4">
+      <button onclick="window.print()" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์
+      </button>
+      <a href="../../" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="home" class="w-4 h-4"></i> กลับหน้าหลัก
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════ -->
+<script>
+// ── Scroll progress bar ──────────────────────────────
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── Entrance animations ──────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.07 });
+document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(el => io.observe(el));
+
+// ── Animated stat counters ───────────────────────────
+function animateCounter(el, target, duration, suffix) {
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target) + (suffix || '');
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(e.target, Number(e.target.dataset.target), 1200, e.target.dataset.suffix || '');
+      counterObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-target]').forEach(el => counterObserver.observe(el));
+
+// ── Insight Reel ─────────────────────────────────────
+const insights = [
+  {
+    statTarget: 39, statPrefix: '', statSuffix: '%',
+    statLabel: 'ของทักษะล้าสมัย ภายใน 2030',
+    headline: '39% ของทักษะปัจจุบันจะล้าสมัยภายในปี 2030',
+    body: 'WEF Future of Jobs 2025 ระบุว่า 39% ของทักษะที่คนทำงานมีจะถูกแทนที่โดย AI และ Automation ทักษะที่ลดความสำคัญมากที่สุด ได้แก่ Manual Dexterity (ลดลง 24%) และงาน clerical routine',
+    color: '#EF4444'
+  },
+  {
+    statTarget: 86, statPrefix: '', statSuffix: '%',
+    statLabel: 'ผู้ประกอบการคาด AI ปฏิวัติธุรกิจ',
+    headline: '86% ของนายจ้างทั่วโลกคาด AI จะเปลี่ยนธุรกิจ',
+    body: 'Analytical Thinking ถูกระบุเป็นทักษะอันดับ 1 โดย 7 ใน 10 บริษัทถือว่าจำเป็น ตามด้วย Resilience/Flexibility และ Leadership ตามรายงาน WEF 2025',
+    color: '#6366F1'
+  },
+  {
+    statTarget: 11, statPrefix: '$', statSuffix: '',
+    statLabel: 'ROI ต่อทุก $1 ลงทุนใน SEL',
+    headline: 'SEL ให้ผลตอบแทน $11 ต่อทุก $1 ที่ลงทุน',
+    body: 'CASEL meta-analysis พบว่า Social-Emotional Learning เพิ่มผลการเรียนเฉลี่ย 11 เปอร์เซ็นไทล์ และ 6 โปรแกรมหลักให้ ROI สูงถึง 11 เท่า',
+    color: '#10B981'
+  },
+  {
+    statTarget: 57, statPrefix: '', statSuffix: '%',
+    statLabel: 'ชั่วโมงงาน US automate ได้ (McKinsey)',
+    headline: '57% ของชั่วโมงทำงาน automate ได้ด้วยเทคโนโลยีปัจจุบัน',
+    body: 'McKinsey ระบุว่า Technological Skills จะเพิ่มจาก 9% เป็น 16% ของชั่วโมงทำงานทั้งหมดภายในปี 2030 และ AI Fluency มีความต้องการเพิ่มขึ้น 7 เท่าในสองปี',
+    color: '#F59E0B'
+  },
+  {
+    statTarget: 394, statPrefix: '', statSuffix: '',
+    statLabel: 'คะแนน PISA คณิต (เฉลี่ย OECD: 472)',
+    headline: 'ไทยได้คะแนน PISA คณิต 394 — ห่างจากค่าเฉลี่ย OECD 78 คะแนน',
+    body: 'ไทยอยู่อันดับ 58 จาก 81 ประเทศ PISA 2022 และมีเพียง 32% ของนักเรียนที่ถึง Baseline Proficiency ในคณิตศาสตร์ (เทียบกับ OECD ที่ 69%)',
+    color: '#8B5CF6'
+  }
+];
+
+let reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function animateReelStat(el) {
+  if (!el) return;
+  const target = Number(el.dataset.target);
+  const prefix = el.dataset.prefix || '';
+  const suffix = el.dataset.suffix || '';
+  const start = performance.now();
+  const duration = 900;
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = prefix + Math.round(ease * target) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+function buildSlide(ins) {
+  return `<div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">
+    <div style="text-align:center;min-width:110px;flex-shrink:0;">
+      <div class="reel-stat-num" data-target="${ins.statTarget}" data-prefix="${ins.statPrefix}" data-suffix="${ins.statSuffix}" style="font-size:2.8rem;font-weight:800;color:${ins.color};line-height:1;">${ins.statPrefix}${ins.statTarget}${ins.statSuffix}</div>
+      <div style="font-size:0.68rem;color:#71717a;margin-top:4px;">${ins.statLabel}</div>
+    </div>
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;line-height:1.4;">${ins.headline}</div>
+      <div style="font-size:0.88rem;color:#71717a;line-height:1.6;">${ins.body}</div>
+    </div>
+  </div>`;
+}
+
+function showSlide(idx, animate) {
+  if (reelAnimating) return;
+  reelAnimating = true;
+  reelIdx = (idx + insights.length) % insights.length;
+  const wrap = document.getElementById('reelSlides');
+  if (animate) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+  setTimeout(() => {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'none';
+    reelAnimating = false;
+    animateReelStat(wrap.querySelector('.reel-stat-num'));
+  }, animate ? 350 : 0);
+  document.querySelectorAll('.reel-dot').forEach((d, i) => {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    bar.style.transition = 'width 4s linear';
+    bar.style.width = '100%';
+  });
+}
+
+function startReel() { reelTimer = setInterval(() => showSlide(reelIdx + 1, true), 4000); }
+function stopReel() { clearInterval(reelTimer); }
+
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;';
+  d.style.background = i === 0 ? 'var(--accent)' : '#d4d4d8';
+  d.onclick = () => { stopReel(); showSlide(i, true); startReel(); };
+  dotsWrap.appendChild(d);
+});
+document.getElementById('reel').addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1, true); startReel(); }
+  if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1, true); startReel(); }
+});
+document.getElementById('reel').addEventListener('mouseenter', stopReel);
+document.getElementById('reel').addEventListener('mouseleave', startReel);
+showSlide(0, false);
+startReel();
+
+// ── Key Findings ─────────────────────────────────────
+const findings = [
+  { num: 1, text: `<strong>4Cs ยังคือรากฐาน</strong> — P21 เสนอ 4 ทักษะหลักตั้งแต่ปี 2007 ได้แก่ Critical Thinking, Communication, Collaboration, Creativity ซึ่งยังคงเป็นกรอบอ้างอิงมากที่สุดในโลกการศึกษา`, cite: '[<a href="#source-1">1</a>][<a href="#source-2">2</a>]' },
+  { num: 2, text: `<strong>WEF 2025: Analytical Thinking อันดับ 1</strong> — ผู้ประกอบการ 7 ใน 10 รายระบุว่า Analytical Thinking คือทักษะหลักที่สำคัญที่สุด ตามด้วย Resilience/Flexibility/Agility และ Leadership/Social Influence`, cite: '[<a href="#source-3">3</a>][<a href="#source-4">4</a>]' },
+  { num: 3, text: `<strong>39% ของทักษะจะล้าสมัยภายในปี 2030</strong> — WEF ระบุว่าทักษะที่กำลังลดความสำคัญ ได้แก่ Manual Dexterity (ลดลง 24%) และ Reading/Writing/Math ในรูปแบบที่ไม่ผสาน AI`, cite: '[<a href="#source-5">5</a>]' },
+  { num: 4, text: `<strong>SEL ให้ผลตอบแทน $11 ต่อทุก $1 ลงทุน</strong> — งานวิจัย CASEL พบว่า Social-Emotional Learning ยกคะแนนเฉลี่ย 11 เปอร์เซ็นไทล์ และ 6 โปรแกรมหลักให้ ROI สูงถึง 11 เท่า`, cite: '[<a href="#source-6">6</a>][<a href="#source-7">7</a>]' },
+  { num: 5, text: `<strong>ไทย PISA 2022: ต่ำกว่า OECD ทุกวิชา</strong> — คะแนนคณิตศาสตร์ 394 (เฉลี่ย OECD 472), การอ่าน 379 (476), วิทยาศาสตร์ 409 (485); ไทยอยู่อันดับ 58-64 จาก 81 ประเทศ`, cite: '[<a href="#source-8">8</a>][<a href="#source-9">9</a>]' },
+  { num: 6, text: `<strong>McKinsey: 57% ของชั่วโมงทำงานสามารถ automate ได้</strong> — ภายในปี 2030 ความต้องการ Technological Skills จะเพิ่มจาก 9% เป็น 16% ของชั่วโมงทำงานทั้งหมด`, cite: '[<a href="#source-10">10</a>]' },
+  { num: 7, text: `<strong>LinkedIn 2025: AI Literacy คือทักษะที่ต้องการมากที่สุด</strong> — ตามด้วย Analytical Thinking และ Adaptability ซึ่งสะท้อนว่า "thinking skills" แซงหน้า "technical skills" แล้ว`, cite: '[<a href="#source-11">11</a>]' },
+  { num: 8, text: `<strong>Meta-skills คือรากฐานของทุกทักษะ</strong> — Growth Mindset (Carol Dweck) และ Metacognition ถือเป็น "ทักษะแห่งทักษะ" ที่ทำให้การเรียนรู้ทักษะอื่นๆ มีประสิทธิภาพสูงสุด`, cite: '[<a href="#source-12">12</a>][<a href="#source-13">13</a>]' }
+];
+
+const findingsGrid = document.getElementById('findings-grid');
+findings.forEach((f, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover scale-in';
+  div.style.transitionDelay = `${Math.min(i * 60, 400)}ms`;
+  div.innerHTML = `<div class="flex gap-3 items-start">
+    <span style="background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:0.8rem;padding:2px 8px;border-radius:6px;flex-shrink:0;margin-top:2px;">${f.num}</span>
+    <div class="text-sm leading-relaxed">${f.text} <span class="text-xs muted">${f.cite}</span></div>
+  </div>`;
+  findingsGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Frameworks Grid ───────────────────────────────────
+const frameworks = [
+  {
+    icon: 'target',
+    title: 'P21 / 4Cs Framework (2007)',
+    org: 'Partnership for 21st Century Learning — สหรัฐอเมริกา',
+    color: '#6366F1',
+    desc: 'โมเดล 3 ชั้น: Learning Skills (4Cs), Life Skills (FLIPS), Literacy Skills (IMT) บนรากฐานของ Core Subjects และ 21st Century Themes',
+    points: ['Critical Thinking', 'Communication', 'Collaboration', 'Creativity', 'Information, Media, Tech Literacy']
+  },
+  {
+    icon: 'compass',
+    title: 'OECD Learning Compass 2030 (2019)',
+    org: 'Organisation for Economic Co-operation and Development — ระดับโลก',
+    color: '#10B981',
+    desc: 'ใช้ "เข็มทิศ" เป็นอุปลักษณ์: ผู้เรียนต้องนำทางตัวเองในโลกที่ไม่คุ้นเคย เน้น Student Agency และ Transformative Competencies',
+    points: ['Creating New Value', 'Reconciling Tensions', 'Taking Responsibility', 'Student Agency / Co-Agency', 'AAR Cycle (Anticipate-Act-Reflect)']
+  },
+  {
+    icon: 'globe',
+    title: 'WEF Future of Jobs 2025',
+    org: 'World Economic Forum — ระดับโลก/ธุรกิจ',
+    color: '#F59E0B',
+    desc: 'สำรวจผู้ประกอบการทั่วโลก ระบุทักษะที่ตลาดแรงงานต้องการปัจจุบันและอนาคต โดยเฉพาะผลกระทบจาก AI และ Automation',
+    points: ['Analytical Thinking (#1)', 'Resilience, Flexibility, Agility (#2)', 'AI and Big Data (fastest growing)', 'Creative Thinking', 'Technological Literacy']
+  },
+  {
+    icon: 'book',
+    title: 'UNESCO — 4 Pillars of Learning (1996)',
+    org: 'United Nations Educational, Scientific and Cultural Organization — ระดับโลก',
+    color: '#8B5CF6',
+    desc: 'กรอบที่เก่าที่สุดแต่ยังคงความสำคัญ เน้นการศึกษาแบบองค์รวม 4 เสาหลักจาก Delors Report',
+    points: ['Learning to Know (เรียนเพื่อรู้)', 'Learning to Do (เรียนเพื่อทำ)', 'Learning to Live Together (เรียนเพื่ออยู่ร่วมกัน)', 'Learning to Be (เรียนเพื่อเป็น)']
+  }
+];
+
+const fwGrid = document.getElementById('frameworks-grid');
+frameworks.forEach((fw, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover fade-up';
+  div.style.transitionDelay = `${Math.min(i * 80, 320)}ms`;
+  div.innerHTML = `<div class="flex items-start gap-3 mb-3">
+    <div style="background:${fw.color}20;border-radius:8px;padding:8px;flex-shrink:0;">
+      <i data-lucide="${fw.icon}" style="width:20px;height:20px;color:${fw.color};display:block;"></i>
+    </div>
+    <div>
+      <div class="font-semibold text-sm">${fw.title}</div>
+      <div class="text-xs muted mt-0.5">${fw.org}</div>
+    </div>
+  </div>
+  <p class="text-sm leading-relaxed muted mb-3">${fw.desc}</p>
+  <ul class="space-y-1">
+    ${fw.points.map(p => `<li class="text-xs flex gap-2"><span style="color:${fw.color};">▸</span>${p}</li>`).join('')}
+  </ul>`;
+  fwGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Skills Grid ───────────────────────────────────────
+const skills = [
+  {
+    icon: 'brain',
+    color: '#6366F1',
+    title: 'ทักษะการคิดและนวัตกรรม (4Cs)',
+    tag: 'Learning Skills',
+    def: 'ความสามารถในการคิดวิเคราะห์ สร้างสรรค์ ร่วมมือ และสื่อสาร — กลุ่มทักษะที่แยกคนที่พร้อมสำหรับโลกใหม่ออกจากคนที่ยังติดกับรูปแบบเก่า',
+    why: 'AI สามารถประมวลผลข้อมูลได้มหาศาล แต่การตั้งคำถาม ตัดสินคุณค่า และสร้างสิ่งใหม่จากแรงบันดาลใจยังต้องใช้มนุษย์',
+    how: ['Critical Thinking: ใช้ Socratic Questioning, อ่าน Opposing Viewpoints', 'Creativity: ฝึก SCAMPER, Brainwriting, Mind Mapping', 'Collaboration: Group Projects แบบสลับบทบาท, Agile/Scrum', 'Communication: Public Speaking clubs, Debate, Peer Feedback'],
+    example: 'นักข่าวตรวจสอบแหล่งข้อมูลก่อนเผยแพร่ข่าว / แพทย์วิเคราะห์ผลแล็บก่อนวินิจฉัย'
+  },
+  {
+    icon: 'monitor',
+    color: '#10B981',
+    title: 'ทักษะดิจิทัลและเทคโนโลยี',
+    tag: 'Literacy Skills',
+    def: 'ความสามารถในการเข้าถึง ประเมิน สร้าง และสื่อสารผ่านเทคโนโลยีดิจิทัล ครอบคลุม 7 องค์ประกอบ: Access, Commerce, Communication, Literacy, Etiquette, Law, Security',
+    why: 'WEF คาดว่า 70% ของงานทั้งหมดในปี 2030 จะต้องใช้ digital interaction และ AI Literacy กลายเป็นทักษะที่ต้องการสูงสุดใน LinkedIn 2025',
+    how: ['AI Literacy: เรียนรู้ ChatGPT, Prompt Engineering พื้นฐาน', 'Media Literacy: ตรวจสอบแหล่งข่าว รู้ทัน Deepfake', 'Digital Security: ปกป้องข้อมูลส่วนตัว, ใช้ 2FA', 'Tech Literacy: เรียนรู้ coding พื้นฐาน, AI tools, data analysis'],
+    example: 'ใช้ AI ช่วยร่างรายงาน + ใช้ Critical Thinking ตรวจสอบ output ก่อนส่ง'
+  },
+  {
+    icon: 'heart',
+    color: '#F59E0B',
+    title: 'ทักษะสังคมและอารมณ์ (SEL/EQ)',
+    tag: 'Life Skills',
+    def: 'CASEL 5 Core Competencies: Self-Awareness, Self-Management, Social Awareness, Relationship Skills, Responsible Decision-Making — ฐานรากของการทำงานร่วมกันและความเป็นผู้นำ',
+    why: 'AI ไม่สามารถรู้สึกหรือเห็นอกเห็นใจได้จริง EQ จึงเป็น "workplace superpower" ที่ให้ผลตอบแทน $11 ต่อทุก $1 ที่ลงทุน',
+    how: ['Self-Awareness: Mood Tracking, Emotion Journaling', 'Self-Regulation: Cognitive Reframing (มองคำวิจารณ์เป็น data point)', 'Empathy: Perspective Roleplay, Active Listening', 'Social Skills: 360-Degree Feedback, Networking practice'],
+    example: 'ผู้จัดการที่สร้าง "challenge safety" ในทีม: สมาชิกรู้สึกปลอดภัยที่จะตั้งคำถามต่อ status quo'
+  },
+  {
+    icon: 'zap',
+    color: '#EF4444',
+    title: 'Meta-Skills (Learning to Learn)',
+    tag: 'Foundation Skills',
+    def: '"ทักษะแห่งทักษะ" — ความสามารถในการเรียนรู้ ปรับตัว และพัฒนาทักษะอื่นๆ ได้อย่างต่อเนื่อง: Growth Mindset, Metacognition, Learning Agility, Adaptability, Resilience',
+    why: 'ในโลกที่งานหลายอย่างยังไม่มีอยู่ เป้าหมายการศึกษาเปลี่ยนจากเตรียมคนสำหรับ "บางสิ่ง" เป็น "ทุกสิ่ง" Meta-skills คือ "software update" ที่ป้องกันไม่ให้ล้าสมัย',
+    how: ['Growth Mindset: มองความล้มเหลวเป็นโอกาสเรียนรู้', 'Metacognition: Planning → Monitoring → Evaluation cycle', 'Learning Agility: ลองทำสิ่งใหม่ สะท้อนผล นำไปใช้', 'Resilience: Mindfulness, Cognitive Reframing, CBT techniques'],
+    example: 'พนักงาน IT ที่เชี่ยวชาญ COBOL ในปี 2000 แต่ใช้ Growth Mindset เรียนรู้ Cloud Computing ได้ภายใน 1 ปี'
+  },
+  {
+    icon: 'trending-up',
+    color: '#8B5CF6',
+    title: 'ทักษะอาชีพและการเงิน',
+    tag: 'Career Readiness',
+    def: 'Financial Literacy: ความรู้ในการจัดการเงิน ออม ลงทุน และบริหารความเสี่ยง + Career Readiness: Professional Communication, Entrepreneurship Mindset, Personal Branding',
+    why: 'ประชากรไทยเข้าถึง Social Security น้อยกว่าประเทศพัฒนาแล้ว การวางแผนการเงินส่วนตัวจึงสำคัญมาก ขณะที่ตลาดแรงงานต้องการ "T-shaped professionals"',
+    how: ['Financial: เรียนรู้ Compound Interest, Diversification, FinTech', 'Career: สร้าง Portfolio ที่แสดง Human+AI Collaboration', 'Networking: LinkedIn, Community events, Cross-functional projects', 'Entrepreneurship: Side Projects, Hackathons, Passion Projects'],
+    example: 'วัยทำงาน 28 ปี ฝึก Critical Thinking กับข่าวการเงิน: ตั้งคำถามกับ "tips" ที่เห็นใน TikTok ก่อนลงทุน'
+  },
+  {
+    icon: 'users',
+    color: '#0EA5E9',
+    title: 'ทักษะชีวิตและอาชีพ (FLIPS)',
+    tag: 'Life & Career Skills',
+    def: 'WHO ระบุ 10 Core Life Skills: Self-awareness, Empathy, Critical Thinking, Creative Thinking, Decision-Making, Problem-Solving, Communication, Interpersonal Relationships, Coping with Stress, Coping with Emotions',
+    why: 'ทักษะเหล่านี้คือ "intangible qualities" ที่ทำให้นำทางในสภาพแวดล้อมที่ซับซ้อนและไม่แน่นอนได้ WEF 2025 จัด Resilience, Flexibility and Agility เป็นอันดับ 2',
+    how: ['Flexibility: ฝึกรับมือกับ ambiguity, pivot เมื่อจำเป็น', 'Leadership: Mentoring, Cross-functional team, Servant Leadership', 'Initiative: เรียนรู้ GenAI ก่อนถูกบังคับ — เป็น Self-starter', 'Productivity: 80/20 Rule (Pareto Principle), Deep Work'],
+    example: 'Facilitator ที่ pivot delivery ทันทีเมื่อเกิดปัญหาเทคนิคระหว่าง live webinar'
+  }
+];
+
+const skillsGrid = document.getElementById('skills-grid');
+skills.forEach((s, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover scale-in skill-card';
+  div.style.transitionDelay = `${Math.min(i * 60, 360)}ms`;
+  div.innerHTML = `<div class="flex items-center gap-3 mb-2">
+    <div style="background:${s.color}20;border-radius:8px;padding:8px;flex-shrink:0;">
+      <i data-lucide="${s.icon}" style="width:18px;height:18px;color:${s.color};display:block;"></i>
+    </div>
+    <div>
+      <div class="font-semibold text-sm">${s.title}</div>
+      <span style="font-size:0.65rem;background:${s.color}15;color:${s.color};padding:1px 6px;border-radius:4px;">${s.tag}</span>
+    </div>
+    <i data-lucide="chevron-down" style="width:16px;height:16px;color:#71717a;margin-left:auto;transition:transform .2s;"></i>
+  </div>
+  <div class="skill-detail">
+    <div class="space-y-3 text-sm">
+      <div><span class="font-medium accent text-xs uppercase tracking-wide">นิยาม</span><p class="mt-1 leading-relaxed">${s.def}</p></div>
+      <div><span class="font-medium accent text-xs uppercase tracking-wide">ทำไมถึงสำคัญ</span><p class="mt-1 leading-relaxed muted">${s.why}</p></div>
+      <div><span class="font-medium accent text-xs uppercase tracking-wide">วิธีพัฒนา</span><ul class="mt-1 space-y-1">${s.how.map(h => `<li class="flex gap-2 leading-relaxed muted"><span>▸</span>${h}</li>`).join('')}</ul></div>
+      <div><span class="font-medium accent text-xs uppercase tracking-wide">ตัวอย่างในชีวิตจริง</span><p class="mt-1 leading-relaxed muted">${s.example}</p></div>
+    </div>
+  </div>`;
+  div.addEventListener('click', () => {
+    div.classList.toggle('open');
+    const chevron = div.querySelector('[data-lucide="chevron-down"]');
+    if (chevron) chevron.style.transform = div.classList.contains('open') ? 'rotate(180deg)' : '';
+    lucide.createIcons();
+  });
+  skillsGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Charts (WEF) ──────────────────────────────────────
+const chartDefaults = {
+  plugins: { legend: { display: false } },
+  animation: { duration: 900, easing: 'easeOutQuart' },
+  indexAxis: 'y',
+  scales: {
+    x: { display: false, max: 11 },
+    y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+  }
+};
+
+const wefLabels = ['Analytical Thinking','Resilience & Agility','Leadership & Social Influence','Creative Thinking','Motivation & Self-Awareness','Technological Literacy','Empathy & Active Listening','Curiosity & Lifelong Learning','Talent Management','Service Orientation'];
+const wefData   = [10,9,8,7,6,5,4,3,2,1];
+const wefColors = wefData.map((_, i) => i < 3 ? '#6366F1' : '#6366F140');
+
+const wefChartEl = document.getElementById('wefChart');
+let wefChartInit = false;
+const wefIO = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && !wefChartInit) {
+    wefChartInit = true;
+    new Chart(wefChartEl, {
+      type: 'bar',
+      data: { labels: wefLabels, datasets: [{ data: wefData, backgroundColor: wefColors, borderRadius: 4 }] },
+      options: { ...chartDefaults, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `อันดับ ${10 - ctx.parsed.x + 1}` } } } }
+    });
+  }
+}, { threshold: 0.3 });
+wefIO.observe(wefChartEl);
+
+const growthLabels = ['AI and Big Data','Technological Literacy','Creative Thinking','Resilience & Agility','Curiosity & Lifelong Learning','Leadership & Social Influence','Talent Management','Analytical Thinking','Systems Thinking','Motivation & Self-Awareness'];
+const growthData   = [10,9,8,7,6,5,4,3,2,1];
+const growthColors = growthData.map((_, i) => i < 3 ? '#10B981' : '#10B98140');
+
+const growthChartEl = document.getElementById('wefGrowthChart');
+let growthChartInit = false;
+const growthIO = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting && !growthChartInit) {
+    growthChartInit = true;
+    new Chart(growthChartEl, {
+      type: 'bar',
+      data: { labels: growthLabels, datasets: [{ data: growthData, backgroundColor: growthColors, borderRadius: 4 }] },
+      options: { ...chartDefaults, plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `อันดับ ${10 - ctx.parsed.x + 1}` } } } }
+    });
+  }
+}, { threshold: 0.3 });
+growthIO.observe(growthChartEl);
+
+// ── Stat Badges ────────────────────────────────────────
+const stats = [
+  { target: 170, suffix: 'M', label: 'งานใหม่ที่จะเกิดขึ้น (WEF 2025)', color: '#10B981', cite: '[<a href="#source-3">3</a>]' },
+  { target: 63,  suffix: '%', label: 'บริษัทระบุ skills gap เป็น #1 barrier', color: '#EF4444', cite: '[<a href="#source-3">3</a>]' },
+  { target: 85,  suffix: '%', label: 'นายจ้างวางแผน upskill พนักงาน', color: '#6366F1', cite: '[<a href="#source-3">3</a>]' },
+  { target: 7,   suffix: 'M', label: 'ผู้ลงทะเบียน GenAI บน Coursera 2024', color: '#F59E0B', cite: '[<a href="#source-23">23</a>]' }
+];
+const statsGrid = document.getElementById('stats-grid');
+stats.forEach((s, i) => {
+  const div = document.createElement('div');
+  div.className = 'surface rounded-xl p-4 text-center scale-in card-hover';
+  div.style.transitionDelay = `${i * 70}ms`;
+  div.innerHTML = `<div class="text-3xl font-bold" style="color:${s.color};" data-target="${s.target}" data-suffix="${s.suffix}">${s.target}${s.suffix}</div>
+    <div class="text-xs muted mt-1 leading-snug">${s.label} <span>${s.cite}</span></div>`;
+  statsGrid.appendChild(div);
+  io.observe(div);
+  counterObserver.observe(div.querySelector('[data-target]'));
+});
+
+// ── AI Era ────────────────────────────────────────────
+const humanEdge = [
+  { skill: 'ความคิดสร้างสรรค์', reason: 'AI สร้างเนื้อหาได้แต่ขาด Intentionality และ Context' },
+  { skill: 'Empathy / EQ', reason: 'AI เลียนแบบได้แต่ไม่ "รู้สึก" จริง' },
+  { skill: 'Complex Ethical Judgment', reason: 'ต้องใช้ค่านิยมและประสบการณ์ชีวิต' },
+  { skill: 'Strategic Leadership', reason: 'ต้องการ Vision และการสร้าง Trust กับมนุษย์' },
+  { skill: 'Contextual Storytelling', reason: 'เรื่องเล่าที่มีรากฐานจากประสบการณ์จริง' }
+];
+const humanEdgeList = document.getElementById('human-edge-list');
+humanEdge.forEach((h, i) => {
+  const div = document.createElement('div');
+  div.className = 'flex gap-3 mb-3 text-sm fade-left';
+  div.style.transitionDelay = `${i * 60}ms`;
+  div.innerHTML = `<span style="color:#10B981;flex-shrink:0;">●</span><div><strong>${h.skill}</strong> <span class="muted">— ${h.reason}</span></div>`;
+  humanEdgeList.appendChild(div);
+  io.observe(div);
+});
+
+const automationRisk = [
+  { task: 'Data Entry / Clerical', wef: 'ลดลงมากที่สุด (Bank Tellers, Admin Assistants)' },
+  { task: 'Manual Dexterity (repetitive)', wef: 'ลดลง 24% ภายในปี 2030' },
+  { task: 'Routine Analysis', wef: 'แทนที่ด้วย AI Analytics' },
+  { task: 'Basic Reading/Writing/Math', wef: 'Small net decline — ถูก AI ช่วย' }
+];
+const automationList = document.getElementById('automation-risk-list');
+automationRisk.forEach((r, i) => {
+  const div = document.createElement('div');
+  div.className = 'flex gap-3 mb-3 text-sm fade-left';
+  div.style.transitionDelay = `${i * 60}ms`;
+  div.innerHTML = `<span style="color:#EF4444;flex-shrink:0;">●</span><div><strong>${r.task}</strong> <span class="muted">— WEF: ${r.wef}</span></div>`;
+  automationList.appendChild(div);
+  io.observe(div);
+});
+
+const aiBoosted = [
+  { skill: 'AI Literacy', desc: 'ใช้ AI Tools อย่างชาญฉลาด' },
+  { skill: 'Critical Evaluation of AI Output', desc: 'ตรวจสอบความถูกต้องของผล AI' },
+  { skill: 'Human-AI Collaboration', desc: 'ทำงานร่วมกับ AI agents อย่างมีประสิทธิภาพ' },
+  { skill: 'Systems Thinking', desc: 'เข้าใจผลกระทบซับซ้อนของ AI ต่อสังคม' },
+  { skill: 'Digital Ethics', desc: 'รับผิดชอบต่อการใช้ AI อย่างเป็นธรรม' },
+  { skill: 'Prompt Engineering', desc: 'ถามคำถาม AI ได้อย่างมีประสิทธิผล' }
+];
+const aiBoostedList = document.getElementById('ai-boosted-list');
+aiBoosted.forEach((a, i) => {
+  const div = document.createElement('div');
+  div.className = 'rounded-lg p-3 scale-in text-sm';
+  div.style.cssText += `background:var(--accent-soft);transition-delay:${i * 60}ms;`;
+  div.innerHTML = `<div class="font-semibold accent mb-1">${a.skill}</div><div class="muted text-xs leading-relaxed">${a.desc}</div>`;
+  aiBoostedList.appendChild(div);
+  io.observe(div);
+});
+
+// ── Development Strategies ─────────────────────────────
+const devStrategies = {
+  school: [
+    { method: 'Project-Based Learning (PBL)', skills: '4Cs ทั้งหมด, Problem-solving' },
+    { method: 'Inquiry-Based Learning', skills: 'Critical Thinking, Curiosity' },
+    { method: 'Design Thinking', skills: 'Creativity, Collaboration, Empathy' },
+    { method: 'Flipped Classroom', skills: 'Self-direction, Technology Literacy' },
+    { method: 'SEL Programs (CASEL model)', skills: 'EQ, Relationship Skills' },
+    { method: 'Socratic Seminars', skills: 'Communication, Critical Thinking' },
+    { method: 'Maker Education / Hackathons', skills: 'Creativity, Tech Literacy, Collaboration' }
+  ],
+  work: [
+    { method: 'Cross-functional Teams', skills: 'Collaboration, Communication' },
+    { method: 'Mentoring & Coaching', skills: 'Leadership, Self-awareness' },
+    { method: 'Rotational Assignments', skills: 'Adaptability, Learning Agility' },
+    { method: 'Internal Innovation Labs', skills: 'Creativity, Entrepreneurship' },
+    { method: '70-20-10 Learning Model', skills: 'Meta-learning ทุกรูปแบบ' },
+    { method: 'AI Tools Onboarding', skills: 'AI Literacy, Tech Literacy' },
+    { method: 'Collaborative Problem Solving (What-Who-Why-How)', skills: 'Critical Thinking, Teamwork' }
+  ],
+  self: [
+    { method: 'Reading diverse books/articles', skills: 'Critical Thinking, Curiosity' },
+    { method: 'Online courses (MOOCs — Khan Academy, Coursera)', skills: 'Any skill, Learning Agility' },
+    { method: 'Community Volunteering', skills: 'SEL, Leadership' },
+    { method: 'Side Projects / Passion Projects', skills: 'Creativity, Initiative' },
+    { method: 'Journaling / Intellectual Journal', skills: 'Self-awareness, Metacognition' },
+    { method: 'Public Speaking Clubs (Toastmasters)', skills: 'Communication, Confidence' },
+    { method: 'Mindfulness practice', skills: 'Self-management, Resilience' }
+  ]
+};
+
+function renderDevGrid(containerId, items) {
+  const grid = document.getElementById(containerId);
+  items.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'rounded-lg p-3 text-sm scale-in card-hover';
+    div.style.cssText += `background:var(--accent-soft);transition-delay:${Math.min(i * 50, 300)}ms;`;
+    div.innerHTML = `<div class="font-semibold mb-1 text-xs accent">${item.method}</div><div class="muted" style="font-size:0.75rem;">ทักษะ: ${item.skills}</div>`;
+    grid.appendChild(div);
+    io.observe(div);
+  });
+}
+renderDevGrid('dev-school-grid', devStrategies.school);
+renderDevGrid('dev-work-grid', devStrategies.work);
+renderDevGrid('dev-self-grid', devStrategies.self);
+
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ── Examples ──────────────────────────────────────────
+const examples = [
+  {
+    icon: '🎓',
+    title: 'นักศึกษาปริญญาตรีสาขาการตลาด',
+    problem: 'กังวลว่าทักษะจะล้าสมัยเมื่อ AI เข้ามา',
+    steps: ['พัฒนา AI Literacy — เรียนรู้ ChatGPT, Analytics AI', 'ฝึก Critical Thinking — evaluate AI outputs', 'เสริม Storytelling & Communication — human touch', 'สร้าง Portfolio ที่แสดง Human+AI Collaboration'],
+    tags: ['AI Literacy', 'Critical Thinking', 'Communication']
+  },
+  {
+    icon: '📚',
+    title: 'ครูมัธยมสาขาประวัติศาสตร์',
+    problem: 'ต้องการนำ 21st-Century Skills เข้าชั้นเรียน',
+    steps: ['Inquiry-Based Learning — ตั้งคำถามเปิด', 'Collaborative Research Projects — ทำงานเป็นกลุ่ม', 'Socratic Seminar — อภิปรายหลายมุมมอง', 'Creative Product — Documentary, Podcast หรือ Infographic'],
+    tags: ['Critical Thinking', 'Collaboration', 'Creativity']
+  },
+  {
+    icon: '🏢',
+    title: 'ผู้บริหาร SME ส่งออกสินค้าเกษตร',
+    problem: 'มีพนักงาน 50 คน ต้องการปรับตัวในยุค AI',
+    steps: ['AI Literacy Workshop — ให้ทุกคนใช้ AI tools พื้นฐาน', 'Cross-functional Team Projects', 'Digital Communication Training — ภาษาอังกฤษ, Collaboration tools', 'Financial Literacy สำหรับพนักงาน — เข้าใจ KPI และ ROI'],
+    tags: ['AI Literacy', 'Collaboration', 'Analytical Thinking']
+  },
+  {
+    icon: '🌾',
+    title: 'เด็กมัธยมต้นในชนบทไทย',
+    problem: 'อยากพัฒนาทักษะแต่ทรัพยากรจำกัด',
+    steps: ['YouTube + Free MOOCs — Khan Academy (ภาษาไทย)', 'Reading Habit — อ่านหนังสือหลากหลาย ฝึกสรุปใจความ', 'Community Problem-Solving — หาปัญหาในชุมชน', 'Online Competitions — ไม่ต้องเดินทาง'],
+    tags: ['Self-directed Learning', 'Critical Thinking', 'Digital Literacy']
+  },
+  {
+    icon: '💰',
+    title: 'นักลงทุนมือใหม่ อายุ 28 ปี',
+    problem: 'ต้องการ Financial Literacy เพื่อเริ่มลงทุน',
+    steps: ['เรียนรู้พื้นฐาน: Compound Interest, Risk-Return Tradeoff', 'Critical Thinking กับข่าวการเงิน — ตั้งคำถาม TikTok tips', 'ติดตาม SET, Crypto ด้วย Data Literacy', 'Diversification — เรียนรู้ว่าทำไมต้องกระจายความเสี่ยง'],
+    tags: ['Financial Literacy', 'Analytical Thinking', 'Media Literacy']
+  }
+];
+
+const examplesGrid = document.getElementById('examples-grid');
+examples.forEach((ex, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover fade-up';
+  div.style.transitionDelay = `${Math.min(i * 80, 400)}ms`;
+  div.innerHTML = `<div class="flex items-start gap-3 mb-3">
+    <span style="font-size:1.8rem;line-height:1;">${ex.icon}</span>
+    <div>
+      <div class="font-semibold text-sm">${ex.title}</div>
+      <div class="text-xs muted mt-0.5">โจทย์: ${ex.problem}</div>
+    </div>
+  </div>
+  <ol class="space-y-1 mb-3">
+    ${ex.steps.map((s, si) => `<li class="text-sm flex gap-2"><span class="accent font-bold text-xs">${si + 1}.</span><span class="leading-relaxed">${s}</span></li>`).join('')}
+  </ol>
+  <div class="flex flex-wrap gap-1">
+    ${ex.tags.map(t => `<span class="bg-accent-soft accent text-xs px-2 py-0.5 rounded-full">${t}</span>`).join('')}
+  </div>`;
+  examplesGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Glossary ──────────────────────────────────────────
+const glossaryTerms = [
+  { term: '4Cs (สี่ทักษะหลัก)', def: 'Critical Thinking, Communication, Collaboration, Creativity — กรอบหลักจาก P21 ปี 2007' },
+  { term: 'Analytical Thinking (การคิดเชิงวิเคราะห์)', def: 'แยกแยะ วิเคราะห์ และสรุปข้อมูลอย่างเป็นระบบ — อันดับ 1 WEF 2025' },
+  { term: 'Adaptability (การปรับตัว)', def: 'ปรับตัวกับสิ่งใหม่ได้อย่างมีประสิทธิภาพ — มี 3 ประเภท: Cognitive, Communication, Emotional' },
+  { term: 'AI Literacy (ความรู้ AI)', def: 'ความสามารถเข้าใจและใช้ AI อย่างฉลาด รวมถึง Prompt Engineering และ output validation' },
+  { term: 'CASEL', def: 'Collaborative for Academic, Social, and Emotional Learning — กรอบ SEL 5 สมรรถนะ' },
+  { term: 'Collaboration (การทำงานร่วมกัน)', def: 'ทำงานเป็นทีมเพื่อเป้าหมายร่วม ประนีประนอม และบริหารความขัดแย้ง' },
+  { term: 'Communication (การสื่อสาร)', def: 'ถ่ายทอดและรับสารอย่างมีประสิทธิภาพ — Verbal, Written, Visual, Non-verbal' },
+  { term: 'Creativity (ความคิดสร้างสรรค์)', def: 'สร้างสิ่งใหม่ด้วย Fluency, Flexibility, Originality, Elaboration (Guilford)' },
+  { term: 'Critical Thinking (การคิดเชิงวิพากษ์)', def: 'ประเมินข้อมูลอย่างมีเหตุผลและไม่มีอคติ ตั้งคำถามกับสมมติฐาน' },
+  { term: 'Design Thinking (การคิดเชิงออกแบบ)', def: 'กระบวนการแก้ปัญหา 5 ขั้น: Empathize, Define, Ideate, Prototype, Test' },
+  { term: 'Digital Literacy (การรู้ดิจิทัล)', def: 'ทักษะใช้เทคโนโลยีดิจิทัลอย่างชาญฉลาดและปลอดภัย — 7 องค์ประกอบ' },
+  { term: 'EQ (Emotional Intelligence)', def: 'ความสามารถรับรู้และจัดการอารมณ์ตนเองและผู้อื่น (Goleman 5 components)' },
+  { term: 'Financial Literacy (ความรู้ทางการเงิน)', def: 'เข้าใจและจัดการเงินได้อย่างมีประสิทธิผล: Budgeting, Investing, Risk' },
+  { term: 'Fixed Mindset (กรอบความคิดแบบตายตัว)', def: 'เชื่อว่าความสามารถเปลี่ยนแปลงไม่ได้ → หลีกเลี่ยงความท้าทาย' },
+  { term: 'Growth Mindset (กรอบความคิดแบบเติบโต)', def: 'เชื่อว่าความสามารถพัฒนาได้ → มองความท้าทายเป็นโอกาส (Carol Dweck)' },
+  { term: 'Learning Agility (ความคล่องในการเรียนรู้)', def: 'เรียนรู้เร็วและนำไปใช้ได้ในบริบทใหม่ — 5 Dimensions: Mental, People, Change, Results, Self-Awareness' },
+  { term: 'Metacognition (อภิปัญญา)', def: 'ตระหนักรู้ในกระบวนการคิดของตัวเอง — Planning, Monitoring, Evaluation cycle' },
+  { term: 'Meta-skills (ทักษะแห่งทักษะ)', def: 'ทักษะที่ช่วยพัฒนาทักษะอื่นๆ ได้อย่างต่อเนื่อง: Learning to Learn' },
+  { term: 'OECD Learning Compass 2030', def: 'กรอบ "เข็มทิศ" เน้น Student Agency, Transformative Competencies, AAR Cycle' },
+  { term: 'P21 Framework', def: 'Partnership for 21st Century Learning — กรอบ 3 ชั้น: 4Cs, Life Skills, Literacy Skills' },
+  { term: 'PBL (Project-Based Learning)', def: 'เรียนรู้ผ่านการทำโปรเจกต์จริงในระยะเวลาขยาย — พัฒนา 4Cs พร้อมกัน' },
+  { term: 'Resilience (ความยืดหยุ่น)', def: 'ฟื้นตัวจากความล้มเหลวหรือการเปลี่ยนแปลงด้วย mindset เชิงบวก' },
+  { term: 'SEL (Social-Emotional Learning)', def: 'การเรียนรู้ทางสังคมและอารมณ์ — ROI $11/$1, +11 percentile (CASEL 2023)' },
+  { term: 'Student Agency', def: 'ผู้เรียนมีความสามารถและแรงบันดาลใจในการนำทางการเรียนรู้ของตนเอง' },
+  { term: 'Systems Thinking (การคิดเชิงระบบ)', def: 'เข้าใจความสัมพันธ์และผลกระทบในระบบซับซ้อน — WEF Fastest Growing #9' },
+  { term: 'Transformative Competencies (OECD)', def: '3 สมรรถนะ: Creating New Value, Reconciling Tensions, Taking Responsibility' },
+  { term: 'WEF (ฟอรัมเศรษฐกิจโลก)', def: 'World Economic Forum — ออก Future of Jobs Report ทุก 2 ปี' }
+];
+
+const glossaryGrid = document.getElementById('glossary-grid');
+glossaryTerms.forEach((g, i) => {
+  const div = document.createElement('div');
+  div.className = 'fade-up';
+  div.style.transitionDelay = `${Math.min(i * 30, 400)}ms`;
+  div.innerHTML = `<dt class="text-sm font-semibold">${g.term}</dt><dd class="text-xs leading-relaxed">${g.def}</dd>`;
+  glossaryGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Init Lucide icons ──────────────────────────────────
+lucide.createIcons();
+</script>
+</body>
+</html>
