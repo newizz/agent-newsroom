@@ -6,6 +6,7 @@
 **Ambiguity:** yellow
 **Mode:** deep
 **Estimated depth:** deep
+**Language:** th (Thai primary, English secondary)
 
 ## Original prompt
 > Game theory in practice

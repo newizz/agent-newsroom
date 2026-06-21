@@ -1,9 +1,9 @@
 {
   "slug": "game-theory-in-practice",
-  "title": "Game Theory in Practice",
-  "subtitle": "Equilibrium concepts and strategy across real-world situations — auctions, negotiations, biology, and politics.",
-  "template": "concept-explorer",
+  "title": "ทฤษฎีเกมภาคปฏิบัติ",
+  "subtitle": "ทฤษฎีเกมถูกนำไปใช้จริงในการประมูลคลื่นความถี่ สงครามเย็น การแข่งขันธุรกิจ และ AI — พร้อมกรณีศึกษาที่พิสูจน์ทั้งความสำเร็จและข้อจำกัดของการคิดแบบ Nash",
+  "template": "data-story",
   "mode": "deep",
-  "date": "2026-06-13",
-  "tags": ["math", "economics", "decision-theory", "strategy"]
+  "date": "2026-06-21",
+  "tags": ["ทฤษฎีเกม", "เศรษฐศาสตร์", "กลยุทธ์", "การตัดสินใจ", "thai"]
 }
