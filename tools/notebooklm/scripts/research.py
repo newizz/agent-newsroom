@@ -82,7 +82,10 @@ def parse_brief(brief_text: str) -> dict:
             if m:
                 questions.append(m.group(1).strip())
 
-    return {"topic": topic, "refined": refined, "questions": questions}
+    lang_m = re.search(r"^\*\*Language:\*\*\s*(\S+)", brief_text, re.MULTILINE)
+    language = lang_m.group(1).strip() if lang_m else "en"
+
+    return {"topic": topic, "refined": refined, "questions": questions, "language": language}
 
 
 SCRIPT_VERSION = "2026-06-20"  # bump on prompt/code changes for traceability
@@ -469,9 +472,13 @@ async def _main_inner(args, err_log: "ErrorLog") -> int:
                 ig = await client.artifacts.generate_infographic(
                     nb.id,
                     orientation=InfographicOrientation.LANDSCAPE,
+                    language=brief.get("language", "en"),
                 )
             else:
-                ig = await client.artifacts.generate_infographic(nb.id)
+                ig = await client.artifacts.generate_infographic(
+                    nb.id,
+                    language=brief.get("language", "en"),
+                )
 
             await client.artifacts.wait_for_completion(nb.id, ig.task_id)
             await client.artifacts.download_infographic(nb.id, str(infographic_path))
@@ -479,7 +486,10 @@ async def _main_inner(args, err_log: "ErrorLog") -> int:
         except TypeError as e:
             err_log.warn("infographic_signature", f"retrying with defaults: {e}")
             try:
-                ig = await client.artifacts.generate_infographic(nb.id)
+                ig = await client.artifacts.generate_infographic(
+                    nb.id,
+                    language=brief.get("language", "en"),
+                )
                 await client.artifacts.wait_for_completion(nb.id, ig.task_id)
                 await client.artifacts.download_infographic(nb.id, str(infographic_path))
                 print(f"  ✓ saved (defaults): {infographic_path}")
