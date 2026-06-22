@@ -2,7 +2,7 @@
   "currentRun": null,
   "currentSlug": null,
   "currentMode": null,
-  "lastUpdate": "2026-06-21T04:23:35Z",
+  "lastUpdate": "2026-06-22T07:12:30Z",
   "agents": [
     {
       "id": "intake",
@@ -33,8 +33,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "busy",
-      "task": "Building Thai dashboard for bias-overview-all-forms"
+      "status": "offline",
+      "task": ""
     },
     {
       "id": "reporter",

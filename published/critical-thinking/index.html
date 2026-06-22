@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>การคิดเชิงวิพากษ์ (Critical Thinking) — agent-newsroom</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Sarabun', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .card { background: #131316 !important; border-color: #27272a !important; }
+    dd { color: #a1a1aa !important; }
+    table td, table th { border-color: #27272a !important; }
+    .tab-row { border-color: #27272a !important; }
+    .tab-btn { border-color: #27272a !important; }
+    .step-card { background: #131316 !important; border-color: #27272a !important; }
+    .bias-card { background: #1a1a1f !important; }
+  }
+  .surface { background: #ffffff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .card { padding: 1.5rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,.13); }
+  .prose-content p { margin-bottom: 1em; line-height: 1.8; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.5em; line-height: 1.8; }
+  .prose-content h3 { font-size: 1.05rem; font-weight: 700; margin: 1.5em 0 0.5em; color: var(--accent); }
+  sup a { font-size: 0.7em; color: var(--accent); }
+  dl { display: grid; gap: 1em; }
+  dt { font-weight: 700; }
+  dd { margin-left: 0; color: #71717a; line-height: 1.6; }
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .scale-in  { opacity: 0; transform: scale(0.93); transition: opacity .45s ease, transform .45s ease; }
+    .visible   { opacity: 1 !important; transform: none !important; }
+  }
+  .tab-btn { transition: background .2s, color .2s; }
+  .tab-btn.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .markmap > svg { width: 100% !important; height: 100% !important; display: block; }
+  .step-card { background: #fff; border: 1px solid #e4e4e7; border-radius: 0.75rem; padding: 1.25rem 1.5rem; display: flex; gap: 1rem; align-items: flex-start; }
+  .step-num { background: var(--accent-soft); color: var(--accent); font-weight: 800; font-size: 1.1rem; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .bias-card { background: #f8f8ff; border: 1px solid #e4e4e7; border-radius: 0.75rem; padding: 1rem 1.25rem; }
+  .skill-toggle { cursor: pointer; user-select: none; }
+  .skill-detail { display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e4e4e7; font-size: 0.875rem; color: #71717a; line-height: 1.7; }
+  .skill-card.open .skill-detail { display: block; }
+  @media print {
+    nav, footer button { display: none; }
+    .surface { border: 1px solid #ccc; box-shadow: none; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Scroll progress bar -->
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Header -->
+<header style="border-bottom:1px solid #e4e4e7;">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      กลับหน้าหลัก
+    </a>
+    <div class="text-xs muted">critical-thinking · 2026-06-22</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-10">
+  <div class="flex flex-wrap gap-2 mb-4">
+    <span class="bg-accent-soft accent text-xs font-medium px-2 py-1 rounded-md">Concept Explainer</span>
+    <span class="bg-accent-soft accent text-xs font-medium px-2 py-1 rounded-md">การวิจัยเชิงลึก</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">การคิดเชิงวิพากษ์ (Critical Thinking)</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">กระบวนการคิดอย่างมีวินัยที่ใช้การวิเคราะห์ ประเมิน และสังเคราะห์ข้อมูลอย่างมีเหตุผล — WEF 2025 ยืนยันว่า Analytical Thinking คือทักษะอันดับ 1 ที่นายจ้างต้องการในยุค 2025–2030</p>
+</section>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-4">
+    <div class="text-xs font-semibold accent uppercase tracking-wide mb-2">สารบัญ</div>
+    <div class="flex flex-wrap gap-1">
+      <a href="#mindmap" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แผนที่ความคิด</a>
+      <a href="#definition" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">นิยาม</a>
+      <a href="#frameworks" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">กรอบแนวคิด</a>
+      <a href="#skills" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ทักษะหลัก 6 ด้าน</a>
+      <a href="#process" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">กระบวนการ 6 ขั้นตอน</a>
+      <a href="#biases" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">อคติทางความคิด</a>
+      <a href="#develop" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">วิธีพัฒนา</a>
+      <a href="#applications" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">การประยุกต์ใช้จริง</a>
+      <a href="#examples" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ตัวอย่าง</a>
+      <a href="#data" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ข้อมูล</a>
+      <a href="#glossary" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">อภิธานศัพท์</a>
+      <a href="#sources" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แหล่งข้อมูล</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Mind Map (Tier 2 fallback) -->
+<section id="mindmap" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="brain" class="w-5 h-5 accent"></i> แผนที่ความคิด
+  </h2>
+  <div class="surface rounded-xl p-2" style="height:640px;">
+    <div class="markmap" style="width:100%;height:100%;">
+      <script type="text/template">
+# การคิดเชิงวิพากษ์ (Critical Thinking)
+
+## นิยามและต้นกำเนิด
+- APA Delphi (Facione 1990): "purposeful, self-regulatory judgment"
+- Paul & Elder: ปรับปรุงคุณภาพความคิดผ่านการวิเคราะห์และประเมิน
+- John Dewey (1910): "reflective thinking" — How We Think
+- ต้นกำเนิด: Socrates → Plato → Aristotle → Francis Bacon → Descartes → Dewey
+
+## กรอบแนวคิดหลัก 4 โมเดล
+### Paul-Elder Framework
+- 8 Elements of Thought (องค์ประกอบการคิด)
+- 9 Intellectual Standards (มาตรฐานทางปัญญา)
+- 7 Intellectual Traits (คุณลักษณะทางปัญญา)
+### Bloom's Taxonomy (HOTS)
+- Analyze — แยกส่วนประกอบ
+- Evaluate — ตัดสินคุณค่า
+- Create — สร้างสิ่งใหม่
+### RED Model (Pearson/Watson-Glaser)
+- Recognize Assumptions
+- Evaluate Arguments
+- Draw Conclusions
+### Facione's Delphi Model (1990)
+- 46 ผู้เชี่ยวชาญ APA ฉันทามติ
+- 6 Core Skills
+- 7 Dispositions
+
+## ทักษะหลัก 6 ด้าน (Facione)
+- การตีความ (Interpretation)
+- การวิเคราะห์ (Analysis)
+- การประเมิน (Evaluation)
+- การอนุมาน (Inference)
+- การอธิบาย (Explanation)
+- การกำกับตนเอง (Self-Regulation)
+
+## กระบวนการ 6 ขั้นตอน
+- 1 ระบุปัญหา/คำถาม
+- 2 รวบรวมข้อมูล
+- 3 วิเคราะห์
+- 4 ประเมิน
+- 5 สรุป/ตัดสินใจ
+- 6 ทบทวน/Self-Regulate
+
+## อคติที่ขัดขวาง CT
+- Confirmation Bias (อคติยืนยัน)
+- Dunning-Kruger Effect
+- Anchoring Bias (อคติจอดสมอ)
+- Availability Heuristic
+- Sunk Cost Fallacy (ต้นทุนจม)
+- Groupthink / Bandwagon
+- Hindsight Bias
+- Framing Effect
+
+## วิธีพัฒนา CT
+- Socratic Questioning (6 ประเภทคำถาม)
+- Think-Aloud (พูดความคิดออกมา)
+- Reflective Journaling (บันทึกสะท้อน)
+- Argument Mapping (+0.7–1.0 SD)
+- Six Thinking Hats (de Bono)
+- Peer Debate & Structured Controversy
+
+## ข้อมูลสำคัญ
+- Analytical Thinking อันดับ 1 (WEF 2025, 69% ขององค์กร)
+- 78% นายจ้างต้องการ CT — 34% บัณฑิตพร้อม (Hart 2018)
+- 39% ทักษะล้าสมัยภายใน 2030 (WEF 2025)
+- 85% นายจ้าง: CT จำเป็นสำหรับการแก้ปัญหา (2024)
+      </script>
+    </div>
+  </div>
+  <div class="text-xs muted mt-2">แผนที่ความคิดสร้างจากการสังเคราะห์งานวิจัย (NotebookLM ไม่มีแผนที่ความคิดสำหรับรอบนี้)</div>
+</section>
+
+<!-- Insight Reel -->
+<section class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="surface rounded-2xl overflow-hidden" id="reel" tabindex="0">
+    <div id="reelSlides" style="position:relative;min-height:180px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- Definition & Origins -->
+<section id="definition" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> นิยามและต้นกำเนิด
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content fade-up mb-6">
+    <h3>คำนิยามที่ได้รับการยอมรับกว้างขวางที่สุด</h3>
+    <p><strong>APA Delphi Report (Facione, 1990):</strong> "Purposeful, self-regulatory judgment which results in interpretation, analysis, evaluation, and inference, as well as explanation of the evidential, conceptual, methodological, criteriological, or contextual considerations upon which that judgment is based." — นิยามนี้เป็นผลจากฉันทามติของผู้เชี่ยวชาญ 46 คนภายใต้ American Philosophical Association<sup><a href="#source-1">[1]</a></sup></p>
+    <p><strong>Paul &amp; Elder (Foundation for Critical Thinking):</strong> "Critical thinking is that mode of thinking — about any subject, content, or problem — in which the thinker improves the quality of his or her thinking by skillfully analyzing, assessing, and reconstructing it."<sup><a href="#source-2">[2]</a></sup></p>
+    <p><strong>John Dewey (1910):</strong> "Active, persistent, and careful consideration of a belief or supposed form of knowledge in the light of the grounds which support it and the further conclusions to which it tends." — Dewey เรียกว่า "reflective thinking" และถือเป็นผู้วางรากฐาน CT ในบริบทการศึกษาสมัยใหม่<sup><a href="#source-8">[8]</a></sup></p>
+    <p><strong>National Council for Excellence in Critical Thinking (1987):</strong> "The intellectually disciplined process of actively and skillfully conceptualizing, applying, analyzing, synthesizing, or evaluating information gathered from, or generated by, observation, experience, reflection, reasoning, or communication."</p>
+    <h3>ประวัติและที่มาของแนวคิด</h3>
+    <p>Critical Thinking มีรากฐานมาจากปรัชญากรีกโบราณ โดย <strong>Socrates</strong> (~470–399 ปีก่อน ค.ศ.) ใช้วิธี Elenchus (การถามตอบ) เพื่อเปิดเผยความขัดแย้งในความคิดของผู้คน พัฒนาต่อโดย Plato และ Aristotle ผู้วางระบบตรรกวิทยา (Logic) ครั้งแรก รวมถึง syllogism และ logical fallacies จากนั้น <strong>Francis Bacon</strong> (ศตวรรษที่ 13) เน้นการสังเกตเชิงประจักษ์ และ <strong>René Descartes</strong> วางฐานการตั้งคำถามต่อทุกสิ่งอย่างเป็นระบบ ("Cogito ergo sum")</p>
+    <p>ในยุคสมัยใหม่ <strong>John Dewey</strong> ตีพิมพ์ "How We Think" (1910) นำ CT เข้าสู่บริบทการศึกษา ตามด้วย Watson &amp; Glaser (1941) ที่สร้างเครื่องมือวัด CT ชิ้นแรก และ Benjamin Bloom (1956) ที่จัดระดับความคิดสูง จนถึงปี 1990 ที่ Peter Facione สร้าง Delphi Report — ฉันทามติที่ครอบคลุมและได้รับการอ้างอิงมากที่สุดในโลก<sup><a href="#source-13">[13]</a></sup></p>
+  </div>
+  <!-- History timeline cards -->
+  <div class="grid md:grid-cols-3 gap-4" id="history-grid"></div>
+</section>
+
+<!-- Major Frameworks -->
+<section id="frameworks" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="layers" class="w-5 h-5 accent"></i> กรอบแนวคิดหลัก 4 โมเดล
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4 mb-6" id="frameworks-grid"></div>
+
+  <!-- Paul-Elder Deep Dive -->
+  <div class="surface rounded-xl p-6 mb-4 fade-up">
+    <h3 class="font-semibold mb-4 accent text-lg">Paul-Elder Framework — รายละเอียด 3 มิติ</h3>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div>
+        <div class="font-semibold text-sm mb-2">8 Elements of Thought</div>
+        <ul class="space-y-1 text-xs leading-relaxed muted" id="elements-list"></ul>
+      </div>
+      <div>
+        <div class="font-semibold text-sm mb-2">9 Intellectual Standards</div>
+        <ul class="space-y-1 text-xs leading-relaxed muted" id="standards-list"></ul>
+      </div>
+      <div>
+        <div class="font-semibold text-sm mb-2">7 Intellectual Traits</div>
+        <ul class="space-y-1 text-xs leading-relaxed muted" id="traits-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bloom's Taxonomy visual -->
+  <div class="surface rounded-xl p-6 fade-up">
+    <h3 class="font-semibold mb-4 accent text-lg">Bloom's Taxonomy — Higher-Order Thinking Skills (HOTS)</h3>
+    <div class="space-y-2" id="bloom-pyramid"></div>
+    <p class="text-xs muted mt-3">Critical Thinking สอดคล้องกับ 3 ระดับบนสุด (Analyze, Evaluate, Create) ซึ่งเรียกรวมว่า HOTS<sup><a href="#source-6">[6]</a></sup></p>
+  </div>
+</section>
+
+<!-- 6 Core Skills -->
+<section id="skills" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2 fade-up">
+    <i data-lucide="star" class="w-5 h-5 accent"></i> ทักษะหลัก 6 ประการ (Facione's Delphi 1990)
+  </h2>
+  <p class="muted text-sm mb-6 fade-up">คลิกที่การ์ดเพื่อดูรายละเอียดและ sub-skills</p>
+  <div class="grid md:grid-cols-2 gap-4" id="skills-grid"></div>
+</section>
+
+<!-- 6-Step Process -->
+<section id="process" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="list-ordered" class="w-5 h-5 accent"></i> กระบวนการ 6 ขั้นตอน
+  </h2>
+  <p class="muted text-sm mb-6 fade-up">ผสมกรอบแนวคิด Bloom + Facione + Paul-Elder เพื่อการนำไปใช้จริง</p>
+  <div class="space-y-3" id="process-grid"></div>
+</section>
+
+<!-- Cognitive Biases -->
+<section id="biases" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="alert-triangle" class="w-5 h-5 accent"></i> อคติทางความคิด 10 ประการที่ขัดขวาง CT
+  </h2>
+  <p class="muted text-sm mb-6 fade-up">อคติเหล่านี้เกิดขึ้นโดยไม่รู้ตัว การตระหนักถึงมันคือก้าวแรกของการคิดเชิงวิพากษ์<sup><a href="#source-24">[24]</a></sup></p>
+  <div class="grid md:grid-cols-2 gap-3" id="biases-grid"></div>
+</section>
+
+<!-- How to Develop -->
+<section id="develop" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="compass" class="w-5 h-5 accent"></i> วิธีพัฒนาทักษะ CT
+  </h2>
+  <div class="surface rounded-xl overflow-hidden fade-up">
+    <div class="flex tab-row flex-wrap" style="border-bottom:1px solid #e4e4e7;">
+      <button class="tab-btn active px-5 py-3 text-sm" data-tab="socratic">การถามแบบโสคราตีส</button>
+      <button class="tab-btn px-5 py-3 text-sm" data-tab="tools" style="border-left:1px solid #e4e4e7;">เครื่องมือและเทคนิค</button>
+      <button class="tab-btn px-5 py-3 text-sm" data-tab="hats" style="border-left:1px solid #e4e4e7;">Six Thinking Hats</button>
+    </div>
+    <div class="p-6">
+      <div class="tab-content active" id="tab-socratic">
+        <p class="text-sm muted mb-4">Socratic Questioning ใช้ 6 ประเภทคำถามเพื่อเจาะลึกความคิดและเปิดเผยข้อสมมติที่ซ่อนอยู่<sup><a href="#source-14">[14]</a></sup></p>
+        <div class="grid md:grid-cols-2 gap-3" id="socratic-grid"></div>
+      </div>
+      <div class="tab-content" id="tab-tools">
+        <div class="grid md:grid-cols-2 gap-3" id="tools-grid"></div>
+      </div>
+      <div class="tab-content" id="tab-hats">
+        <p class="text-sm muted mb-4">Edward de Bono's Six Thinking Hats — สวม "หมวก" 6 ใบที่แทนมุมมองต่างๆ เพื่อคิดรอบด้านอย่างเป็นระบบ<sup><a href="#source-18">[18]</a></sup></p>
+        <div class="grid md:grid-cols-2 gap-3" id="hats-grid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Real-World Applications -->
+<section id="applications" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="globe" class="w-5 h-5 accent"></i> การประยุกต์ใช้จริงในหลายบริบท
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4" id="applications-grid"></div>
+</section>
+
+<!-- Worked Examples -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> ตัวอย่างที่ปฏิบัติได้จริง
+  </h2>
+  <div class="grid md:grid-cols-1 gap-6" id="examples-grid"></div>
+</section>
+
+<!-- Data Table -->
+<section id="data" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="bar-chart-2" class="w-5 h-5 accent"></i> ข้อมูลสถิติ
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-1 text-sm">ความต้องการ CT ในตลาดแรงงาน</h3>
+      <p class="text-xs muted mb-4">แหล่งข้อมูล: WEF 2025, Hart Research 2018<sup><a href="#source-4">[4]</a></sup><sup><a href="#source-17">[17]</a></sup></p>
+      <canvas id="ctChart"></canvas>
+    </div>
+    <div class="surface rounded-xl p-6 fade-up">
+      <h3 class="font-semibold mb-1 text-sm">เครื่องมือวัด CT ที่ได้รับการยอมรับ</h3>
+      <p class="text-xs muted mb-4">แหล่งข้อมูล: Watson-Glaser, Facione, Cornell<sup><a href="#source-22">[22]</a></sup></p>
+      <div id="tools-table"></div>
+    </div>
+  </div>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="stats-grid"></div>
+</section>
+
+<!-- Glossary -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> อภิธานศัพท์
+  </h2>
+  <div class="surface rounded-xl p-8 fade-up">
+    <div class="grid md:grid-cols-2 gap-x-8 gap-y-4" id="glossary-grid"></div>
+  </div>
+</section>
+
+<!-- Sources -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> แหล่งข้อมูล
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm fade-up">
+    <ol class="space-y-2 leading-relaxed" id="sources-list"></ol>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="border-top:1px solid #e4e4e7;" class="mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>สร้างโดย <a href="../../">agent-newsroom</a> เมื่อ 2026-06-22</div>
+    <div class="flex items-center gap-4">
+      <button onclick="window.print()" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์
+      </button>
+      <a href="../../" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="home" class="w-4 h-4"></i> กลับหน้าหลัก
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Scroll progress bar ──────────────────────────────
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── Entrance animations ──────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.07 });
+document.querySelectorAll('.fade-up, .scale-in').forEach(el => io.observe(el));
+
+// ── Animated stat counters ───────────────────────────
+function animateCounter(el, target, duration, prefix, suffix) {
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = (prefix||'') + Math.round(ease * target) + (suffix||'');
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(e.target, Number(e.target.dataset.target), 1200, e.target.dataset.prefix||'', e.target.dataset.suffix||'');
+      counterObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+// ── Insight Reel ──────────────────────────────────────
+const insights = [
+  {
+    statTarget: 69, statPrefix: '', statSuffix: '%',
+    statLabel: 'องค์กรระบุ Analytical Thinking เป็นทักษะหลัก',
+    headline: 'Analytical Thinking คืออันดับ 1 ทักษะที่นายจ้างต้องการ',
+    body: 'WEF Future of Jobs Report 2025 สำรวจ 1,043 บริษัท (14.1 ล้านพนักงาน+) พบว่า 69% ระบุ Analytical Thinking เป็น "core skill" สูงสุด — สะท้อนว่าการคิดเชิงวิพากษ์คือหัวใจของแรงงานแห่งอนาคต',
+    color: '#6366F1'
+  },
+  {
+    statTarget: 78, statPrefix: '', statSuffix: '%',
+    statLabel: 'นายจ้างต้องการ CT จากบัณฑิตใหม่ (Hart 2018)',
+    headline: '78% นายจ้างต้องการ CT — แต่มีเพียง 34% บัณฑิตที่พร้อม',
+    body: 'Hart Research Associates (AAC&U Survey 2018) เผยช่องว่างที่น่าตกใจ: นายจ้าง 78% ต้องการ Critical Thinking จากผู้สมัครใหม่ แต่บัณฑิตที่มีความพร้อมจริงมีเพียง 34% — เป็น skills gap ที่ใหญ่ที่สุดในตลาดแรงงาน',
+    color: '#EF4444'
+  },
+  {
+    statTarget: 39, statPrefix: '', statSuffix: '%',
+    statLabel: 'ทักษะแรงงานจะเปลี่ยนภายใน 2030 (WEF)',
+    headline: '39% ของทักษะปัจจุบันจะล้าสมัยภายในปี 2030',
+    body: 'WEF Future of Jobs 2025 ระบุว่า 39% ของทักษะที่คนทำงานมีในปัจจุบันจะถูกแทนที่โดย AI และ Automation ทำให้ CT และ Higher-Order Thinking กลายเป็นทักษะที่สำคัญและ future-proof ที่สุด',
+    color: '#F59E0B'
+  },
+  {
+    statTarget: 85, statPrefix: '', statSuffix: '%',
+    statLabel: 'นายจ้างเห็นว่า CT จำเป็นสำหรับการแก้ปัญหา',
+    headline: '85% ของนายจ้างยืนยัน CT คือเครื่องมือแก้ปัญหาขององค์กร',
+    body: 'การสำรวจนายจ้าง 2024 (aggregated) พบว่า 85% เห็นว่า CT จำเป็นสำหรับการแก้ปัญหาในองค์กร และผู้ที่มีทักษะ CT สูงมีโอกาสเพิ่มผลิตภาพในที่ทำงานสูงถึง +25% เมื่อเทียบกับกลุ่มทั่วไป',
+    color: '#10B981'
+  },
+  {
+    statTarget: 70, statPrefix: '', statSuffix: '%',
+    statLabel: 'ผู้นำองค์กรรายงาน critical skills gap (2024)',
+    headline: '70% ของผู้นำองค์กรรายงานช่องว่างทักษะวิกฤตในองค์กร',
+    body: 'การสำรวจองค์กรชั้นนำ 2024 พบว่า 70% ของผู้นำระดับสูงรายงานว่าช่องว่างทักษะ CT ในองค์กรส่งผลโดยตรงต่อประสิทธิภาพการตัดสินใจ และ LinkedIn Learning Report 2025 ระบุการลงทะเบียนอบรม CT เพิ่มจาก 41% เป็น 50% ใน 2 ปี',
+    color: '#8B5CF6'
+  }
+];
+
+let reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function animateReelStat(el) {
+  if (!el) return;
+  const target = Number(el.dataset.target);
+  const prefix = el.dataset.prefix || '';
+  const suffix = el.dataset.suffix || '';
+  const start = performance.now();
+  const duration = 900;
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = prefix + Math.round(ease * target) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+function buildSlide(ins) {
+  return `<div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">
+    <div style="text-align:center;min-width:110px;flex-shrink:0;">
+      <div class="reel-stat-num" data-target="${ins.statTarget}" data-prefix="${ins.statPrefix}" data-suffix="${ins.statSuffix}" style="font-size:2.8rem;font-weight:800;color:${ins.color};line-height:1;">${ins.statPrefix}${ins.statTarget}${ins.statSuffix}</div>
+      <div style="font-size:0.68rem;color:#71717a;margin-top:4px;">${ins.statLabel}</div>
+    </div>
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;line-height:1.4;">${ins.headline}</div>
+      <div style="font-size:0.88rem;color:#71717a;line-height:1.6;">${ins.body}</div>
+    </div>
+  </div>`;
+}
+
+function showSlide(idx, animate) {
+  if (reelAnimating) return;
+  reelAnimating = true;
+  reelIdx = (idx + insights.length) % insights.length;
+  const wrap = document.getElementById('reelSlides');
+  if (animate) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+  setTimeout(() => {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'none';
+    reelAnimating = false;
+    animateReelStat(wrap.querySelector('.reel-stat-num'));
+  }, animate ? 350 : 0);
+  document.querySelectorAll('.reel-dot').forEach((d, i) => {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    bar.style.transition = 'width 4s linear';
+    bar.style.width = '100%';
+  });
+}
+
+function startReel() { reelTimer = setInterval(() => showSlide(reelIdx + 1, true), 4000); }
+function stopReel() { clearInterval(reelTimer); }
+
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;background:#d4d4d8;';
+  d.onclick = () => { stopReel(); showSlide(i, true); startReel(); };
+  dotsWrap.appendChild(d);
+});
+document.getElementById('reel').addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1, true); startReel(); }
+  if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1, true); startReel(); }
+});
+document.getElementById('reel').addEventListener('mouseenter', stopReel);
+document.getElementById('reel').addEventListener('mouseleave', startReel);
+showSlide(0, false);
+startReel();
+
+// ── History Grid ──────────────────────────────────────
+const history = [
+  { year: '~470 ปีก่อน ค.ศ.', who: 'Socrates', desc: 'ใช้ Elenchus (วิธีถามตอบ) เพื่อเปิดเผยความขัดแย้งในความคิด — รากฐานของ Socratic Method', color: '#6366F1' },
+  { year: '384–322 ปีก่อน ค.ศ.', who: 'Aristotle', desc: 'วาง Logic (ตรรกวิทยา) เป็นระบบแรก รวมถึง syllogism และ logical fallacies', color: '#8B5CF6' },
+  { year: '1910', who: 'John Dewey', desc: 'ตีพิมพ์ "How We Think" — นำ critical/reflective thinking เข้าสู่บริบทการศึกษาสมัยใหม่', color: '#10B981' },
+  { year: '1956', who: 'Benjamin Bloom', desc: "Bloom's Taxonomy — จัดระดับความคิดสูง: analysis, synthesis, evaluation เป็น HOTS", color: '#F59E0B' },
+  { year: '1987', who: 'Richard Paul', desc: 'ก่อตั้ง Foundation for Critical Thinking และพัฒนา Paul-Elder Framework', color: '#EF4444' },
+  { year: '1990', who: 'Peter Facione', desc: 'Delphi Report — ฉันทามติจาก 46 ผู้เชี่ยวชาญ APA กำหนด 6 ทักษะหลัก CT', color: '#6366F1' }
+];
+const histGrid = document.getElementById('history-grid');
+history.forEach((h, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover scale-in';
+  div.style.transitionDelay = `${i * 60}ms`;
+  div.innerHTML = `<div class="text-xs font-mono mb-1" style="color:${h.color};">${h.year}</div>
+    <div class="font-semibold text-sm mb-2">${h.who}</div>
+    <div class="text-xs muted leading-relaxed">${h.desc}</div>`;
+  histGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Frameworks Grid ──────────────────────────────────
+const frameworks = [
+  {
+    icon: 'target',
+    title: 'Paul-Elder Framework',
+    org: 'Foundation for Critical Thinking (1987/2019)',
+    color: '#6366F1',
+    desc: 'โมเดลที่ครอบคลุมที่สุดในโลก — 3 มิติหลัก: Elements of Thought, Intellectual Standards, Intellectual Traits ทำงานร่วมกันเป็นระบบ',
+    points: ['8 Elements of Thought (องค์ประกอบการคิด)', '9 Intellectual Standards (มาตรฐานทางปัญญา)', '7 Intellectual Traits (คุณลักษณะทางปัญญา)', 'ใช้ "Essential Questions" เป็นเครื่องมือ']
+  },
+  {
+    icon: 'layers',
+    title: "Bloom's Taxonomy",
+    org: 'Benjamin Bloom (1956), Anderson & Krathwohl (2001)',
+    color: '#10B981',
+    desc: 'จัดระดับความคิด 6 ระดับ — CT สอดคล้องกับ 3 ระดับบนสุด (HOTS: Analyze, Evaluate, Create) ที่ต้องใช้การประมวลผลสูงสุด',
+    points: ['Remember → Understand → Apply (LOTS)', 'Analyze → แยกส่วน เปรียบเทียบ', 'Evaluate → ตัดสิน วิจารณ์ ประเมินคุณค่า', 'Create → สร้างสิ่งใหม่ ออกแบบ วางแผน']
+  },
+  {
+    icon: 'arrow-right-left',
+    title: 'RED Model (Watson-Glaser)',
+    org: 'Pearson TalentLens (พัฒนาจาก Watson-Glaser 1925)',
+    color: '#F59E0B',
+    desc: 'กรอบปฏิบัติที่นิยมในองค์กรและ HR assessment ทั่วโลก โดยเฉพาะกับตำแหน่งที่ต้องการการตัดสินใจสูง (ทนาย แพทย์ นักวิเคราะห์)',
+    points: ['R — Recognize Assumptions (จดจำข้อสมมติ)', 'E — Evaluate Arguments (ประเมินข้อโต้แย้ง)', 'D — Draw Conclusions (สรุปข้อมูล)', 'ใช้ใน HR assessment กว่า 75 ประเทศ']
+  },
+  {
+    icon: 'users',
+    title: "Facione's Delphi Model",
+    org: 'American Philosophical Association (APA, 1990)',
+    color: '#8B5CF6',
+    desc: 'ฉันทามติของผู้เชี่ยวชาญ 46 คน กำหนด 6 ทักษะหลักและ 7 Dispositions — ถือเป็น "gold standard" ของการนิยาม CT ทางวิชาการ',
+    points: ['6 Core Skills: Interpretation–Analysis–Evaluation', 'Inference–Explanation–Self-Regulation', '7 Dispositions: Truth-seeking, Open-mindedness ฯลฯ', 'เป็นฐานของ CCTST (California CT Skills Test)']
+  }
+];
+const fwGrid = document.getElementById('frameworks-grid');
+frameworks.forEach((fw, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover fade-up';
+  div.style.transitionDelay = `${i * 80}ms`;
+  div.innerHTML = `<div class="flex items-start gap-3 mb-3">
+    <div style="background:${fw.color}20;border-radius:8px;padding:8px;flex-shrink:0;">
+      <i data-lucide="${fw.icon}" style="width:20px;height:20px;color:${fw.color};display:block;"></i>
+    </div>
+    <div>
+      <div class="font-semibold text-sm">${fw.title}</div>
+      <div class="text-xs muted mt-0.5">${fw.org}</div>
+    </div>
+  </div>
+  <p class="text-sm leading-relaxed muted mb-3">${fw.desc}</p>
+  <ul class="space-y-1">
+    ${fw.points.map(p => `<li class="text-xs flex gap-2"><span style="color:${fw.color};">▸</span>${p}</li>`).join('')}
+  </ul>`;
+  fwGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Paul-Elder lists ──────────────────────────────────
+const elements = ['Purpose (เป้าหมาย)', 'Question at Issue (คำถามหลัก)', 'Information/Evidence (ข้อมูล)', 'Concepts/Theories (แนวคิด)', 'Assumptions (ข้อสมมติ)', 'Inferences (การอนุมาน)', 'Point of View (มุมมอง)', 'Implications/Consequences (ผลที่ตามมา)'];
+const standards = ['Clarity (ความชัดเจน)', 'Accuracy (ความถูกต้อง)', 'Precision (ความแม่นยำ)', 'Relevance (ความเกี่ยวข้อง)', 'Depth (ความลึก)', 'Breadth (ความกว้าง)', 'Logic (ตรรกะ)', 'Significance (ความสำคัญ)', 'Fairness (ความเป็นธรรม)'];
+const traits = ['Intellectual Humility (ความถ่อมตนทางปัญญา)', 'Intellectual Courage (ความกล้าทางปัญญา)', 'Intellectual Empathy (ความเห็นใจทางปัญญา)', 'Intellectual Integrity (ความซื่อสัตย์ทางปัญญา)', 'Intellectual Perseverance (ความอดทนทางปัญญา)', 'Confidence in Reason (ความเชื่อมั่นในเหตุผล)', 'Fair-mindedness (ความยุติธรรมทางความคิด)'];
+
+document.getElementById('elements-list').innerHTML = elements.map(e => `<li class="flex gap-1"><span class="accent">▸</span>${e}</li>`).join('');
+document.getElementById('standards-list').innerHTML = standards.map(s => `<li class="flex gap-1"><span class="accent">▸</span>${s}</li>`).join('');
+document.getElementById('traits-list').innerHTML = traits.map(t => `<li class="flex gap-1"><span class="accent">▸</span>${t}</li>`).join('');
+
+// ── Bloom's pyramid ──────────────────────────────────
+const bloom = [
+  { level: 'CREATE', th: 'สร้าง', desc: 'ออกแบบ วางแผน ผลิต', bg: '#6366F1', tag: 'HOTS' },
+  { level: 'EVALUATE', th: 'ประเมิน', desc: 'ตัดสิน วิจารณ์ ประเมินคุณค่า', bg: '#8B5CF6', tag: 'HOTS' },
+  { level: 'ANALYZE', th: 'วิเคราะห์', desc: 'แยกส่วน เปรียบเทียบ จำแนก', bg: '#A78BFA', tag: 'HOTS' },
+  { level: 'APPLY', th: 'ประยุกต์', desc: 'ใช้ แก้ปัญหา ดำเนินการ', bg: '#D1D5DB', tag: 'LOTS' },
+  { level: 'UNDERSTAND', th: 'เข้าใจ', desc: 'อธิบาย สรุป ตีความ', bg: '#E5E7EB', tag: 'LOTS' },
+  { level: 'REMEMBER', th: 'จำ', desc: 'ระบุ ท่อง รู้จัก', bg: '#F3F4F6', tag: 'LOTS' }
+];
+document.getElementById('bloom-pyramid').innerHTML = bloom.map(b => `
+  <div class="flex items-center gap-3">
+    <div style="background:${b.bg};border-radius:6px;padding:4px 12px;min-width:100px;text-align:center;color:${b.tag==='HOTS'?'#fff':'#374151'};">
+      <span class="font-bold text-xs">${b.level}</span>
+    </div>
+    <div class="text-sm"><span class="font-semibold">${b.th}</span> — ${b.desc}</div>
+    ${b.tag==='HOTS'?`<span style="background:#6366F11A;color:#6366F1;font-size:0.65rem;font-weight:700;padding:2px 6px;border-radius:4px;">CT</span>`:''}
+  </div>`).join('');
+
+// ── 6 Core Skills ─────────────────────────────────────
+const skills = [
+  {
+    num: 1, icon: 'eye', color: '#6366F1',
+    th: 'การตีความ', en: 'Interpretation',
+    short: 'เข้าใจและแสดงความหมายของประสบการณ์ สถานการณ์ และข้อมูล',
+    detail: 'Sub-skills: Categorization (จัดหมวดหมู่), Decoding significance (ถอดความสำคัญ), Clarifying meaning (ชี้แจงความหมาย) — ตัวอย่าง: อ่านบทความและแยกแยะ fact จาก opinion, เข้าใจเจตนาของผู้เขียน'
+  },
+  {
+    num: 2, icon: 'search', color: '#8B5CF6',
+    th: 'การวิเคราะห์', en: 'Analysis',
+    short: 'ระบุความสัมพันธ์เชิงอนุมานระหว่างแนวคิดและการแสดงออก',
+    detail: 'Sub-skills: Examining ideas, Identifying arguments, Analyzing arguments — ตัวอย่าง: แยกโครงสร้างข้อโต้แย้ง ระบุ premises และ conclusions, วิเคราะห์ว่าหลักฐานสนับสนุน claim ได้แค่ไหน'
+  },
+  {
+    num: 3, icon: 'scale', color: '#10B981',
+    th: 'การประเมิน', en: 'Evaluation',
+    short: 'ประเมินความน่าเชื่อถือและความแข็งแกร่งของเหตุผล',
+    detail: 'Sub-skills: Assessing claims (ประเมินข้อกล่าวอ้าง), Assessing arguments (ประเมินข้อโต้แย้ง) — ตัวอย่าง: ตัดสินว่าแหล่งข่าวน่าเชื่อถือหรือไม่, ประเมินว่าหลักฐานสนับสนุนข้อสรุปได้เพียงพอ'
+  },
+  {
+    num: 4, icon: 'git-branch', color: '#F59E0B',
+    th: 'การอนุมาน', en: 'Inference',
+    short: 'ระบุและรักษาองค์ประกอบที่จำเป็นสำหรับข้อสรุปที่สมเหตุสมผล',
+    detail: 'Sub-skills: Querying evidence (ตั้งคำถามต่อหลักฐาน), Conjecturing alternatives (สร้างทางเลือก), Drawing conclusions — ตัวอย่าง: จากข้อมูลที่มีทั้งหมด สรุปว่าทางเลือกใดน่าจะดีที่สุด'
+  },
+  {
+    num: 5, icon: 'message-square', color: '#EF4444',
+    th: 'การอธิบาย', en: 'Explanation',
+    short: 'อธิบายผลลัพธ์และกระบวนการที่ใช้ให้ผู้อื่นเข้าใจได้',
+    detail: 'Sub-skills: Stating results, Justifying procedures, Presenting arguments — ตัวอย่าง: อธิบายอย่างชัดเจนว่าทำไมถึงสรุปแบบนั้น ใช้หลักฐานอะไร และมีข้อจำกัดอะไรบ้าง'
+  },
+  {
+    num: 6, icon: 'refresh-cw', color: '#6366F1',
+    th: 'การกำกับตนเอง', en: 'Self-Regulation',
+    short: 'ตรวจสอบกิจกรรมทางความคิดของตนเองและปรับปรุงอย่างต่อเนื่อง',
+    detail: 'Sub-skills: Self-examination (ตรวจสอบตนเอง), Self-correction (แก้ไขตนเอง) — ตัวอย่าง: ย้อนทบทวนความคิดตัวเอง "ฉัน bias หรือเปล่า? หลักฐานที่มีเพียงพอไหม? มีมุมมองอื่นที่ยังไม่พิจารณาไหม?"'
+  }
+];
+const skillsGrid = document.getElementById('skills-grid');
+skills.forEach((s, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover skill-card scale-in';
+  div.style.transitionDelay = `${i * 70}ms`;
+  div.innerHTML = `<div class="skill-toggle flex items-center gap-3 mb-2">
+    <div style="background:${s.color}20;border-radius:8px;padding:8px;flex-shrink:0;">
+      <i data-lucide="${s.icon}" style="width:18px;height:18px;color:${s.color};display:block;"></i>
+    </div>
+    <div class="flex-1">
+      <div class="flex items-center gap-2">
+        <span style="background:${s.color};color:#fff;font-weight:700;font-size:0.7rem;padding:1px 6px;border-radius:4px;">${s.num}</span>
+        <span class="font-semibold text-sm">${s.th}</span>
+        <span class="text-xs muted">(${s.en})</span>
+      </div>
+    </div>
+    <i data-lucide="chevron-down" style="width:14px;height:14px;" class="muted flex-shrink-0"></i>
+  </div>
+  <p class="text-sm muted leading-relaxed">${s.short}</p>
+  <div class="skill-detail text-xs leading-relaxed">${s.detail}</div>`;
+  div.querySelector('.skill-toggle').addEventListener('click', () => div.classList.toggle('open'));
+  skillsGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── 6-Step Process ────────────────────────────────────
+const processSteps = [
+  {
+    num: 1, th: 'ระบุปัญหา / คำถาม (IDENTIFY)',
+    desc: 'กำหนดว่า "คำถามที่แท้จริงคืออะไร?" ระบุขอบเขตของปัญหา แยกแยะสิ่งที่รู้และไม่รู้ ชี้แจงว่ากำลังพยายามแก้ปัญหาอะไร',
+    q: '"คำถามสำคัญที่ฉันกำลังพยายามตอบคืออะไร?"',
+    color: '#6366F1'
+  },
+  {
+    num: 2, th: 'รวบรวมข้อมูล (GATHER)',
+    desc: 'ค้นหาหลักฐานจากหลายแหล่ง ตรวจสอบความน่าเชื่อถือ (peer-reviewed? ผู้เชี่ยวชาญ? มีผลประโยชน์ทับซ้อน?) รวมถึงมุมมองที่ขัดแย้งกับความเชื่อของตน',
+    q: '"แหล่งข้อมูลนี้มีความน่าเชื่อถือเพียงใด? มีหลักฐานที่ขัดแย้งกันบ้างไหม?"',
+    color: '#8B5CF6'
+  },
+  {
+    num: 3, th: 'วิเคราะห์ (ANALYZE)',
+    desc: 'แยกส่วนประกอบของปัญหา ระบุ assumptions ที่ซ่อนอยู่ ตรวจสอบ logic และ consistency ของข้อมูล แยก fact จาก opinion',
+    q: '"ข้อสมมติใดที่ฉันยึดถืออยู่โดยไม่ได้พิสูจน์?"',
+    color: '#10B981'
+  },
+  {
+    num: 4, th: 'ประเมิน (EVALUATE)',
+    desc: 'ประเมินน้ำหนักของหลักฐานทั้งหมด พิจารณา pro/con ระบุ cognitive biases ที่อาจกำลังมีผล ประเมินจากหลายมุมมอง',
+    q: '"อคติใดของฉันที่กำลังส่งผลต่อการตัดสินใจ? หลักฐานที่ขัดแย้งกับความคิดฉันมีน้ำหนักแค่ไหน?"',
+    color: '#F59E0B'
+  },
+  {
+    num: 5, th: 'สรุป / ตัดสินใจ (CONCLUDE)',
+    desc: 'สรุปอย่างมีเหตุผลจากหลักฐานที่มีทั้งหมด ระบุระดับความมั่นใจ (certainty vs. probability) และข้อจำกัดของข้อสรุป หลีกเลี่ยงการกระโดดสรุป',
+    q: '"ข้อสรุปนี้ได้รับการสนับสนุนจากหลักฐานแค่ไหน? ฉันมั่นใจในระดับใด?"',
+    color: '#EF4444'
+  },
+  {
+    num: 6, th: 'ทบทวน / Self-Regulate (REFLECT)',
+    desc: 'ประเมินกระบวนการคิดย้อนหลัง ถามว่า "ฉันมีอคติอะไรบ้าง? มีข้อมูลอะไรที่ยังขาดไป? ถ้าฉันคิดผิดจะรู้ได้อย่างไร?" — นี่คือขั้นตอนที่แยกนักคิดวิพากษ์ออกจากคนธรรมดา',
+    q: '"ถ้าฉันคิดผิดทั้งหมด จะรู้ได้อย่างไร? ฉันพลาดมุมมองอะไรไปบ้าง?"',
+    color: '#6366F1'
+  }
+];
+const processGrid = document.getElementById('process-grid');
+processSteps.forEach((step, i) => {
+  const div = document.createElement('div');
+  div.className = 'step-card card-hover fade-up';
+  div.style.transitionDelay = `${i * 60}ms`;
+  div.innerHTML = `<div class="step-num" style="background:${step.color}20;color:${step.color};">${step.num}</div>
+    <div class="flex-1">
+      <div class="font-semibold text-sm mb-1" style="color:${step.color};">${step.th}</div>
+      <p class="text-sm muted leading-relaxed mb-2">${step.desc}</p>
+      <div style="background:#f8f8ff;border-left:3px solid ${step.color};padding:8px 12px;border-radius:0 6px 6px 0;font-size:0.8rem;font-style:italic;color:#71717a;">${step.q}</div>
+    </div>`;
+  processGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Cognitive Biases ──────────────────────────────────
+const biases = [
+  { th: 'อคติยืนยัน', en: 'Confirmation Bias', icon: '🔍', desc: 'แสวงหาข้อมูลที่ยืนยันความเชื่อเดิม ละเลยหลักฐานที่ขัดแย้ง', ex: 'เชื่อว่าหุ้น A ดี แล้วอ่านแค่ข่าวดีของหุ้น A', color: '#EF4444' },
+  { th: 'ผลกระทบ Dunning-Kruger', en: 'Dunning-Kruger Effect', icon: '📊', desc: 'คนรู้น้อยมั่นใจมากเกินจริง คนรู้มากกลับระมัดระวังมากกว่า', ex: 'ผู้เชี่ยวชาญรุ่นใหม่คิดว่าตนรู้ทุกอย่างแล้วหลังเรียนจบ', color: '#F59E0B' },
+  { th: 'อคติจอดสมอ', en: 'Anchoring Bias', icon: '⚓', desc: 'ยึดติดกับข้อมูลชุดแรกที่ได้รับมากเกินไป แม้ข้อมูลนั้นจะไม่เกี่ยวข้อง', ex: 'ราคาแรกที่เห็นในตลาดกลายเป็น "anchor" สำหรับการต่อรอง', color: '#6366F1' },
+  { th: 'การนึกถึงได้ง่าย', en: 'Availability Heuristic', icon: '📰', desc: 'ประเมินความน่าจะเป็นจากสิ่งที่นึกถึงได้ง่าย ไม่ใช่ข้อมูลจริง', ex: 'คิดว่าเครื่องบินอันตรายกว่ารถ เพราะข่าวเครื่องบินตกมักพาดหัว', color: '#8B5CF6' },
+  { th: 'ความผิดพลาดต้นทุนจม', en: 'Sunk Cost Fallacy', icon: '💸', desc: 'ยังทำต่อเพราะลงทุนไปแล้ว แม้ผลตอบแทนจะไม่คุ้มค่าแล้ว', ex: '"เสียเงินไปตั้งเยอะ จะเลิกตอนนี้ได้อย่างไร" ทั้งที่ควรหยุด', color: '#EF4444' },
+  { th: 'ความคิดตามฝูง', en: 'Bandwagon Effect / Groupthink', icon: '👥', desc: 'เชื่อตามคนส่วนใหญ่โดยไม่ตั้งคำถาม กลัวขัดแย้งกับกลุ่ม', ex: 'เห็นด้วยกับทีมเพราะทุกคนเห็นด้วย แม้จะรู้สึกว่าผิด', color: '#10B981' },
+  { th: 'อคติมองย้อนหลัง', en: 'Hindsight Bias', icon: '🔮', desc: '"ฉันรู้ตั้งนานแล้ว" — หลังเหตุการณ์เกิด รู้สึกว่าผลลัพธ์ชัดเจนมาตลอด', ex: 'หลังหุ้นตก บอกว่า "รู้แล้วว่าจะตก แต่ไม่มีใครฟัง"', color: '#F59E0B' },
+  { th: 'จุดบอดอคติ', en: 'Bias Blind Spot', icon: '👁️', desc: 'มองเห็น bias ของคนอื่นได้ชัด แต่ไม่เห็น bias ของตนเอง', ex: '"ฉันไม่มีอคติ แต่คนอื่นในที่ประชุมมีอคติชัดเจนเลย"', color: '#6366F1' },
+  { th: 'อคติอารมณ์', en: 'Affect Heuristic', icon: '❤️', desc: 'ตัดสินใจจากความรู้สึกและอารมณ์มากกว่าข้อมูลและตรรกะ', ex: 'ไม่ลงทุนในบริษัทที่ "ไม่ชอบ" โดยไม่ดูตัวเลขการเงิน', color: '#8B5CF6' },
+  { th: 'ผลกระทบกรอบ', en: 'Framing Effect', icon: '🖼️', desc: 'คำตอบหรือการตัดสินใจเปลี่ยนตามกรอบที่ข้อมูลถูกนำเสนอ', ex: '"90% รอดชีวิต" vs "10% เสียชีวิต" — รู้สึกต่างกันทั้งที่ความหมายเหมือนกัน', color: '#EF4444' }
+];
+const biasesGrid = document.getElementById('biases-grid');
+biases.forEach((b, i) => {
+  const div = document.createElement('div');
+  div.className = 'bias-card card-hover fade-up';
+  div.style.transitionDelay = `${i * 50}ms`;
+  div.innerHTML = `<div class="flex items-start gap-2 mb-1">
+    <span style="font-size:1.2rem;">${b.icon}</span>
+    <div>
+      <div class="font-semibold text-sm">${b.th}</div>
+      <div class="text-xs muted">${b.en}</div>
+    </div>
+  </div>
+  <p class="text-xs leading-relaxed mt-2">${b.desc}</p>
+  <div class="text-xs muted mt-2 italic border-l-2 pl-2" style="border-color:${b.color};">${b.ex}</div>`;
+  biasesGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Socratic Questions ────────────────────────────────
+const socraticQ = [
+  { type: 'Clarification', th: 'คำถามเพื่อความชัดเจน', ex: '"คุณหมายความว่าอะไรพอดีด้วย...?"', color: '#6366F1' },
+  { type: 'Probing Assumptions', th: 'ตั้งคำถามต่อข้อสมมติ', ex: '"คุณสมมติอะไรบ้างในข้อเสนอนี้?"', color: '#8B5CF6' },
+  { type: 'Probing Evidence', th: 'ตั้งคำถามต่อหลักฐาน', ex: '"มีหลักฐานอะไรสนับสนุนข้ออ้างนี้?"', color: '#10B981' },
+  { type: 'Different Viewpoints', th: 'มุมมองทางเลือก', ex: '"คนที่ไม่เห็นด้วยจะพูดอะไร?"', color: '#F59E0B' },
+  { type: 'Implications', th: 'ผลที่ตามมา', ex: '"ถ้าข้ออ้างนี้เป็นจริง ผลที่ตามมาคืออะไร?"', color: '#EF4444' },
+  { type: 'Meta-questions', th: 'คำถามเกี่ยวกับคำถาม', ex: '"ทำไมคำถามนี้จึงสำคัญ? ใครได้ประโยชน์?"', color: '#6366F1' }
+];
+const socGrid = document.getElementById('socratic-grid');
+socraticQ.forEach(q => {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `<div class="font-semibold text-xs mb-1" style="color:${q.color};">${q.type}</div>
+    <div class="text-sm font-medium mb-1">${q.th}</div>
+    <div class="text-xs muted italic">${q.ex}</div>`;
+  socGrid.appendChild(div);
+});
+
+// ── Tools Grid ────────────────────────────────────────
+const tools = [
+  { name: 'Think-Aloud (พูดความคิดออกมา)', icon: '🗣️', desc: 'พูดกระบวนการคิดออกมาดังๆ ขณะแก้ปัญหา ช่วยตระหนักถึงข้อผิดพลาดในการคิด', benefit: 'เพิ่มความตระหนักรู้เชิง metacognition' },
+  { name: 'Reflective Journaling', icon: '📓', desc: 'บันทึกทุกวัน: "วันนี้ฉันตัดสินใจอะไร? ใช้หลักฐานอะไร? มี bias อะไรบ้าง?"', benefit: 'งานวิจัย (Scanlan & Chernomas, Wald et al.) พิสูจน์พัฒนา HOTS ได้จริง' },
+  { name: 'Argument Mapping', icon: '🗺️', desc: 'วาดโครงสร้างข้อโต้แย้งด้วยภาพ แสดงความสัมพันธ์ระหว่าง premises และ conclusions', benefit: 'Twardy (2004): พัฒนา CT ได้ +0.7–1.0 standard deviation' },
+  { name: 'Peer Debate & Structured Controversy', icon: '⚖️', desc: 'อภิปรายในกลุ่มโดยให้สลับฝ่าย (Socratic Circles) เพื่อฝึกเข้าใจมุมมองตรงข้าม', benefit: 'พัฒนา Intellectual Empathy และ Fair-mindedness' }
+];
+const toolsGrid = document.getElementById('tools-grid');
+tools.forEach(t => {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `<div class="flex items-center gap-2 mb-2">
+    <span style="font-size:1.3rem;">${t.icon}</span>
+    <div class="font-semibold text-sm">${t.name}</div>
+  </div>
+  <p class="text-xs muted leading-relaxed mb-2">${t.desc}</p>
+  <div class="text-xs accent font-medium">${t.benefit}</div>`;
+  toolsGrid.appendChild(div);
+});
+
+// ── Six Thinking Hats ──────────────────────────────────
+const hats = [
+  { hat: '⬜ หมวกขาว', en: 'White Hat', desc: 'ข้อมูลและข้อเท็จจริง — "เรามีข้อมูลอะไรบ้าง? ต้องการข้อมูลอะไรเพิ่ม?"', color: '#6B7280' },
+  { hat: '🔴 หมวกแดง', en: 'Red Hat', desc: 'ความรู้สึกและอารมณ์ — "ฉันรู้สึกอย่างไรกับเรื่องนี้? ความรู้สึกนี้บอกอะไร?"', color: '#EF4444' },
+  { hat: '⬛ หมวกดำ', en: 'Black Hat', desc: 'ความระมัดระวังและความเสี่ยง — "อะไรที่อาจผิดพลาด? ความเสี่ยงคืออะไร?"', color: '#374151' },
+  { hat: '🟡 หมวกเหลือง', en: 'Yellow Hat', desc: 'การมองโลกแง่ดีและประโยชน์ — "ประโยชน์ที่จะได้รับคืออะไร? ทำไมจึงน่าทำ?"', color: '#F59E0B' },
+  { hat: '🟢 หมวกเขียว', en: 'Green Hat', desc: 'ความคิดสร้างสรรค์และทางเลือก — "มีทางเลือกอื่นอะไรบ้าง? สร้างสรรค์ได้อีกไหม?"', color: '#10B981' },
+  { hat: '🔵 หมวกน้ำเงิน', en: 'Blue Hat', desc: 'การจัดการกระบวนการคิด — "ตอนนี้เราอยู่ที่ขั้นตอนไหน? เราควรใช้หมวกใบไหนถัดไป?"', color: '#3B82F6' }
+];
+const hatsGrid = document.getElementById('hats-grid');
+hats.forEach(h => {
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML = `<div class="font-semibold text-sm mb-1" style="color:${h.color};">${h.hat} <span class="text-xs muted">(${h.en})</span></div>
+    <p class="text-xs muted leading-relaxed">${h.desc}</p>`;
+  hatsGrid.appendChild(div);
+});
+
+// ── Tab logic ─────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    btn.closest('.surface').querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.closest('.surface').querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+  });
+});
+
+// ── Applications ──────────────────────────────────────
+const apps = [
+  {
+    icon: 'heart-pulse', color: '#EF4444', title: 'การแพทย์',
+    desc: 'แพทย์ใช้ CT ใน differential diagnosis — ระบุ symptoms, สร้าง hypotheses, ประเมิน tests, สรุป diagnosis',
+    example: 'แพทย์ฉุกเฉินประเมินผู้ป่วยหมดสติ: cardiac, neurological หรือ metabolic cause? ต้องใช้ evidence อย่างเป็นระบบ ไม่ใช่สัญชาตญาณอย่างเดียว'
+  },
+  {
+    icon: 'briefcase', color: '#6366F1', title: 'ธุรกิจและองค์กร',
+    desc: 'นักวิเคราะห์ใช้ CT ประเมิน market trends โดยไม่ยึดติดกับ wishful thinking, ผู้บริหารใช้ CT ใน M&A, strategic planning, risk assessment',
+    example: 'CEO ต้องตัดสินใจ merge กับคู่แข่ง: ใช้ CT วิเคราะห์สมมติที่ซ่อนอยู่ในข้อเสนอ ประเมินมูลค่าจริง และพิจารณา culture fit'
+  },
+  {
+    icon: 'scale', color: '#8B5CF6', title: 'กฎหมาย',
+    desc: 'ทนายความวิเคราะห์หลักฐาน ประเมิน reliability ของพยาน สร้าง legal arguments และพิจารณา counter-arguments ก่อนขึ้นศาล',
+    example: 'ทนายต้องประเมิน: หลักฐาน DNA มีน้ำหนักแค่ไหน? พยานมีแรงจูงใจโกหกไหม? chain of custody สมบูรณ์ไหม?'
+  },
+  {
+    icon: 'graduation-cap', color: '#10B981', title: 'การศึกษา',
+    desc: 'OECD PISA วัด CT ใน reading และ scientific literacy นักเรียนใช้ CT วิเคราะห์ literature, ประเมิน sources, สร้าง arguments ในการเขียน',
+    example: 'เขียน essay เชิงวิชาการ: อ่าน sources หลายแหล่งที่ขัดแย้งกัน ประเมินน้ำหนักหลักฐาน สร้าง argument ของตัวเองที่สอดคล้องกับหลักฐาน'
+  },
+  {
+    icon: 'smartphone', color: '#F59E0B', title: 'ชีวิตประจำวัน',
+    desc: 'ประเมินข่าวก่อนแชร์ ตัดสินใจซื้อของ ประเมินคำแนะนำด้านสุขภาพ รับมือกับ fake news ที่แพร่กระจายในโซเชียลมีเดีย',
+    example: 'เห็นข่าว "กินมะนาวรักษามะเร็ง": ถามว่า "แหล่งอ้างอิงคือใคร? มี clinical trial ไหม? ใครได้ประโยชน์ถ้าเชื่อเรื่องนี้?"'
+  },
+  {
+    icon: 'trending-up', color: '#6366F1', title: 'การลงทุน',
+    desc: 'นักลงทุน CT ใช้เพื่อหลีกเลี่ยง FOMO (Fear of Missing Out), Herd mentality และ Confirmation Bias ที่ทำให้ตัดสินใจผิดพลาด',
+    example: 'เพื่อนบอกว่า "Crypto กำลังขึ้น!" — ใช้ Socratic Questioning: หลักฐานคืออะไร? มีอคติอะไร? ถ้าตลาดตก ผลที่ตามมาคืออะไร?'
+  }
+];
+const appGrid = document.getElementById('applications-grid');
+apps.forEach((a, i) => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover fade-up';
+  div.style.transitionDelay = `${i * 70}ms`;
+  div.innerHTML = `<div class="flex items-center gap-3 mb-3">
+    <div style="background:${a.color}20;border-radius:8px;padding:8px;flex-shrink:0;">
+      <i data-lucide="${a.icon}" style="width:18px;height:18px;color:${a.color};display:block;"></i>
+    </div>
+    <div class="font-semibold text-sm">${a.title}</div>
+  </div>
+  <p class="text-sm muted leading-relaxed mb-3">${a.desc}</p>
+  <div class="text-xs leading-relaxed border-l-2 pl-3 italic" style="border-color:${a.color};color:#71717a;">${a.example}</div>`;
+  appGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── Worked Examples ───────────────────────────────────
+const examples = [
+  {
+    title: 'ตัวอย่างที่ 1: ประเมินข่าวปลอม',
+    situation: 'สถานการณ์: เห็นข่าวในโซเชียลว่า "น้ำมะนาวรักษามะเร็งได้"',
+    model: 'กระบวนการ CT 6 ขั้นตอน',
+    color: '#6366F1',
+    steps: [
+      { num: 1, label: 'Identify', text: 'คำถามหลักคือ "ข้ออ้างนี้มีหลักฐานทางวิทยาศาสตร์รองรับหรือไม่?"' },
+      { num: 2, label: 'Gather', text: 'ค้นหาใน PubMed, WHO, สถาบันมะเร็งแห่งชาติ' },
+      { num: 3, label: 'Analyze', text: 'ระบุ assumption: "ผู้เขียนสมมติว่าการทดสอบ in vitro = ผลในมนุษย์"' },
+      { num: 4, label: 'Evaluate', text: 'ไม่มี clinical trial; แหล่งข่าวไม่มี peer review; ใคร benefit จากการแชร์?' },
+      { num: 5, label: 'Conclude', text: 'ข้ออ้างไม่มีหลักฐานเพียงพอ ไม่ควรเชื่อหรือแชร์' },
+      { num: 6, label: 'Reflect', text: 'ตรวจสอบว่าตนเองมี wishful thinking เพราะต้องการให้มีวิธีรักษาง่ายๆ หรือไม่' }
+    ]
+  },
+  {
+    title: 'ตัวอย่างที่ 2: การตัดสินใจทางธุรกิจ',
+    situation: 'สถานการณ์: บริษัทกำลังพิจารณาเปิดตลาดใหม่ในต่างประเทศ',
+    model: 'RED Model (Pearson)',
+    color: '#F59E0B',
+    steps: [
+      { num: 'R', label: 'Recognize', text: 'ข้อสมมติที่ซ่อนอยู่: "ตลาดต่างประเทศมีความต้องการเหมือนไทย" — เป็นสมมติที่อันตราย' },
+      { num: 'E', label: 'Evaluate', text: 'ประเมิน: ข้อมูลวิจัยตลาด, กฎหมายท้องถิ่น, คู่แข่ง, ความเสี่ยงทางการเมือง, purchasing power' },
+      { num: 'D', label: 'Draw', text: 'สรุป: ตลาด A มีศักยภาพ แต่ต้องการ pilot test ก่อน 6 เดือน เพื่อลด confirmation bias' }
+    ]
+  },
+  {
+    title: 'ตัวอย่างที่ 3: Socratic Questioning ในชีวิตประจำวัน',
+    situation: 'สถานการณ์: เพื่อนบอกว่า "ควรลงทุนใน Crypto ตอนนี้เลย มันกำลังขึ้น!"',
+    model: 'Socratic Questioning (6 ประเภท)',
+    color: '#10B981',
+    steps: [
+      { num: '?', label: 'Clarification', text: '"ทำไมถึงคิดว่าตอนนี้คือเวลาที่ดี? คุณหมายถึง crypto ไหน? timeframe เท่าไร?"' },
+      { num: '?', label: 'Assumptions', text: '"คุณสมมติอะไรอยู่เบื้องหลังคำแนะนำนี้? สมมติว่ามันจะขึ้นต่อไปจริงหรือ?"' },
+      { num: '?', label: 'Evidence', text: '"มีหลักฐานอะไรสนับสนุน? ผลตอบแทนในอดีตนั้นรับประกันอนาคตได้ไหม?"' },
+      { num: '?', label: 'Implications', text: '"ถ้าตลาดตก 50% ผลที่ตามมาจะเป็นอย่างไร? รับ loss ได้แค่ไหน?"' },
+      { num: '?', label: 'Viewpoints', text: '"คนที่ไม่เห็นด้วยกับการลงทุนตอนนี้จะพูดอะไร? arguments ของเขาเป็นอย่างไร?"' }
+    ]
+  }
+];
+const exGrid = document.getElementById('examples-grid');
+examples.forEach(ex => {
+  const div = document.createElement('div');
+  div.className = 'card card-hover fade-up';
+  div.innerHTML = `<div class="font-semibold mb-1" style="color:${ex.color};">${ex.title}</div>
+    <div class="text-sm muted mb-1">${ex.situation}</div>
+    <div class="text-xs font-medium mb-3" style="color:${ex.color};">${ex.model}</div>
+    <div class="space-y-2">
+      ${ex.steps.map(s => `<div class="flex gap-3 items-start">
+        <span style="background:${ex.color}20;color:${ex.color};font-weight:700;font-size:0.75rem;padding:2px 7px;border-radius:5px;flex-shrink:0;min-width:28px;text-align:center;">${s.num}</span>
+        <div class="text-sm leading-relaxed"><strong>${s.label}:</strong> ${s.text}</div>
+      </div>`).join('')}
+    </div>`;
+  exGrid.appendChild(div);
+  io.observe(div);
+});
+
+// ── CT Chart (Chart.js) ───────────────────────────────
+const ctx = document.getElementById('ctChart');
+if (ctx) {
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['นายจ้าง\nต้องการ CT', 'บัณฑิต\nพร้อม CT', 'องค์กร:\nAnalytical\nThinking #1', 'CT จำเป็น\nแก้ปัญหา', 'Skills gap\nรายงาน'],
+      datasets: [{
+        label: 'เปอร์เซ็นต์',
+        data: [78, 34, 69, 85, 70],
+        backgroundColor: ['#6366F1', '#EF4444', '#6366F1', '#10B981', '#F59E0B'],
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, max: 100, ticks: { callback: v => v + '%' } },
+        x: { ticks: { font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+// ── Tools assessment table ─────────────────────────────
+const toolsTableData = [
+  { name: 'Watson-Glaser (WGCTA)', year: '1925/1980', items: '40 items', time: '30 นาที' },
+  { name: 'California CT Skills Test (CCTST)', year: '1990', items: '34 items', time: '45 นาที' },
+  { name: 'Cornell Critical Thinking Test', year: '1985', items: '76 items', time: '50 นาที' },
+  { name: 'Halpern Critical Thinking Assessment', year: '2010', items: 'Scenarios', time: '~60 นาที' },
+  { name: 'Collegiate Learning Assessment (CLA+)', year: '2014', items: 'Performance task', time: '90 นาที' }
+];
+document.getElementById('tools-table').innerHTML = `<div class="overflow-x-auto"><table style="width:100%;font-size:0.75rem;border-collapse:collapse;">
+  <thead><tr style="background:var(--accent-soft);">
+    <th style="text-align:left;padding:6px 8px;font-weight:600;">เครื่องมือ</th>
+    <th style="padding:6px;font-weight:600;">ปี</th>
+    <th style="padding:6px;font-weight:600;">รูปแบบ</th>
+  </tr></thead>
+  <tbody>${toolsTableData.map((t,i) => `<tr style="border-top:1px solid #e4e4e7;background:${i%2===0?'transparent':'#f8f8ff'};">
+    <td style="padding:6px 8px;">${t.name}</td>
+    <td style="padding:6px;text-align:center;">${t.year}</td>
+    <td style="padding:6px;text-align:center;">${t.items}</td>
+  </tr>`).join('')}</tbody>
+</table></div>`;
+
+// ── Stats Grid ────────────────────────────────────────
+const stats = [
+  { label: 'นายจ้างต้องการ CT', value: 78, suffix: '%', source: 'Hart 2018', color: '#6366F1' },
+  { label: 'บัณฑิตพร้อม CT', value: 34, suffix: '%', source: 'Hart 2018', color: '#EF4444' },
+  { label: 'ทักษะล้าสมัย 2030', value: 39, suffix: '%', source: 'WEF 2025', color: '#F59E0B' },
+  { label: 'CT จำเป็นแก้ปัญหา', value: 85, suffix: '%', source: 'Surveys 2024', color: '#10B981' }
+];
+const statsGrid = document.getElementById('stats-grid');
+stats.forEach(s => {
+  const div = document.createElement('div');
+  div.className = 'surface rounded-xl p-5 text-center scale-in card-hover';
+  div.innerHTML = `<div class="text-xs muted mb-1">${s.label}</div>
+    <div class="text-4xl font-bold" style="color:${s.color};" data-target="${s.value}" data-suffix="${s.suffix}">${s.value}${s.suffix}</div>
+    <div class="text-xs muted mt-1">${s.source}</div>`;
+  statsGrid.appendChild(div);
+  div.querySelector('[data-target]') && counterObserver.observe(div.querySelector('[data-target]'));
+  io.observe(div);
+});
+
+// ── Glossary ──────────────────────────────────────────
+const glossary = [
+  { en: 'Critical Thinking', th: 'การคิดเชิงวิพากษ์', def: 'กระบวนการคิดที่มีวินัย มีเหตุผล และประเมินหลักฐานอย่างเป็นระบบ' },
+  { en: 'Analytical Thinking', th: 'การคิดเชิงวิเคราะห์', def: 'การแยกส่วนประกอบและหาความสัมพันธ์ (subset ของ CT)' },
+  { en: 'Metacognition', th: 'อภิปัญญา', def: 'การคิดเกี่ยวกับการคิดของตัวเอง — รากฐานของ Self-Regulation' },
+  { en: 'Cognitive Bias', th: 'อคติทางความคิด', def: 'รูปแบบความคิดที่เบี่ยงเบนจากเหตุผล เกิดโดยไม่รู้ตัว' },
+  { en: 'Confirmation Bias', th: 'อคติยืนยัน', def: 'แนวโน้มหาข้อมูลที่ยืนยันความเชื่อเดิม ละเลยหลักฐานที่ขัดแย้ง' },
+  { en: 'Dunning-Kruger Effect', th: 'ผลกระทบดันนิง-ครูเกอร์', def: 'คนรู้น้อยประเมินความสามารถตนเองสูงเกินจริง' },
+  { en: 'Socratic Method', th: 'วิธีการโสคราตีส', def: 'การค้นหาความจริงผ่านการตั้งคำถามอย่างเป็นระบบ 6 ประเภท' },
+  { en: 'Delphi Report', th: 'รายงาน Delphi', def: 'ฉันทามติผู้เชี่ยวชาญ 46 คน ภายใต้ APA ปี 1990 กำหนดนิยาม CT' },
+  { en: 'Paul-Elder Framework', th: 'กรอบแนวคิด Paul-Elder', def: 'โมเดล CT ที่รวม 8 Elements, 9 Standards, 7 Traits' },
+  { en: 'RED Model', th: 'โมเดล RED', def: 'Recognize Assumptions → Evaluate Arguments → Draw Conclusions' },
+  { en: 'HOTS', th: 'การคิดระดับสูง', def: "Bloom's Higher-Order Thinking Skills: Analyze, Evaluate, Create" },
+  { en: 'Inference', th: 'การอนุมาน', def: 'การสรุปผลอย่างมีเหตุผลจากหลักฐานและข้อมูลที่มี' },
+  { en: 'Self-Regulation', th: 'การกำกับตนเอง', def: 'การตรวจสอบและปรับกระบวนการคิดของตนเองอย่างต่อเนื่อง' },
+  { en: 'Intellectual Standards', th: 'มาตรฐานทางปัญญา', def: 'เกณฑ์ประเมินคุณภาพการคิด 9 ข้อ: ชัดเจน, ถูกต้อง, แม่นยำ ฯลฯ' },
+  { en: 'Argument Mapping', th: 'การทำแผนที่ข้อโต้แย้ง', def: 'วาดโครงสร้างเหตุผลด้วยภาพ — พัฒนา CT ได้ +0.7–1.0 SD' },
+  { en: 'Sunk Cost Fallacy', th: 'ความผิดพลาดต้นทุนจม', def: 'ยังทำต่อเพราะลงทุนไปแล้ว แม้ไม่คุ้มค่าแล้ว' },
+  { en: 'Dispositions', th: 'แนวโน้มทางจิต', def: 'ทัศนคติและนิสัยที่เอื้อต่อ CT: Truth-seeking, Open-mindedness ฯลฯ' },
+  { en: 'Assumptions', th: 'ข้อสมมติ', def: 'สิ่งที่เชื่อว่าเป็นจริงโดยไม่ได้พิสูจน์ — ตรวจสอบใน Recognize ขั้นแรกของ RED' }
+];
+const glossGrid = document.getElementById('glossary-grid');
+glossary.forEach(g => {
+  const div = document.createElement('div');
+  div.innerHTML = `<dt><span class="accent">${g.th}</span> <span class="text-xs muted font-normal">(${g.en})</span></dt>
+    <dd class="text-sm">${g.def}</dd>`;
+  glossGrid.appendChild(div);
+});
+
+// ── Sources ───────────────────────────────────────────
+const sources = [
+  { id: 1, title: 'Critical Thinking: A Statement of Expert Consensus (Delphi Report)', author: 'Peter A. Facione', pub: 'APA / California Academic Press', year: '1990', url: 'https://www.qcc.cuny.edu/socialSciences/ppecorino/CT-Expert-Report.pdf' },
+  { id: 2, title: 'Paul-Elder Critical Thinking Framework', author: 'Richard Paul, Linda Elder', pub: 'Foundation for Critical Thinking', year: '2019', url: 'https://www.criticalthinking.org/pages/the-paul-elder-critical-thinking-framework/766' },
+  { id: 3, title: 'The Elements of Reasoning and the Intellectual Standards', author: 'Richard Paul, Linda Elder', pub: 'Foundation for Critical Thinking', year: '2020', url: 'https://www.criticalthinking.org/pages/the-elements-of-reasoning-and-the-intellectual-standards/480' },
+  { id: 4, title: 'The Future of Jobs Report 2025', author: 'World Economic Forum', pub: 'WEF', year: '2025', url: 'https://reports.weforum.org/docs/WEF_Future_of_Jobs_Report_2025.pdf' },
+  { id: 5, title: 'Future of Jobs Report 2025: Skills Outlook', author: 'World Economic Forum', pub: 'WEF', year: '2025', url: 'https://www.weforum.org/publications/the-future-of-jobs-report-2025/in-full/3-skills-outlook/' },
+  { id: 6, title: "Bloom's Taxonomy", author: 'Benjamin Bloom; Anderson & Krathwohl (2001)', pub: 'Wikipedia / Wikimedia Foundation', year: '2024', url: "https://en.wikipedia.org/wiki/Bloom's_taxonomy" },
+  { id: 7, title: 'Critical Thinking — Wikipedia', author: 'Multiple contributors', pub: 'Wikipedia / Wikimedia Foundation', year: '2024', url: 'https://en.wikipedia.org/wiki/Critical_thinking' },
+  { id: 8, title: 'Critical Thinking > History (Stanford Encyclopedia of Philosophy)', author: 'Multiple scholars', pub: 'Stanford Encyclopedia of Philosophy', year: '2024', url: 'https://plato.stanford.edu/entries/critical-thinking/history.html' },
+  { id: 9, title: 'How to Apply Paul-Elder Critical Thinking Framework', author: 'Rafiq Elmansy', pub: 'Designorate', year: '2023', url: 'https://www.designorate.com/critical-thinking-paul-elder-framework/' },
+  { id: 10, title: 'The Delphi Report Model — QEP Thinking and Beyond', author: 'San Jacinto College Library', pub: 'San Jacinto College', year: '2022', url: 'https://sjcd.libguides.com/c.php?g=862697&p=6960334' },
+  { id: 11, title: 'RED Model of Critical Thinking — Watson Glaser / Pearson TalentLens', author: 'Pearson Education', pub: 'Pearson TalentLens / Air University', year: '2016', url: 'https://www.airuniversity.af.edu/Portals/10/CMSA/documents/ReadAheads/PBS401B-RED-Critical-Thinking.pdf' },
+  { id: 12, title: 'Measuring Critical Thinking Skills with the RED Model', author: 'Various researchers', pub: 'IOP Publishing / Journal of Physics Conference Series', year: '2021', url: 'https://iopscience.iop.org/article/10.1088/1742-6596/1808/1/012030/pdf' },
+  { id: 13, title: 'Revisiting the Origin of Critical Thinking', author: 'Joe Y.F. Lau', pub: 'Educational Philosophy and Theory (Taylor & Francis)', year: '2024', url: 'https://www.tandfonline.com/doi/full/10.1080/00131857.2024.2320199' },
+  { id: 14, title: 'Socratic Questioning in Psychology: Examples and Techniques', author: 'Positive Psychology Team', pub: 'PositivePsychology.com', year: '2024', url: 'https://positivepsychology.com/socratic-questioning/' },
+  { id: 15, title: "Bloom's Taxonomy of Educational Objectives", author: 'UIC CATE', pub: 'University of Illinois Chicago — Center for the Advancement of Teaching Excellence', year: '2023', url: 'https://teaching.uic.edu/cate-teaching-guides/syllabus-course-design/blooms-taxonomy-of-educational-objectives/' },
+  { id: 16, title: 'Critical Thinking Statistics: Reports 2025', author: 'WiFiTalents Research Team', pub: 'WiFiTalents', year: '2025', url: 'https://wifitalents.com/critical-thinking-statistics/' },
+  { id: 17, title: 'Falling Short? College Learning and Career Success (AAC&U Employer Survey)', author: 'Hart Research Associates', pub: 'Association of American Colleges & Universities (AAC&U)', year: '2018', url: 'https://www.aacu.org/research/falling-short-college-learning-and-career-success' },
+  { id: 18, title: "Edward de Bono's Six Thinking Hats Explained", author: 'DMAIC Editorial Team', pub: 'DMAIC.com', year: '2023', url: 'https://www.dmaic.com/faq/six-thinking-hats-method/' },
+  { id: 19, title: 'Analytical Thinking vs. Critical Thinking vs. Creative Thinking', author: 'Paul Economus', pub: 'LinkedIn', year: '2023', url: 'https://www.linkedin.com/pulse/analytical-thinking-vs-critical-creative-paul-economus-6hvzc' },
+  { id: 20, title: 'Reflective Journaling for Critical Thinking Development', author: 'Asselin ME, Fain JA', pub: 'PubMed / Nurse Educator', year: '2013', url: 'https://pubmed.ncbi.nlm.nih.gov/26814821/' },
+  { id: 21, title: 'Argument Maps Improve Critical Thinking', author: 'Twardy, C.R.', pub: 'ResearchGate / Teaching Philosophy', year: '2004', url: 'https://www.researchgate.net/publication/28763750_Argument_Maps_Improve_Critical_Thinking' },
+  { id: 22, title: 'Measuring Critical Thinking with the Watson Glaser Critical Thinking Appraisal (WG-CTA)', author: 'GFB Group', pub: 'GFB Group', year: '2023', url: 'https://www.gfbgroup.com/post/measuring-critical-thinking-with-the-watson-glaser-critical-thinking-appraisal-wg-cta' },
+  { id: 23, title: 'LinkedIn Workplace Learning Report 2025', author: 'LinkedIn', pub: 'LinkedIn Learning', year: '2025', url: 'https://business.linkedin.com/learn/resources/workplace-learning-report' },
+  { id: 24, title: 'List of Cognitive Biases — Wikipedia', author: 'Multiple contributors', pub: 'Wikipedia / Wikimedia Foundation', year: '2024', url: 'https://en.wikipedia.org/wiki/List_of_cognitive_biases' },
+  { id: 25, title: 'Critical Thinking: Creating Job-Proof Skills for the Future of Work', author: 'Various authors', pub: 'PMC / Frontiers in Education', year: '2023', url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC10607682/' }
+];
+const sourcesList = document.getElementById('sources-list');
+sources.forEach(s => {
+  const li = document.createElement('li');
+  li.id = 'source-' + s.id;
+  li.innerHTML = `<span class="font-mono text-xs muted mr-2">${s.id}.</span>${s.title} — ${s.author} / ${s.pub} (<a href="${s.url}" target="_blank" rel="noopener">ลิงก์</a>) · ${s.year}`;
+  sourcesList.appendChild(li);
+});
+
+lucide.createIcons();
+</script>
+</body>
+</html>
