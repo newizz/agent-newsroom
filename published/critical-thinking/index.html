@@ -100,6 +100,8 @@
   <div class="surface rounded-xl p-4">
     <div class="text-xs font-semibold accent uppercase tracking-wide mb-2">สารบัญ</div>
     <div class="flex flex-wrap gap-1">
+      <a href="#infographic" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ภาพรวม</a>
+      <a href="#deep-synthesis" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">การสังเคราะห์เชิงลึก</a>
       <a href="#mindmap" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แผนที่ความคิด</a>
       <a href="#definition" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">นิยาม</a>
       <a href="#frameworks" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">กรอบแนวคิด</a>
@@ -115,6 +117,33 @@
     </div>
   </div>
 </nav>
+
+<!-- Visual Overview (infographic from NotebookLM) -->
+<section id="infographic" class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="image" class="w-5 h-5 accent"></i> ภาพรวม
+  </h2>
+  <div class="surface rounded-xl overflow-hidden">
+    <img src="infographic.png" alt="ภาพรวม Critical Thinking โดย NotebookLM" class="w-full h-auto block"/>
+  </div>
+  <div class="text-xs muted mt-2">สร้างโดย NotebookLM ระหว่างการวิจัยเชิงลึก</div>
+</section>
+
+<!-- Deep Synthesis Callout (Rin — 27 sources) -->
+<aside id="deep-synthesis" class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <div class="rounded-xl p-5 border-l-4" style="border-left-color:var(--accent);background:var(--accent-soft);">
+    <div class="text-xs font-medium accent mb-2">🔬 การวิจัยเชิงลึก — สังเคราะห์จาก 27 แหล่งข้อมูลผ่าน NotebookLM</div>
+    <p class="leading-relaxed" style="font-size:0.95rem;">
+      <strong>การคิดเชิงวิพากษ์ (Critical Thinking)</strong> คือกระบวนการทางจิตสำนึกที่มีระบบเพื่อวิเคราะห์ ประเมิน และจัดระเบียบข้อมูลจากประสบการณ์หรือการสื่อสาร เพื่อให้ได้ข้อสรุปหรือการตัดสินใจที่สมเหตุสมผลและมีประสิทธิภาพ มีรากฐานทางปัญญามาตั้งแต่ยุค<strong>โสกราตีส (Socrates)</strong> เมื่อ 2,500 ปีก่อน ผ่านวิธีการตั้งคำถามเชิงรุกที่เรียกว่า <strong>"Socratic Questioning"</strong> และได้รับการพัฒนาผ่านนักคิดหลายยุคสมัย เช่น เดส์การ์ตส์ และจอห์น ดิวอี้
+    </p>
+    <p class="leading-relaxed mt-3" style="font-size:0.95rem;">
+      กรอบแนวคิดสำคัญที่นิยมใช้ในปัจจุบันคือ <strong>Paul-Elder Framework</strong> ซึ่งแบ่งองค์ประกอบเป็นมาตรฐานทางสติปัญญา (เช่น ความชัดเจน ความแม่นยำ) องค์ประกอบการใช้เหตุผล และคุณลักษณะทางปัญญา รวมถึง <strong>Bloom's Revised Taxonomy</strong> ที่จัดให้การวิเคราะห์ (Analyzing) และการประเมิน (Evaluating) เป็นทักษะการคิดขั้นสูง (Higher Order Thinking Skills) ทักษะหลักของการคิดเชิงวิพากษ์ประกอบด้วย <strong>การคิดวิเคราะห์ ความใจกว้าง การแก้ปัญหา การตัดสินใจอย่างมีเหตุผล และการสื่อสาร</strong>
+    </p>
+    <p class="leading-relaxed mt-3" style="font-size:0.95rem;">
+      การนำไปใช้ในชีวิตจริงช่วยหลีกเลี่ยงการตัดสินใจที่ผิดพลาดและส่งเสริมกระบวนการประชาธิปไตย ในการทำงานช่วยเปลี่ยนทีมจากฝ่ายรับเป็นฝ่ายรุก ขับเคลื่อนนวัตกรรม ลดความเสี่ยง อย่างไรก็ตาม อุปสรรคสำคัญคือ <strong>อคติทางความคิด (Cognitive Biases)</strong> เช่น <strong>Confirmation Bias</strong> ที่ทำให้เราเลือกรับเฉพาะข้อมูลที่ตรงกับความเชื่อเดิม และ <strong>Dunning-Kruger Effect</strong> ที่คนมีความรู้น้อยมักประเมินความสามารถตนเองสูงเกินจริง
+    </p>
+  </div>
+</aside>
 
 <!-- Mind Map (Tier 2 fallback) -->
 <section id="mindmap" class="max-w-5xl mx-auto px-6 mb-12">
