@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ทักษะการคิดขั้นสูง (HOTS) — agent-newsroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://rsms.me/inter/inter.css" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
+<style>
+:root {
+  --accent: #6366F1;
+  --accent-soft: rgba(99,102,241,0.08);
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --muted: #71717a;
+  --border: #e4e4e7;
+  --text: #18181b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #09090b;
+    --surface: #18181b;
+    --muted: #a1a1aa;
+    --border: #27272a;
+    --text: #fafafa;
+    --accent-soft: rgba(99,102,241,0.15);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Sarabun', 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px; }
+.surface { background: var(--surface); border: 1px solid var(--border); }
+.accent { color: var(--accent); }
+.muted { color: var(--muted); }
+.accent-bg { background: var(--accent); color: #fff; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border: 1px solid var(--border); padding: 0.6rem 0.8rem; text-align: left; font-size: 0.88rem; }
+th { background: var(--accent-soft); font-weight: 600; }
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+  .scale-in { opacity: 0; transform: scale(0.93); transition: opacity .45s ease, transform .45s ease; }
+  .visible { opacity: 1 !important; transform: none !important; }
+}
+.card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+.card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,.13); }
+.markmap > svg { width: 100% !important; height: 100% !important; display: block; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+.badge-hots { background: rgba(99,102,241,0.12); color: var(--accent); }
+.badge-lots { background: rgba(113,113,122,0.12); color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- Scroll progress -->
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Hero -->
+<header style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%);color:#fff;padding:3.5rem 1.5rem 2.5rem;">
+  <div class="max-w-5xl mx-auto">
+    <a href="../../" style="font-size:0.8rem;opacity:0.75;text-decoration:none;color:#fff;">← กลับหน้าหลัก</a>
+    <h1 style="font-size:2.4rem;font-weight:800;margin-top:1rem;line-height:1.2;">ทักษะการคิดขั้นสูง</h1>
+    <p style="font-size:1.1rem;opacity:0.9;margin-top:0.5rem;">Higher Order Thinking Skills (HOTS)</p>
+    <p style="font-size:0.9rem;opacity:0.75;margin-top:0.5rem;">ภาพรวมครบถ้วน: Bloom's Taxonomy, 4 กรอบแนวคิด, วิธีพัฒนา และตัวอย่างจริงในชีวิตและการทำงาน</p>
+    <div style="margin-top:1.5rem;font-size:0.8rem;opacity:0.7;">2026-06-22 · agent-newsroom · deep mode · 35 แหล่งข้อมูล (Ravi) + 30 แหล่ง (NotebookLM)</div>
+  </div>
+</header>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 py-4">
+  <div class="surface rounded-xl p-4">
+    <div class="text-xs font-semibold accent uppercase tracking-wide mb-2">สารบัญ</div>
+    <div class="flex flex-wrap gap-1">
+      <a href="#infographic" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition" style="background:var(--accent-soft);">ภาพรวม</a>
+      <a href="#deep-synthesis" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">การสังเคราะห์เชิงลึก</a>
+      <a href="#mindmap" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แผนที่ความคิด</a>
+      <a href="#definition" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">นิยาม</a>
+      <a href="#bloom" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">Bloom's Taxonomy</a>
+      <a href="#hots-levels" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">3 ระดับ HOTS</a>
+      <a href="#frameworks" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">4 กรอบแนวคิด</a>
+      <a href="#methods" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">วิธีพัฒนา</a>
+      <a href="#examples" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ตัวอย่าง</a>
+      <a href="#biases" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">อคติที่ขัดขวาง</a>
+      <a href="#proscons" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ข้อดี/ข้อเสีย</a>
+      <a href="#data" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ข้อมูล</a>
+      <a href="#self" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">พัฒนาตนเอง</a>
+      <a href="#glossary" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">อภิธานศัพท์</a>
+      <a href="#sources" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แหล่งข้อมูล</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Visual Overview (infographic) -->
+<section id="infographic" class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="image" class="w-5 h-5 accent"></i> ภาพรวม
+  </h2>
+  <div class="surface rounded-xl overflow-hidden">
+    <img src="infographic.png" alt="ภาพรวม HOTS โดย NotebookLM" class="w-full h-auto block"/>
+  </div>
+  <div class="text-xs muted mt-2">สร้างโดย NotebookLM ระหว่างการวิจัยเชิงลึก</div>
+</section>
+
+<!-- Deep Synthesis Callout -->
+<aside id="deep-synthesis" class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <div class="rounded-xl p-5 border-l-4" style="border-left-color:var(--accent);background:var(--accent-soft);">
+    <div class="text-xs font-medium accent mb-2">🔬 การวิจัยเชิงลึก — สังเคราะห์จาก 30 แหล่งข้อมูลผ่าน NotebookLM</div>
+    <p class="leading-relaxed" style="font-size:0.95rem;">
+      <strong>ทักษะการคิดขั้นสูง (HOTS)</strong> คือกระบวนการทางปัญญาที่มีความซับซ้อนมากกว่าเพียงการจดจำหรือระลึกข้อมูลได้ โดยเป็นการใช้ทักษะพื้นฐานหลายด้านผสมผสานกันเพื่อจัดการข้อมูล แก้ปัญหา หรือบรรลุวัตถุประสงค์ที่ต้องการ ประเภทของ HOTS มักแบ่งตามอนุกรมวิธานของบลูม (Bloom's Taxonomy) เป็น 3 ระดับบนสุด ได้แก่ <strong>การวิเคราะห์ (Analyzing), การประเมินค่า (Evaluating) และการสร้างสรรค์ (Creating)</strong> สิ่งที่ทำให้ HOTS แตกต่างจาก LOTS คือกระบวนการคิดระดับลึกที่ต้องอาศัยการกำกับตนเอง (Metacognition) เพื่อเชื่อมโยงและประมวลผลข้อมูลในสถานการณ์ที่แปลกใหม่
+    </p>
+    <p class="leading-relaxed mt-3" style="font-size:0.95rem;">
+      การนำ HOTS ไปใช้ครอบคลุมทั้ง <strong>การทำงาน</strong> ที่ต้องอาศัยการตัดสินใจเชิงกลยุทธ์และการสร้างนวัตกรรม <strong>การศึกษา</strong> ที่เปลี่ยนบทบาทจากการท่องจำมาเป็นการเรียนรู้เชิงรุก (Active Learning) และ <strong>ชีวิตประจำวัน</strong> ที่ช่วยคัดกรองข้อมูลข่าวสาร แยกแยะข้อเท็จจริงออกจากความเห็น ตลอดจนจัดการความขัดแย้งส่วนบุคคลด้วยการมองจากหลายมุมมอง การฝึกฝน HOTS อย่างสม่ำเสมอเพียงวันละ 10-15 นาที จึงเป็นกุญแจสำคัญสู่ความสำเร็จและการเรียนรู้ตลอดชีวิต
+    </p>
+  </div>
+</aside>
+
+<!-- Mind Map (Tier 2 fallback) -->
+<section id="mindmap" class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="brain" class="w-5 h-5 accent"></i> แผนที่ความคิด
+  </h2>
+  <div class="surface rounded-xl p-2" style="height:600px;">
+    <div class="markmap" style="width:100%;height:100%;">
+      <script type="text/template">
+# ทักษะการคิดขั้นสูง (HOTS)
+
+## TL;DR
+- HOTS = วิเคราะห์ + ประเมิน + สร้างสรรค์
+- AI ทดแทน LOTS ได้ แต่ทดแทน HOTS ยาก
+- WEF 2025: Analytical Thinking อันดับ 1
+
+## HOTS vs LOTS
+- LOTS: จดจำ เข้าใจ ประยุกต์ (ระดับ 1-3)
+- HOTS: วิเคราะห์ ประเมิน สร้างสรรค์ (ระดับ 4-6)
+- LOTS: ตอบถูก/ผิด
+- HOTS: สร้างคำตอบใหม่
+
+## Bloom's Taxonomy (ปรับปรุง 2001)
+### ระดับ 4 — วิเคราะห์ (Analyze)
+- เปรียบเทียบ แยกแยะ ตรวจสอบ
+- Action verbs: differentiate, compare, examine
+### ระดับ 5 — ประเมิน (Evaluate)
+- ตัดสิน ปกป้อง วิจารณ์
+- Action verbs: judge, critique, justify
+### ระดับ 6 — สร้างสรรค์ (Create)
+- ออกแบบ พัฒนา สร้าง
+- Action verbs: design, construct, produce
+
+## 4 กรอบแนวคิด
+### Bloom Revised (2001)
+- 6 ระดับ จำแนกประเภทการคิด
+- เหมาะ: ออกแบบหลักสูตร
+### Webb's DOK (1997)
+- 4 ระดับ วัดความลึกของงาน
+- เหมาะ: ออกแบบข้อสอบ
+### SOLO Taxonomy (1982)
+- 5 ระดับ คุณภาพผลลัพธ์
+- เหมาะ: ให้ feedback ผู้เรียน
+### Marzano's (2007)
+- 3 ระบบ รวม Self-System
+- เหมาะ: โค้ชชิ่งครู
+
+## วิธีพัฒนา
+- Socratic Questioning (d=0.82)
+- Problem-Based Learning (n-gain=0.34)
+- Debate — ประเมิน + วิเคราะห์
+- Case Study — แก้ปัญหาจริง
+- Project-Based Learning — ผลผลิตจริง
+- Metacognitive Strategies (+8 เดือน)
+
+## อคติที่ขัดขวาง
+- Confirmation Bias — รับเฉพาะข้อมูลที่เห็นด้วย
+- Availability Heuristic — กลัวตามข่าวไม่ใช่สถิติ
+- Anchoring Effect — ยึดข้อมูลแรก
+- Survivorship Bias — มองแค่ความสำเร็จ
+- Sunk Cost Fallacy — ต้นทุนจม
+
+## ข้อมูลสำคัญ
+- 70% บริษัทถือ Analytical Thinking สำคัญที่สุด (WEF 2025)
+- PISA 2022 คณิตไทย 394 vs OECD 472
+- d=0.82 Socratic Questioning effect size
+- 39% ทักษะเปลี่ยนภายใน 2030
+      </script>
+    </div>
+  </div>
+  <div class="text-xs muted mt-2">แผนที่ความคิดสร้างจากการสังเคราะห์งานวิจัย (NotebookLM ไม่มีแผนที่ความคิดสำหรับรอบนี้)</div>
+</section>
+
+<!-- Insight Reel -->
+<section class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="surface rounded-2xl overflow-hidden" id="reel" tabindex="0">
+    <div id="reelSlides" style="position:relative;min-height:180px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- Definition & HOTS vs LOTS -->
+<section id="definition" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> HOTS คืออะไร และต่างจาก LOTS อย่างไร
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6 mb-8">
+    <div class="surface rounded-xl p-6 card-hover scale-in">
+      <div class="badge badge-lots mb-3">LOTS — ทักษะการคิดขั้นต่ำ (ระดับ 1-3)</div>
+      <p class="leading-relaxed mb-4">ดึงข้อมูลและเข้าใจมัน — <strong>recognize the right answer</strong></p>
+      <ul style="list-style:none;padding:0;" class="space-y-2">
+        <li style="padding:8px 12px;background:var(--bg);border-radius:8px;font-size:0.88rem;">🔵 <strong>จำ (Remember)</strong> — ระบุ, ระลึก, จดทำรายการ</li>
+        <li style="padding:8px 12px;background:var(--bg);border-radius:8px;font-size:0.88rem;">🔵 <strong>เข้าใจ (Understand)</strong> — อธิบาย, สรุป, ตีความ</li>
+        <li style="padding:8px 12px;background:var(--bg);border-radius:8px;font-size:0.88rem;">🔵 <strong>ประยุกต์ (Apply)</strong> — ใช้, แสดง, แก้ปัญหาที่คุ้นเคย</li>
+      </ul>
+      <p class="text-xs muted mt-4">คำถาม: "อะไร? ที่ไหน? เมื่อไร?" | ผลลัพธ์: ตอบถูก/ผิด</p>
+    </div>
+    <div class="surface rounded-xl p-6 card-hover scale-in" style="border-color:var(--accent);">
+      <div class="badge badge-hots mb-3">HOTS — ทักษะการคิดขั้นสูง (ระดับ 4-6)</div>
+      <p class="leading-relaxed mb-4">จัดการและแปลงข้อมูล — <strong>construct original answers</strong></p>
+      <ul style="list-style:none;padding:0;" class="space-y-2">
+        <li style="padding:8px 12px;background:var(--accent-soft);border-radius:8px;font-size:0.88rem;">🟣 <strong>วิเคราะห์ (Analyze)</strong> — เปรียบเทียบ, แยกแยะ, ตรวจสอบ</li>
+        <li style="padding:8px 12px;background:var(--accent-soft);border-radius:8px;font-size:0.88rem;">🟣 <strong>ประเมิน (Evaluate)</strong> — ตัดสิน, วิจารณ์, พิสูจน์</li>
+        <li style="padding:8px 12px;background:var(--accent-soft);border-radius:8px;font-size:0.88rem;">🟣 <strong>สร้างสรรค์ (Create)</strong> — ออกแบบ, สร้าง, วางแผน</li>
+      </ul>
+      <p class="text-xs muted mt-4">คำถาม: "ทำไม? อย่างไร? ถ้า...จะเป็นอย่างไร?" | ผลลัพธ์: สร้างคำตอบใหม่</p>
+    </div>
+  </div>
+  <div class="surface rounded-xl overflow-hidden fade-up">
+    <table>
+      <thead><tr><th>มิติ</th><th>LOTS (ระดับ 1-3)</th><th>HOTS (ระดับ 4-6)</th></tr></thead>
+      <tbody>
+        <tr><td>กิจกรรมหลัก</td><td>จดจำ, อธิบาย, ใช้งาน</td><td>วิเคราะห์, ประเมิน, สร้างสรรค์</td></tr>
+        <tr><td>คำถามที่ใช้</td><td>"อะไร? ที่ไหน? เมื่อไร?"</td><td>"ทำไม? อย่างไร? ถ้า...จะเป็นอย่างไร?"</td></tr>
+        <tr><td>ผลลัพธ์</td><td>ตอบถูก/ผิด</td><td>สร้างคำตอบใหม่</td></tr>
+        <tr><td>การถ่ายโอน</td><td>จำกัดในบริบทเดิม</td><td>ยืดหยุ่นในบริบทใหม่</td></tr>
+        <tr><td>ความยาก</td><td>วัดได้ง่ายด้วยข้อสอบมาตรฐาน</td><td>วัดยาก ต้องใช้ rubric</td></tr>
+        <tr><td>ในยุค AI</td><td>AI ทดแทนได้ง่าย</td><td>AI ทดแทนได้ยากที่สุด</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Bloom's Taxonomy 1956 vs 2001 -->
+<section id="bloom" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="layers" class="w-5 h-5 accent"></i> Bloom's Taxonomy — ดั้งเดิม (1956) vs ปรับปรุง (2001)
+  </h2>
+  <div class="surface rounded-xl overflow-hidden fade-up mb-4">
+    <table>
+      <thead>
+        <tr>
+          <th>ระดับ</th>
+          <th>ฉบับดั้งเดิม (1956) — คำนาม</th>
+          <th>ฉบับปรับปรุง (2001) — กริยา</th>
+          <th>หมวด</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>Knowledge (ความรู้)</td><td><strong>Remember (จำ)</strong></td><td><span class="badge badge-lots">LOTS</span></td></tr>
+        <tr><td>2</td><td>Comprehension (ความเข้าใจ)</td><td><strong>Understand (เข้าใจ)</strong></td><td><span class="badge badge-lots">LOTS</span></td></tr>
+        <tr><td>3</td><td>Application (การประยุกต์)</td><td><strong>Apply (ประยุกต์)</strong></td><td><span class="badge badge-lots">LOTS</span></td></tr>
+        <tr><td>4</td><td>Analysis (การวิเคราะห์)</td><td><strong>Analyze (วิเคราะห์)</strong></td><td><span class="badge badge-hots">HOTS</span></td></tr>
+        <tr><td>5</td><td><del>Synthesis (สังเคราะห์)</del> → ระดับ 6</td><td><strong>Evaluate (ประเมิน)</strong></td><td><span class="badge badge-hots">HOTS</span></td></tr>
+        <tr><td>6</td><td><del>Evaluation (ประเมิน)</del> → ระดับ 5</td><td><strong>Create (สร้างสรรค์)</strong></td><td><span class="badge badge-hots">HOTS</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid md:grid-cols-3 gap-4 fade-up">
+    <div class="surface rounded-xl p-4 card-hover">
+      <div class="text-xs font-semibold accent mb-2">1. คำนาม → กริยา</div>
+      <p class="text-sm leading-relaxed">เขียนวัตถุประสงค์การเรียนรู้ที่วัดได้ชัดขึ้น — "นักเรียนสามารถวิเคราะห์..." แทน "นักเรียนมีความรู้ด้าน..."</p>
+    </div>
+    <div class="surface rounded-xl p-4 card-hover">
+      <div class="text-xs font-semibold accent mb-2">2. สลับลำดับ Synthesis/Evaluation</div>
+      <p class="text-sm leading-relaxed">Evaluate ก่อน Create เพราะการประเมินอย่างลึกซึ้งเป็นพื้นฐานของการสร้างสิ่งใหม่ที่มีคุณค่า</p>
+    </div>
+    <div class="surface rounded-xl p-4 card-hover">
+      <div class="text-xs font-semibold accent mb-2">3. เพิ่ม Knowledge Dimension</div>
+      <p class="text-sm leading-relaxed">4 ประเภทความรู้: Factual, Conceptual, Procedural, Metacognitive — แยกว่าคิด "ด้วยอะไร" ออกจาก "คิดอย่างไร"</p>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-4 mt-4 fade-up" style="background:var(--accent-soft);border-color:var(--accent);">
+    <strong>ควรใช้ฉบับไหน?</strong> → ฉบับปรับปรุง 2001 (Anderson & Krathwohl) เป็นมาตรฐานสากลในการจัดการเรียนการสอนปัจจุบัน เนื่องจากใช้กริยาที่ทำให้เขียน learning outcomes ได้วัดได้ชัดเจนกว่า และถูกพัฒนาต่อเป็น Digital Taxonomy สำหรับยุค AI แล้ว
+  </div>
+</section>
+
+<!-- 3 ระดับ HOTS -->
+<section id="hots-levels" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="zap" class="w-5 h-5 accent"></i> 3 ระดับ HOTS — รายละเอียดและ Action Verbs
+  </h2>
+  <div id="hotsCards" class="grid md:grid-cols-3 gap-6"></div>
+</section>
+
+<!-- 4 กรอบแนวคิด -->
+<section id="frameworks" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="grid" class="w-5 h-5 accent"></i> 4 กรอบแนวคิดคู่ขนาน
+  </h2>
+  <div class="surface rounded-xl overflow-hidden fade-up mb-6">
+    <table>
+      <thead><tr><th>กรอบแนวคิด</th><th>ผู้พัฒนา</th><th>ปี</th><th>ระดับ</th><th>จุดเน้น</th><th>เหมาะกับ</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Bloom's Taxonomy</strong> (Revised)</td><td>Anderson & Krathwohl</td><td>2001</td><td>6</td><td>ประเภทกระบวนการคิด</td><td>ออกแบบหลักสูตร</td></tr>
+        <tr><td><strong>Webb's Depth of Knowledge</strong> (DOK)</td><td>Norman Webb</td><td>1997</td><td>4</td><td>ความลึกของการประมวลผล</td><td>ประเมินงานและข้อสอบ</td></tr>
+        <tr><td><strong>SOLO Taxonomy</strong></td><td>Biggs & Collis</td><td>1982</td><td>5</td><td>คุณภาพผลลัพธ์ที่สังเกตได้</td><td>ให้ feedback ผู้เรียน</td></tr>
+        <tr><td><strong>Marzano's New Taxonomy</strong></td><td>Marzano & Kendall</td><td>2007</td><td>3 ระบบ</td><td>กระบวนการภายใน + แรงจูงใจ</td><td>พัฒนาครูและโค้ชชิ่ง</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="surface rounded-xl p-5 card-hover fade-up">
+      <div class="font-semibold mb-3 accent">Webb's DOK — 4 ระดับ</div>
+      <div class="space-y-2 text-sm">
+        <div style="padding:8px;background:var(--bg);border-radius:8px;"><strong>DOK 1</strong> — Recall: ระบุข้อเท็จจริงพื้นฐาน</div>
+        <div style="padding:8px;background:var(--bg);border-radius:8px;"><strong>DOK 2</strong> — Skills: อธิบาย แปลความ สรุป</div>
+        <div style="padding:8px;background:var(--accent-soft);border-radius:8px;"><strong>DOK 3</strong> — Strategic Thinking: วิเคราะห์ วางแผน โต้แย้ง ← HOTS</div>
+        <div style="padding:8px;background:var(--accent-soft);border-radius:8px;"><strong>DOK 4</strong> — Extended Thinking: คิดซับซ้อนต่อเนื่อง ← HOTS สูงสุด</div>
+      </div>
+      <p class="text-xs muted mt-3">กริยาเดียวกัน เช่น "วิเคราะห์" อาจเป็น DOK 2 หรือ DOK 4 ขึ้นอยู่กับบริบท</p>
+    </div>
+    <div class="surface rounded-xl p-5 card-hover fade-up">
+      <div class="font-semibold mb-3 accent">SOLO Taxonomy — 5 ระดับ</div>
+      <div class="space-y-2 text-sm">
+        <div style="padding:8px;background:var(--bg);border-radius:8px;"><strong>Prestructural</strong> — ไม่เกี่ยวข้องกับงาน</div>
+        <div style="padding:8px;background:var(--bg);border-radius:8px;"><strong>Unistructural</strong> — ตอบได้จุดเดียว</div>
+        <div style="padding:8px;background:var(--bg);border-radius:8px;"><strong>Multistructural</strong> — ตอบหลายจุดแต่แยกกัน</div>
+        <div style="padding:8px;background:var(--accent-soft);border-radius:8px;"><strong>Relational</strong> — เชื่อมโยงองค์ประกอบ ← HOTS</div>
+        <div style="padding:8px;background:var(--accent-soft);border-radius:8px;"><strong>Extended Abstract</strong> — ถ่ายโอนสู่บริบทใหม่ ← HOTS สูงสุด</div>
+      </div>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-5 card-hover fade-up mt-6">
+    <div class="font-semibold mb-3 accent">Marzano's New Taxonomy — 3 ระบบซ้อนกัน</div>
+    <div class="grid md:grid-cols-3 gap-4 text-sm">
+      <div style="padding:12px;background:var(--bg);border-radius:8px;">
+        <div class="font-semibold mb-1">Self-System (ระบบตัวตน)</div>
+        <p>แรงจูงใจ ทัศนคติ และความเชื่อ — กรอง "จะเรียนหรือไม่" ก่อนที่จะเกิดกระบวนการคิดใดๆ</p>
+      </div>
+      <div style="padding:12px;background:var(--accent-soft);border-radius:8px;">
+        <div class="font-semibold mb-1">Metacognitive System</div>
+        <p>ตั้งเป้าหมาย ติดตามกระบวนการ ตรวจสอบความถูกต้อง — กำกับการคิดจากภายใน</p>
+      </div>
+      <div style="padding:12px;background:var(--accent-soft);border-radius:8px;">
+        <div class="font-semibold mb-1">Cognitive System</div>
+        <p>4 ระดับย่อย: Retrieval → Comprehension → Analysis → Knowledge Utilization</p>
+      </div>
+    </div>
+    <p class="text-xs muted mt-3">จุดเด่น: Marzano เน้นว่าแรงจูงใจ (Self-System) มีอิทธิพลต่อการเรียนรู้มากกว่าความสามารถทางปัญญาเพียงอย่างเดียว</p>
+  </div>
+</section>
+
+<!-- วิธีพัฒนา -->
+<section id="methods" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="wrench" class="w-5 h-5 accent"></i> วิธีพัฒนาทักษะ HOTS — 6 เทคนิค
+  </h2>
+  <div id="methodCards" class="grid md:grid-cols-2 gap-6"></div>
+</section>
+
+<!-- ตัวอย่างจริง -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="play-circle" class="w-5 h-5 accent"></i> ตัวอย่างในชีวิตจริง
+  </h2>
+  <div class="space-y-6">
+    <div class="surface rounded-xl p-6 card-hover fade-up">
+      <div class="font-semibold mb-3">🏫 ตัวอย่างที่ 1: HOTS ในห้องเรียนมัธยม (บริบทไทย)</div>
+      <p class="text-sm muted mb-3">สถานการณ์: ครูวิทยาศาสตร์ ม.4 สอนเรื่องโลกร้อน</p>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div style="padding:12px;background:var(--bg);border-radius:8px;font-size:0.88rem;">
+          <div class="font-medium mb-2">❌ LOTS approach</div>
+          ให้นักเรียนท่องว่าก๊าซเรือนกระจกมีอะไรบ้าง และจำวันที่ข้อตกลงปารีส
+        </div>
+        <div style="padding:12px;background:var(--accent-soft);border-radius:8px;font-size:0.88rem;">
+          <div class="font-medium mb-2 accent">✅ HOTS approach (DOK 3-4)</div>
+          "เปรียบเทียบนโยบายพลังงานไทยกับอาเซียน — ออกแบบแผนชุมชนสีเขียวสำหรับหมู่บ้านของคุณ"
+          <div class="mt-2 text-xs muted">→ Analyze → Evaluate → Create ในบริบทที่มีความหมาย</div>
+        </div>
+      </div>
+    </div>
+    <div class="surface rounded-xl p-6 card-hover fade-up">
+      <div class="font-semibold mb-3">💼 ตัวอย่างที่ 2: HOTS ในที่ทำงาน (ผู้จัดการทีม)</div>
+      <p class="text-sm muted mb-3">สถานการณ์: ยอดขายตกลง 15% ในไตรมาสที่ 3</p>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div style="padding:12px;background:var(--bg);border-radius:8px;font-size:0.88rem;">
+          <div class="font-medium mb-2">❌ LOTS: "ยอดขายลด → โฆษณาเพิ่ม"</div>
+          ตอบสนองทันทีโดยไม่วิเคราะห์สาเหตุ
+        </div>
+        <div style="padding:12px;background:var(--accent-soft);border-radius:8px;font-size:0.88rem;">
+          <div class="font-medium mb-2 accent">✅ HOTS step-by-step</div>
+          <div>🔍 <strong>Analyze:</strong> ลดเฉพาะไลน์ไหน ภูมิภาคใด ลูกค้ากลุ่มไหน?</div>
+          <div>⚖️ <strong>Evaluate:</strong> ทดสอบสมมติฐาน 3 ข้อ — คุณภาพ/ราคา/การแข่งขัน</div>
+          <div>🎨 <strong>Create:</strong> ออกแบบทดลองเล็กๆ ก่อนลงทุนเต็มแผน</div>
+        </div>
+      </div>
+    </div>
+    <div class="surface rounded-xl p-6 card-hover fade-up">
+      <div class="font-semibold mb-3">📱 ตัวอย่างที่ 3: HOTS ในชีวิตประจำวัน (ผู้บริโภค)</div>
+      <p class="text-sm muted mb-3">สถานการณ์: เห็นโพสต์ข่าวสุขภาพในเฟซบุ๊ก</p>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div style="padding:12px;background:var(--bg);border-radius:8px;font-size:0.88rem;">
+          <div class="font-medium mb-2">❌ LOTS: SHARE ทันที</div>
+          อ่านแล้วแชร์โดยไม่ตรวจสอบ
+        </div>
+        <div style="padding:12px;background:var(--accent-soft);border-radius:8px;font-size:0.88rem;">
+          <div class="font-medium mb-2 accent">✅ HOTS</div>
+          <div>🔍 <strong>Analyze:</strong> ใครเขียน? แหล่งอ้างอิงคืออะไร? ผลประโยชน์ของผู้เขียน?</div>
+          <div>⚖️ <strong>Evaluate:</strong> สอดคล้องกับงานวิจัยที่ผ่านการ peer review หรือไม่?</div>
+          <div>🎨 <strong>Create:</strong> สรุปมุมมองรอบด้านก่อนแชร์ หรือแชร์พร้อมบริบทเพิ่มเติม</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- อคติทางปัญญา -->
+<section id="biases" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="alert-triangle" class="w-5 h-5 accent"></i> อคติทางปัญญา 7 ประเภทที่ขัดขวาง HOTS
+  </h2>
+  <p class="muted mb-6 fade-up">อคติทำงานแบบอัตโนมัติ System 1 มักครอบงำ System 2 ในสถานการณ์ที่มีแรงกดดัน — การตระหนักรู้คือก้าวแรกของการต้านทาน</p>
+  <div id="biasCards" class="grid md:grid-cols-2 gap-4"></div>
+</section>
+
+<!-- ข้อดีและข้อเสีย -->
+<section id="proscons" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="scale" class="w-5 h-5 accent"></i> ข้อดีและข้อเสียของการเน้น HOTS
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="surface rounded-xl p-6 fade-up">
+      <div class="font-semibold text-green-600 mb-4">✅ ข้อดี</div>
+      <ul class="space-y-3 text-sm">
+        <li style="padding:8px 12px;border-left:3px solid #10B981;padding-left:12px;"><strong>เตรียมพร้อมสำหรับโลกเปลี่ยนแปลง</strong> — ทักษะ HOTS ถ่ายโอนสู่บริบทใหม่ได้ดีกว่าความรู้เฉพาะ</li>
+        <li style="padding:8px 12px;border-left:3px solid #10B981;padding-left:12px;"><strong>เพิ่มนวัตกรรมและการแก้ปัญหา</strong> — องค์กรที่พนักงาน HOTS สูงปรับตัวได้เร็วกว่า</li>
+        <li style="padding:8px 12px;border-left:3px solid #10B981;padding-left:12px;"><strong>เพิ่มแรงจูงใจและ engagement</strong> — ผู้เรียนรู้สึกมีความหมายมากกว่าการท่องจำ</li>
+        <li style="padding:8px 12px;border-left:3px solid #10B981;padding-left:12px;"><strong>ป้องกัน automation displacement</strong> — ส่วนที่ AI ทดแทนได้ยากที่สุด</li>
+        <li style="padding:8px 12px;border-left:3px solid #10B981;padding-left:12px;"><strong>เสริมสร้างพลเมืองวิพากษ์</strong> — ต้านข่าวปลอมและสนับสนุนการตัดสินใจทางประชาธิปไตย</li>
+      </ul>
+    </div>
+    <div class="surface rounded-xl p-6 fade-up">
+      <div class="font-semibold text-red-600 mb-4">⚠️ ข้อเสีย / ข้อวิจารณ์</div>
+      <ul class="space-y-3 text-sm">
+        <li style="padding:8px 12px;border-left:3px solid #EF4444;padding-left:12px;"><strong>ต้องพื้นฐานความรู้ก่อน</strong> — HOTS ต้องอาศัย Factual Knowledge เป็นฐาน ข้ามขั้นไม่ได้</li>
+        <li style="padding:8px 12px;border-left:3px solid #EF4444;padding-left:12px;"><strong>เข้าใจผิดว่าการคิดเป็นเส้นตรง</strong> — Bloom's อาจทำให้เชื่อว่าต้องผ่านทุกระดับตามลำดับ ซึ่งไม่จริงเสมอ</li>
+        <li style="padding:8px 12px;border-left:3px solid #EF4444;padding-left:12px;"><strong>ยากต่อการประเมินมาตรฐาน</strong> — ข้อสอบ multiple choice วัด HOTS ได้จำกัดมาก</li>
+        <li style="padding:8px 12px;border-left:3px solid #EF4444;padding-left:12px;"><strong>ใช้เวลาและทรัพยากรมากกว่า</strong> — PBL ต้องการเวลาและการอำนวยการมากกว่าการบรรยาย</li>
+        <li style="padding:8px 12px;border-left:3px solid #EF4444;padding-left:12px;"><strong>ท้าทายสำหรับผู้เรียนที่ขาดพื้นฐาน</strong> — จะรู้สึกล้นมือหากข้ามขั้น LOTS ไปก่อน</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Data & Chart -->
+<section id="data" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="bar-chart-2" class="w-5 h-5 accent"></i> ข้อมูลสำคัญ
+  </h2>
+  <div class="grid md:grid-cols-2 gap-8 mb-8">
+    <div>
+      <div class="font-medium mb-3 fade-up">PISA 2022 — ไทย vs OECD</div>
+      <canvas id="pisaChart" height="200"></canvas>
+    </div>
+    <div>
+      <div class="font-medium mb-3 fade-up">Effect Size ของเทคนิค HOTS ต่างๆ</div>
+      <canvas id="effectChart" height="200"></canvas>
+    </div>
+  </div>
+  <div class="surface rounded-xl overflow-hidden fade-up">
+    <table>
+      <thead><tr><th>ตัวชี้วัด</th><th>ค่า</th><th>ปี</th><th>แหล่ง</th></tr></thead>
+      <tbody>
+        <tr><td>บริษัทที่ถือ Analytical Thinking เป็นทักษะสำคัญที่สุด</td><td><strong>70%</strong></td><td>2025</td><td>WEF</td></tr>
+        <tr><td>ทักษะที่จะเปลี่ยนในตลาดแรงงานภายใน 2030</td><td><strong>39%</strong></td><td>2025</td><td>WEF</td></tr>
+        <tr><td>ผู้นำองค์กรที่ระบุช่องว่างทักษะกระทบธุรกิจ</td><td><strong>70%</strong></td><td>2024</td><td>Springboard</td></tr>
+        <tr><td>ช่องว่าง Critical Thinking (ความสำคัญ vs ความพร้อม)</td><td><strong>21 จุด%</strong></td><td>2021</td><td>AAC&U</td></tr>
+        <tr><td>PISA 2022 คณิตศาสตร์ไทย vs OECD</td><td><strong>394 vs 472</strong></td><td>2022</td><td>OECD</td></tr>
+        <tr><td>PISA 2022 การอ่านไทย vs OECD</td><td><strong>379 vs 476</strong></td><td>2022</td><td>OECD</td></tr>
+        <tr><td>ผู้เรียนไทยถึงระดับพื้นฐาน PISA คณิตศาสตร์</td><td><strong>32%</strong> (OECD: 69%)</td><td>2022</td><td>OECD</td></tr>
+        <tr><td>Effect size — Classroom Discussion & Socratic Q</td><td><strong>d = 0.82</strong></td><td>—</td><td>Structural Learning</td></tr>
+        <tr><td>Effect size — Problem-solving Teaching</td><td><strong>d = 0.61</strong></td><td>—</td><td>Structural Learning</td></tr>
+        <tr><td>Metacognitive Strategies — ความก้าวหน้าเพิ่มเติม</td><td><strong>+8 เดือน</strong></td><td>—</td><td>Structural Learning</td></tr>
+        <tr><td>PBL effect on HOTS (n-gain)</td><td><strong>0.34</strong></td><td>2024</td><td>ResearchGate</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Thai Curriculum -->
+<section class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="map-pin" class="w-5 h-5 accent"></i> บริบทการศึกษาไทย
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="surface rounded-xl p-5 fade-up">
+      <div class="font-semibold mb-3">หลักสูตรแกนกลาง พ.ศ. 2551 (OBEC)</div>
+      <p class="text-sm mb-3">กำหนดสมรรถนะหลัก 5 ด้าน รวมถึง "ความสามารถในการคิด" — วิเคราะห์, สังเคราะห์, สร้าง, วิจารณ์, คิดเป็นระบบ</p>
+      <div class="text-sm muted">สสวท. นำ STEM Education มาใช้เพื่อพัฒนา Analytical Thinking, Problem Solving และ Creativity</div>
+    </div>
+    <div class="surface rounded-xl p-5 fade-up">
+      <div class="font-semibold mb-3 text-red-600">ช่องว่างและความท้าทาย</div>
+      <table style="font-size:0.82rem;">
+        <tbody>
+          <tr><td style="border:none;padding:4px 8px 4px 0;font-weight:600;">การเน้นท่องจำ</td><td style="border:none;">ระบบใช้การทดสอบ closed-ended เป็นหลัก</td></tr>
+          <tr><td style="border:none;padding:4px 8px 4px 0;font-weight:600;">Teacher-centered</td><td style="border:none;">ครูบรรยายแทนให้นักเรียนค้นพบ</td></tr>
+          <tr><td style="border:none;padding:4px 8px 4px 0;font-weight:600;">Gap นโยบาย-ปฏิบัติ</td><td style="border:none;">หลักสูตรระบุ HOTS แต่ข้อสอบวัดความจำ</td></tr>
+          <tr><td style="border:none;padding:4px 8px 4px 0;font-weight:600;">ทรัพยากรจำกัด</td><td style="border:none;">โรงเรียนชนบทขาดครูที่ผ่านอบรม</td></tr>
+          <tr><td style="border:none;padding:4px 8px 4px 0;font-weight:600;">PISA 2022</td><td style="border:none;">ต่ำกว่า OECD มากกว่า 75 คะแนนทุกสาขา</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Self-Development -->
+<section id="self" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="user-check" class="w-5 h-5 accent"></i> พัฒนา HOTS ด้วยตนเอง — 10 วิธีที่ทำได้ทันที
+  </h2>
+  <div id="selfCards" class="grid md:grid-cols-2 gap-4"></div>
+</section>
+
+<!-- Glossary -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book" class="w-5 h-5 accent"></i> อภิธานศัพท์
+  </h2>
+  <div class="surface rounded-xl p-6 fade-up">
+    <dl id="glossaryList" class="grid md:grid-cols-2 gap-x-8 gap-y-3"></dl>
+  </div>
+</section>
+
+<!-- Sources -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> แหล่งข้อมูล
+  </h2>
+  <div class="surface rounded-xl p-6 fade-up mb-4">
+    <div class="text-sm font-semibold mb-4">แหล่งข้อมูลหลัก (Ravi — 35 แหล่ง)</div>
+    <ol id="sourcesList" class="space-y-2 text-sm" style="padding-left:1.2rem;"></ol>
+  </div>
+  <div class="surface rounded-xl p-6 fade-up">
+    <div class="text-sm font-semibold mb-2">แหล่งข้อมูลวิดีโอ (NotebookLM — 20 YouTube + 10 web)</div>
+    <p class="text-sm muted">Notebook ID: aaced98d-5c29-4c6d-aab2-147144a6191c | Mode: fast | Sources: 30</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="max-w-5xl mx-auto px-6 py-8 text-center text-sm muted border-t" style="border-color:var(--border);">
+  <a href="../../" style="color:var(--accent);text-decoration:none;">กลับหน้าหลัก</a> ·
+  สร้างโดย agent-newsroom · 2026-06-22 · deep mode
+</footer>
+
+<script>
+// ── Scroll progress ──────────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── Entrance animations ──────────────────────────────────────────────────────
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.07 });
+document.querySelectorAll('.fade-up, .scale-in').forEach(el => io.observe(el));
+
+// ── Insight Reel ─────────────────────────────────────────────────────────────
+const insights = [
+  { icon: 'trending-up', stat: '70%', statLabel: 'บริษัทต้องการ Analytical Thinking', headline: 'HOTS คือทักษะอันดับ 1 ของโลกแรงงาน', body: 'WEF Future of Jobs 2025: Analytical Thinking ครองอันดับ 1 ทักษะที่นายจ้างต้องการมากที่สุด', color: '#6366F1' },
+  { icon: 'alert-circle', stat: '39%', statLabel: 'ทักษะจะเปลี่ยนภายใน 2030', headline: 'AI กำลังเปลี่ยนตลาดแรงงาน', body: 'WEF 2025: 39% ของทักษะหลักจะล้าสมัยภายใน 2030 แต่ HOTS คือทักษะที่ AI ทดแทนได้ยากที่สุด', color: '#F59E0B' },
+  { icon: 'bar-chart', stat: '394', statLabel: 'PISA คณิตศาสตร์ไทย 2022 (OECD: 472)', headline: 'ช่องว่าง HOTS ในระบบการศึกษาไทย', body: 'คะแนน PISA 2022 ไทยต่ำกว่า OECD มากกว่า 75 คะแนนทุกสาขา สะท้อนระบบที่ยังเน้นการท่องจำ', color: '#EF4444' },
+  { icon: 'zap', stat: '0.82', statLabel: 'Effect size ของ Socratic Questioning (d)', headline: 'Socratic Questioning — วิธีที่ได้ผลสูงสุด', body: 'การอภิปรายในห้องเรียนและ Socratic Questioning มี effect size d=0.82 สูงที่สุดในบรรดาเทคนิคทั้งหมด', color: '#10B981' },
+  { icon: 'users', stat: '21%', statLabel: 'ช่องว่างระหว่าง "ความสำคัญ" และ "ความพร้อม"', headline: 'นายจ้างอยากได้ แต่บัณฑิตไม่พร้อม', body: 'AAC&U 2021: ช่องว่างระหว่างความสำคัญและความพร้อมของ Critical Thinking อยู่ที่ 21 จุดเปอร์เซ็นต์', color: '#8B5CF6' },
+  { icon: 'database', stat: '30', statLabel: 'แหล่งข้อมูลใน NotebookLM', headline: 'สังเคราะห์จากแหล่งข้อมูลลึก', body: 'Rin (NotebookLM) รวบรวม 30 แหล่งข้อมูล (10 เว็บ + 20 YouTube) สังเคราะห์ความรู้ HOTS อย่างครบถ้วน', color: '#6366F1' },
+];
+
+let reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function buildSlide(ins) {
+  return `<div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;">
+    <div style="text-align:center;min-width:120px;flex-shrink:0;">
+      <div class="reel-stat" style="font-size:2.8rem;font-weight:800;color:${ins.color};line-height:1;">${ins.stat}</div>
+      <div style="font-size:0.7rem;color:#71717a;margin-top:4px;">${ins.statLabel}</div>
+    </div>
+    <div>
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">${ins.headline}</div>
+      <div style="font-size:0.9rem;color:#71717a;line-height:1.6;">${ins.body}</div>
+    </div>
+  </div>`;
+}
+
+function showSlide(idx, animate) {
+  if (reelAnimating) return;
+  reelAnimating = true;
+  reelIdx = (idx + insights.length) % insights.length;
+  const wrap = document.getElementById('reelSlides');
+  if (animate !== false) {
+    wrap.style.opacity = '0'; wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+  setTimeout(() => {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    wrap.style.opacity = '1'; wrap.style.transform = 'none';
+    reelAnimating = false;
+  }, animate !== false ? 350 : 0);
+  document.querySelectorAll('.reel-dot').forEach((d, i) => {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  requestAnimationFrame(() => { bar.style.transition = 'width 4s linear'; bar.style.width = '100%'; });
+}
+
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;';
+  d.style.background = i === 0 ? 'var(--accent)' : '#d4d4d8';
+  d.onclick = () => { clearInterval(reelTimer); showSlide(i); reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000); };
+  dotsWrap.appendChild(d);
+});
+
+const reelEl = document.getElementById('reel');
+reelEl.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { clearInterval(reelTimer); showSlide(reelIdx + 1); reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000); }
+  if (e.key === 'ArrowLeft') { clearInterval(reelTimer); showSlide(reelIdx - 1); reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000); }
+});
+reelEl.addEventListener('mouseenter', () => clearInterval(reelTimer));
+reelEl.addEventListener('mouseleave', () => { reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000); });
+
+showSlide(0, false);
+reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000);
+
+// ── HOTS Level Cards ──────────────────────────────────────────────────────────
+const hotsLevels = [
+  {
+    level: 4, name: 'วิเคราะห์ (Analyze)', color: '#6366F1',
+    def: 'แยกข้อมูลออกเป็นส่วนประกอบย่อย เพื่อทำความเข้าใจโครงสร้าง ความสัมพันธ์ และรูปแบบ',
+    verbsTh: 'เปรียบเทียบ · แยกแยะ · ตรวจสอบ · จัดระเบียบ · แยกส่วน · วินิจฉัย',
+    verbsEn: 'differentiate · compare · examine · deconstruct · classify',
+    examples: ['เปรียบเทียบนโยบายเศรษฐกิจสองชุด', 'วิเคราะห์ข้อมูลยอดขาย 3 ปี', 'แยกข่าวจริงจากข่าวปลอม']
+  },
+  {
+    level: 5, name: 'ประเมิน (Evaluate)', color: '#8B5CF6',
+    def: 'ตัดสินคุณค่า ความถูกต้อง หรือคุณภาพของข้อมูล วิธีการ หรือผลลัพธ์ โดยอิงเกณฑ์และหลักฐาน',
+    verbsTh: 'ตัดสิน · ปกป้อง · วิจารณ์ · ประเมินคุณค่า · พิสูจน์ · โต้แย้ง',
+    verbsEn: 'judge · defend · critique · justify · debate · recommend',
+    examples: ['ประเมินข้อเสนอโปรเจกต์ 3 แบบ', 'ตัดสินใจเลือกวิธีการรักษาสุขภาพ', 'วิจารณ์ความน่าเชื่อถือของแหล่งข้อมูล']
+  },
+  {
+    level: 6, name: 'สร้างสรรค์ (Create)', color: '#10B981',
+    def: 'รวมองค์ประกอบต่างๆ เพื่อผลิตสิ่งใหม่ที่มีคุณค่า ไม่ว่าจะเป็นผลิตภัณฑ์ แผนงาน หรือมุมมองใหม่',
+    verbsTh: 'ออกแบบ · พัฒนา · สร้าง · ผลิต · วางแผน · ประกอบ · สร้างสมมติฐาน',
+    verbsEn: 'design · construct · produce · plan · generate · formulate',
+    examples: ['ออกแบบโครงการลดขยะในชุมชน', 'พัฒนาแนวคิดผลิตภัณฑ์ใหม่', 'วางแผนการเงินส่วนตัว']
+  }
+];
+
+const hotsContainer = document.getElementById('hotsCards');
+hotsLevels.forEach((h, i) => {
+  const card = document.createElement('div');
+  card.className = 'surface rounded-xl p-6 card-hover scale-in';
+  card.style.transitionDelay = `${i * 80}ms`;
+  card.style.borderTop = `4px solid ${h.color}`;
+  card.innerHTML = `
+    <div class="text-xs muted mb-1">ระดับ ${h.level}</div>
+    <div class="text-lg font-bold mb-3" style="color:${h.color};">${h.name}</div>
+    <p class="text-sm leading-relaxed mb-4">${h.def}</p>
+    <div class="text-xs font-semibold mb-1" style="color:${h.color};">คำกริยาไทย</div>
+    <div class="text-xs muted mb-3">${h.verbsTh}</div>
+    <div class="text-xs font-semibold mb-1" style="color:${h.color};">Action Verbs</div>
+    <div class="text-xs muted mb-4">${h.verbsEn}</div>
+    <div class="text-xs font-semibold mb-2">ตัวอย่าง</div>
+    ${h.examples.map(e => `<div class="text-xs" style="padding:5px 10px;border-radius:6px;background:var(--bg);margin-bottom:4px;">• ${e}</div>`).join('')}
+  `;
+  hotsContainer.appendChild(card);
+});
+
+// ── Method Cards ──────────────────────────────────────────────────────────────
+const methods = [
+  { name: 'Socratic Questioning', icon: '❓', effect: 'd = 0.82', detail: '6 ประเภทคำถาม (Paul & Elder): ชี้แจง · สำรวจข้อสมมติ · สอบสวนหลักฐาน · มุมมองอื่น · ผลลัพธ์ · ตั้งคำถาม', steps: 'เริ่มด้วยคำถามเปิด → ให้เวลาคิด → ถามต่อยอดจากคำตอบ → สรุปร่วมกัน' },
+  { name: 'Problem-Based Learning (PBL)', icon: '🧩', effect: 'n-gain = 0.34', detail: '7 ขั้นตอนมาตรฐาน: ชี้แจงคำศัพท์ → นิยามปัญหา → วิเคราะห์ → ระดมคำอธิบาย → กำหนดวัตถุประสงค์ → รวบรวมข้อมูล → สังเคราะห์', steps: 'เหมาะกับกลุ่ม 5-8 คน ปัญหาที่ไม่มีคำตอบเดียว' },
+  { name: 'Case Study Method', icon: '📋', effect: 'HOTS ระดับ 4-5', detail: 'ผู้เรียนตั้งคำถามเอง แก้ปัญหาและเรียนรู้จากเพื่อน คลี่คลายกรณีทีละชั้น สรุปบทเรียนที่ถ่ายโอนได้', steps: 'เหมาะกับ 15-30 คน ปัญหาที่มีหลายมุมมอง (ธุรกิจ/การแพทย์)' },
+  { name: 'Debate (โต้วาที)', icon: '🎤', effect: 'HOTS ระดับ 4-5', detail: 'แบ่งฝ่าย → ค้นคว้าสนับสนุนฝ่ายตน → ฟังฝ่ายตรงข้าม → โต้แย้งด้วยหลักฐาน → สะท้อนบทเรียน', steps: 'พัฒนา: การประเมิน, วิเคราะห์ข้อโต้แย้ง, มุมมองหลายด้าน' },
+  { name: 'Project-Based Learning (PjBL)', icon: '🔨', effect: 'HOTS ระดับ 4-6', detail: 'แตกต่างจาก PBL: PjBL เริ่มจากโครงงานที่มีผลลัพธ์จริง ผู้ชมจริง สินค้าจริง (Authentic tasks)', steps: 'Analyze → Evaluate → Create ครบทั้ง 3 ระดับ HOTS ในโครงงานเดียว' },
+  { name: 'Metacognitive Strategies', icon: '🧠', effect: '+8 เดือนความก้าวหน้า', detail: 'Think Aloud · Self-questioning · Concept Mapping · Self-reflection — กำกับการเรียนรู้จากภายใน', steps: 'ครูแสดงกระบวนการคิดดังๆ รวมถึงข้อผิดพลาด → ผู้เรียนถามตัวเองระหว่างเรียน' },
+];
+
+const methodContainer = document.getElementById('methodCards');
+methods.forEach((m, i) => {
+  const card = document.createElement('div');
+  card.className = 'surface rounded-xl p-5 card-hover fade-up';
+  card.style.transitionDelay = `${i * 60}ms`;
+  card.innerHTML = `
+    <div class="flex items-start gap-3 mb-3">
+      <span style="font-size:1.5rem;">${m.icon}</span>
+      <div>
+        <div class="font-semibold">${m.name}</div>
+        <div class="text-xs" style="color:var(--accent);">${m.effect}</div>
+      </div>
+    </div>
+    <p class="text-sm leading-relaxed mb-3">${m.detail}</p>
+    <div class="text-xs muted p-2 rounded" style="background:var(--bg);">${m.steps}</div>
+  `;
+  methodContainer.appendChild(card);
+});
+
+// ── Bias Cards ────────────────────────────────────────────────────────────────
+const biases = [
+  { name: 'Confirmation Bias (อคติยืนยัน)', def: 'เสาะหาข้อมูลที่ยืนยันความเชื่อเดิมและเพิกเฉยต่อข้อมูลที่ขัดแย้ง', example: 'เชื่อว่าสมุนไพรรักษาโรคได้ทุกอย่าง แล้วค้นหาแต่หลักฐานที่สนับสนุน', fix: 'แสวงหาหลักฐานที่โต้แย้งความเชื่อของตัวเองด้วย' },
+  { name: 'Availability Heuristic (ฮิวริสติกความพร้อม)', def: 'ประเมินโอกาสจากเหตุการณ์ที่นึกออกได้ง่าย', example: 'กลัวเครื่องบินตกมากกว่ารถยนต์ เพราะข่าวเครื่องบินโดดเด่นในสื่อ', fix: 'ค้นหาสถิติจริงก่อนตัดสินใจ' },
+  { name: 'Anchoring Effect (ผลของสมอ)', def: 'พึ่งพาข้อมูลแรกที่รับรู้เกินไป', example: 'ราคาบ้านเปิดที่ 5 ล้าน ทำให้ต่อรองรอบ 5 ล้าน แม้มูลค่าจริงต่ำกว่า', fix: 'ค้นคว้าข้อมูลพื้นฐานก่อนรับข้อมูลจากคู่สัญญา' },
+  { name: 'Survivorship Bias (อคติผู้รอดชีวิต)', def: 'มองแต่กรณีที่สำเร็จ ละเลยกรณีล้มเหลว', example: 'คิดว่าออกจากงานไปทำธุรกิจง่าย เพราะรู้จักแต่คนที่สำเร็จ', fix: 'ศึกษาสถิติอัตราล้มเหลวของธุรกิจด้วย' },
+  { name: 'Sunk Cost Fallacy (เหตุผลวิบัติต้นทุนจม)', def: 'ลงทุนต่อเพราะกลัวสูญเสียที่ผ่านมา แม้ไม่คุ้มค่า', example: 'เรียนต่อสายที่ไม่ชอบเพราะจ่ายค่าเทอมไปแล้ว', fix: 'ประเมินเฉพาะต้นทุนและผลประโยชน์ในอนาคต ไม่ใช่อดีต' },
+  { name: 'Overconfidence Effect (ประเมินตนเองสูงเกิน)', def: 'คิดว่าตนรู้มากกว่าที่เป็นจริง (Dunning-Kruger)', example: 'มั่นใจว่าสอบผ่านโดยไม่ทบทวนเพราะรู้สึกว่าเข้าใจแล้ว', fix: 'ทดสอบตัวเองด้วยคำถามที่ยากกว่าที่คาด' },
+  { name: 'Framing Effect (ผลของกรอบ)', def: 'ตัดสินใจตามกรอบที่นำเสนอมาไม่ใช่เนื้อหา', example: '"สำเร็จ 90%" ฟังดีกว่า "ล้มเหลว 10%" แต่หมายความเดียวกัน', fix: 'สร้างกรอบใหม่ด้วยตัวเองก่อนตัดสินใจ' },
+];
+
+const biasContainer = document.getElementById('biasCards');
+biases.forEach((b, i) => {
+  const card = document.createElement('div');
+  card.className = 'surface rounded-xl p-4 card-hover scale-in';
+  card.style.transitionDelay = `${Math.min(i * 60, 360)}ms`;
+  card.innerHTML = `
+    <div class="font-semibold mb-2 text-sm" style="color:#EF4444;">${b.name}</div>
+    <p class="text-xs leading-relaxed mb-2">${b.def}</p>
+    <div class="text-xs muted mb-1">ตัวอย่าง: ${b.example}</div>
+    <div class="text-xs" style="color:#10B981;">✓ วิธีต้านทาน: ${b.fix}</div>
+  `;
+  biasContainer.appendChild(card);
+});
+
+// ── Self-development Cards ────────────────────────────────────────────────────
+const selfMethods = [
+  { num: 1, name: 'อ่านอย่างวิพากษ์', time: '5-10 นาที/วัน', detail: 'ตั้งคำถาม "ใคร? เพราะอะไร? หลักฐานคืออะไร?" ทุกครั้งที่อ่านข่าว' },
+  { num: 2, name: 'Socratic self-talk', time: 'ทุกครั้งที่ตัดสินใจ', detail: 'ถามตัวเองว่า "ฉันสมมติอะไร? มีมุมมองอื่นอีกไหม? หลักฐานสนับสนุนมีอะไร?"' },
+  { num: 3, name: 'เล่นเกมกลยุทธ์', time: '30 นาที/ครั้ง', detail: 'หมากรุก/โกะ/เกมกลยุทธ์ — บังคับให้คิดล่วงหน้าหลายขั้น วิเคราะห์ตำแหน่ง' },
+  { num: 4, name: 'เขียน journal วิเคราะห์', time: '10 นาที/วัน', detail: 'บันทึกเหตุการณ์และวิเคราะห์สาเหตุ-ผล — ฝึกเชื่อมโยงข้อมูล' },
+  { num: 5, name: 'ถกเถียงกับตนเอง', time: '15 นาที/สัปดาห์', detail: 'สร้างข้อโต้แย้งที่แข็งแกร่งที่สุดสำหรับฝ่ายตรงข้ามความเชื่อของตัวเอง' },
+  { num: 6, name: 'เรียนรู้สาขาใหม่', time: 'ตามสะดวก', detail: 'ความรู้ที่หลากหลายช่วยสร้างการคิดเชื่อมโยงข้ามศาสตร์' },
+  { num: 7, name: 'ฝึกชะลอการตัดสินใจ', time: 'ทันที', detail: 'รอ 24 ชั่วโมงก่อนตัดสินใจสำคัญ ให้ System 2 ทำงาน' },
+  { num: 8, name: 'แบ่งปันและสอนผู้อื่น', time: 'ตามโอกาส', detail: 'การสอนบังคับให้ตัวเองต้องคิดลึกกว่าเดิม — Feynman Technique' },
+  { num: 9, name: 'ทำ mind mapping', time: '20 นาที/ครั้ง', detail: 'เชื่อมโยงแนวคิดที่ดูแตกต่างเข้าหากัน — พัฒนา Create level' },
+  { num: 10, name: 'ตั้งคำถาม "จะเป็นอย่างไรถ้า?"', time: 'ตลอดเวลา', detail: 'สร้างสถานการณ์สมมติเพื่อฝึกประเมินผลลัพธ์ก่อนตัดสินใจจริง' },
+];
+
+const selfContainer = document.getElementById('selfCards');
+selfMethods.forEach((s, i) => {
+  const card = document.createElement('div');
+  card.className = 'surface rounded-xl p-4 card-hover fade-up';
+  card.style.transitionDelay = `${Math.min(i * 50, 300)}ms`;
+  card.innerHTML = `
+    <div class="flex items-start gap-3">
+      <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;">${s.num}</div>
+      <div>
+        <div class="font-semibold text-sm">${s.name} <span class="text-xs muted">(${s.time})</span></div>
+        <p class="text-xs muted leading-relaxed mt-1">${s.detail}</p>
+      </div>
+    </div>
+  `;
+  selfContainer.appendChild(card);
+});
+
+// ── Glossary ──────────────────────────────────────────────────────────────────
+const glossary = [
+  ['HOTS', 'Higher Order Thinking Skills — ทักษะการคิดขั้นสูง (วิเคราะห์ ประเมิน สร้างสรรค์)'],
+  ['LOTS', 'Lower Order Thinking Skills — ทักษะการคิดขั้นต่ำ (จำ เข้าใจ ประยุกต์)'],
+  ['Bloom\'s Taxonomy', 'กรอบแนวคิดจำแนกระดับการเรียนรู้ 6 ระดับ พัฒนาโดย Benjamin Bloom (1956)'],
+  ['Anderson & Krathwohl', 'คณะนักวิชาการที่ปรับปรุง Bloom\'s Taxonomy เป็นฉบับ 2001 โดยใช้กริยาแทนคำนาม'],
+  ['DOK', 'Depth of Knowledge — ความลึกของความรู้ กรอบแนวคิด 4 ระดับของ Norman Webb'],
+  ['SOLO Taxonomy', 'Structure of Observed Learning Outcome — 5 ระดับคุณภาพผลลัพธ์การเรียนรู้ (Biggs & Collis)'],
+  ['Marzano\'s Taxonomy', 'กรอบแนวคิด 3 ระบบของ Robert Marzano ที่รวม Self-System และ Metacognitive System'],
+  ['Metacognition', 'การกำกับตนเอง — ความสามารถคิดเกี่ยวกับกระบวนการคิดของตัวเอง'],
+  ['Socratic Questioning', 'การตั้งคำถามแบบโสกราตีส — ใช้คำถามต่อเนื่องกระตุ้นให้คิดอย่างลึกซึ้ง'],
+  ['PBL', 'Problem-Based Learning — การเรียนรู้โดยใช้ปัญหาเป็นฐาน'],
+  ['PjBL', 'Project-Based Learning — การเรียนรู้โดยใช้โครงงานเป็นฐาน (มีผลผลิตจริง)'],
+  ['Effect Size (d)', 'ขนาดผลกระทบ — วัดความแตกต่างระหว่างกลุ่มทดลองและควบคุม d>0.5 ถือว่าใหญ่'],
+  ['PISA', 'Programme for International Student Assessment — การประเมินนักเรียนนานาชาติโดย OECD'],
+  ['Confirmation Bias', 'อคติยืนยัน — แนวโน้มรับข้อมูลที่ยืนยันความเชื่อเดิมและปฏิเสธข้อมูลที่ขัดแย้ง'],
+  ['Sunk Cost Fallacy', 'เหตุผลวิบัติต้นทุนจม — การตัดสินใจโดยพิจารณาต้นทุนที่จ่ายไปแล้วแทนมูลค่าในอนาคต'],
+  ['Anchoring Effect', 'ผลของสมอ — การพึ่งพาข้อมูลแรกที่รับรู้มาเป็นฐานการตัดสินใจมากเกินไป'],
+  ['Availability Heuristic', 'ฮิวริสติกความพร้อม — ประเมินโอกาสจากเหตุการณ์ที่นึกออกได้ง่ายในจิตใจ'],
+  ['Rubric', 'รูบริก — เครื่องมือประเมินที่กำหนดเกณฑ์และระดับคุณภาพไว้ชัดเจน'],
+  ['Authentic Assessment', 'การประเมินแท้จริง — ประเมินในบริบทจริงด้วยงานจริง เช่น โครงงาน portfolio'],
+  ['Framing Effect', 'ผลของกรอบ — ตัดสินใจต่างกันขึ้นอยู่กับวิธีนำเสนอข้อมูล ไม่ใช่เนื้อหา'],
+];
+
+const glossaryEl = document.getElementById('glossaryList');
+glossary.forEach(([term, def]) => {
+  const dt = document.createElement('dt');
+  dt.className = 'font-semibold text-sm';
+  dt.textContent = term;
+  const dd = document.createElement('dd');
+  dd.className = 'text-sm muted mb-3';
+  dd.textContent = def;
+  glossaryEl.appendChild(dt);
+  glossaryEl.appendChild(dd);
+});
+
+// ── Sources ───────────────────────────────────────────────────────────────────
+const sources = [
+  [1, 'Higher-order thinking — Wikipedia', 'https://en.wikipedia.org/wiki/Higher-order_thinking', 'Wikipedia'],
+  [2, 'Bloom\'s Taxonomy of Learning | Domain Levels Explained', 'https://www.simplypsychology.org/blooms-taxonomy.html', 'Simply Psychology'],
+  [3, 'Bloom\'s Taxonomy (and Anderson & Krathwohl\'s)', 'https://proedit.com/understanding-blooms-and-anderson-and-krathwohls-taxonomy/', 'ProEdit'],
+  [4, 'Bloom\'s Taxonomy vs. Revised Bloom\'s Taxonomy', 'https://instructionaldesignjunction.com/2021/08/11/blooms-taxonomy-vs-revised-blooms-taxonomy-differences-and-which-is-better/', 'Instructional Design Junction'],
+  [5, 'Case Method Teaching and Learning | Columbia CTL', 'https://ctl.columbia.edu/resources-and-technology/resources/case-method/', 'Columbia University'],
+  [6, 'Higher-Order Thinking Skills: Moving Beyond Recall', 'https://www.structural-learning.com/post/higher-order-thinking-skills', 'Structural Learning'],
+  [7, 'Webb\'s DOK Levels: A Teacher\'s Guide', 'https://www.structural-learning.com/post/webbs-depth-of-knowledge', 'Structural Learning'],
+  [8, 'SOLO Taxonomy: Five Levels of Understanding', 'https://www.structural-learning.com/post/what-is-solo-taxonomy', 'Structural Learning'],
+  [9, 'Future of Jobs Report 2025', 'https://www.weforum.org/publications/the-future-of-jobs-report-2025/', 'World Economic Forum'],
+  [11, 'PISA 2022 Results — Thailand', 'https://www.oecd.org/en/publications/pisa-2022-results-volume-i-and-ii-country-notes_ed6fbcc5-en/thailand_6138f4af-en.html', 'OECD'],
+  [14, '70% of Leaders Say Business Performance Is Suffering', 'https://www.businesswire.com/news/home/20240131744208/en/70-of-Leaders-Say-Business-Performance-Is-Suffering', 'Springboard for Business'],
+  [15, 'AAC&U Survey — Liberal Arts Skills Preparedness Gap', 'https://www.insidehighered.com/news/2021/04/06/aacu-survey-finds-employers-want-candidates-liberal-arts-skills-cite-preparedness', 'Inside Higher Ed'],
+  [16, 'The Effectiveness of PBL in Improving HOTS', 'https://www.researchgate.net/publication/377602281_The_Effectiveness_of_Problem_Based_Learning_Model_in_Improving_Students_Higher_Order_Thinking_Skills', 'ResearchGate'],
+  [22, 'The Basic Education Core Curriculum B.E. 2551', 'https://academic.obec.go.th/images/document/1525235513_d_1.pdf', 'OBEC / Ministry of Education Thailand'],
+  [25, 'Bloom\'s Taxonomy — Wikipedia', 'https://en.wikipedia.org/wiki/Bloom%27s_taxonomy', 'Wikipedia'],
+  [27, 'Teacher training guides: 21st century skills', 'https://www.unesco.org/en/articles/teacher-training-guides-finalised-unesco-workshop-incorporate-21st-century-skills', 'UNESCO'],
+  [33, 'Anderson and Krathwohl Bloom\'s Taxonomy Revised', 'https://quincycollege.edu/wp-content/uploads/Anderson-and-Krathwohl_Revised-Blooms-Taxonomy.pdf', 'Quincy College'],
+  [35, 'Enhancing HOTS in Education: Strategies and Outcomes', 'https://www.researchgate.net/publication/387067288_Enhancing_Higher_Order_Thinking_Skills_HOTS_in_Education_Strategies_and_Outcomes', 'ResearchGate / TOFEDU'],
+];
+
+const sourcesList = document.getElementById('sourcesList');
+sources.forEach(([id, title, url, pub]) => {
+  const li = document.createElement('li');
+  li.id = `ref-${id}`;
+  li.innerHTML = `[${id}] <a href="${url}" target="_blank" rel="noopener" style="color:var(--accent);">${title}</a> — ${pub}`;
+  sourcesList.appendChild(li);
+});
+
+// ── Charts ────────────────────────────────────────────────────────────────────
+const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+const textColor = isDark ? '#a1a1aa' : '#71717a';
+
+new Chart(document.getElementById('pisaChart'), {
+  type: 'bar',
+  data: {
+    labels: ['คณิตศาสตร์', 'การอ่าน', 'วิทยาศาสตร์'],
+    datasets: [
+      { label: 'ไทย', data: [394, 379, 409], backgroundColor: '#EF4444' },
+      { label: 'OECD เฉลี่ย', data: [472, 476, 485], backgroundColor: '#6366F1' },
+    ]
+  },
+  options: {
+    animation: { duration: 900, easing: 'easeOutQuart' },
+    plugins: { legend: { labels: { color: textColor } } },
+    scales: {
+      x: { ticks: { color: textColor }, grid: { display: false } },
+      y: { ticks: { color: textColor }, min: 300, max: 520 }
+    }
+  }
+});
+
+new Chart(document.getElementById('effectChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Socratic Q', 'Classroom Discussion', 'Problem-solving', 'Metacognitive', 'PBL (n-gain)'],
+    datasets: [{
+      label: 'Effect Size',
+      data: [0.82, 0.82, 0.61, 0.80, 0.34],
+      backgroundColor: ['#6366F1','#8B5CF6','#10B981','#F59E0B','#3B82F6'],
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    animation: { duration: 900, easing: 'easeOutQuart' },
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { color: textColor }, max: 1.0 },
+      y: { ticks: { color: textColor, font: { size: 11 } }, grid: { display: false } }
+    }
+  }
+});
+
+// ── Lucide Icons ──────────────────────────────────────────────────────────────
+lucide.createIcons();
+</script>
+</body>
+</html>
