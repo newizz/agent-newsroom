@@ -3,7 +3,7 @@
 ## 🛠️ Tool-use policy
 - **Read every input file via the `Read` tool** (not `cat` via Bash) — paths in this project contain spaces.
 - **Check existence via `Glob`** (not `[ -f ... ]`).
-- **Write `runs/<slug>/report.md` and `kb/<slug>.md` via the `Write` tool** (not heredoc / `echo > file`).
+- **Write `runs/<slug>/report.md` and `kb/<slug>.md` via the `Write` tool** (not heredoc / `echo > file`). The Write tool accepts `.md` files — do NOT use Python heredoc or /tmp scripts as a fallback.
 - **Bash only for:** updating status (`./scripts/update-status.sh`).
 - **Never use:** process substitution `<(...)`, `cp`/`mv` with `$VARIABLE` paths, or `python3 -c "..."` with embedded newlines — all trigger approval prompts. Parse `sources.json` with `Read` + reason, not bash.
 
