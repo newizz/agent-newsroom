@@ -85,7 +85,7 @@ def parse_brief(brief_text: str) -> dict:
     return {"topic": topic, "refined": refined, "questions": questions}
 
 
-SCRIPT_VERSION = "2026-06-19"  # bump on prompt/code changes for traceability
+SCRIPT_VERSION = "2026-06-20"  # bump on prompt/code changes for traceability
 
 
 class ErrorLog:
@@ -213,106 +213,149 @@ async def _main_inner(args, err_log: "ErrorLog") -> int:
     print(f"→ Web fallback:{len(web_fallback_urls)} URL(s)")
     print()
 
-    async with await NotebookLMClient.from_storage() as client:
-        # ── 1. Create notebook ──────────────────────────────────────
-        print("→ Creating NotebookLM notebook...")
-        try:
-            nb = await client.notebooks.create(f"{args.slug} — agent-newsroom")
-            print(f"  notebook id: {nb.id}")
-        except Exception as e:
-            err_log.add("notebook_create", e)
-            err_log.flush()
-            return 2
+    requery_mode = bool(getattr(args, "notebook_id", ""))
 
-        # ── 2. Web research (3-step flow + retry + fallback) ────────
-        # Strategy (A+C combined):
-        #   A. Try mode="deep" with extended timeout (1800s = 30 min)
-        #   A. If "no_research" timeout → retry mode="fast" (smaller, more reliable)
-        #   C. If both fail OR import < 5 → add Rin's pre-curated web URLs directly
-        print("→ Running NotebookLM web research…")
-        research_task_id: str | None = None
-        research_imported = 0
-        research_mode_used: str | None = None
-        web_fallback_added = 0
+    # Tracking variables — initialised here so requery mode can skip steps 1-3
+    deep_task_id: str | None = None
+    fast_task_id: str | None = None
+    research_imported = 0
+    research_mode_used: str | None = None
+    web_fallback_added = 0
+    deep_recovered = 0
+    yt_added = 0
 
-        async def try_research(mode: str, timeout: int) -> int:
-            """Run research.start → wait → import. Returns count of imported sources."""
-            nonlocal research_task_id, research_mode_used
-            print(f"  attempting mode='{mode}' (timeout {timeout}s)...")
-            result = await client.research.start(
-                nb.id, brief["refined"], source="web", mode=mode
-            )
-            if result is None:
-                err_log.warn(f"research_start_{mode}", "research.start returned None")
-                return 0
-            research_task_id = result.get("task_id")
-            research_mode_used = mode
-            print(f"    task_id: {research_task_id}")
+    async with NotebookLMClient.from_storage() as client:
+        # ── 1. Create or reuse notebook ─────────────────────────────
+        if requery_mode:
+            import types as _types
+            nb = _types.SimpleNamespace(id=args.notebook_id, title="")
+            research_mode_used = "requery"
+            print(f"→ Reusing existing notebook: {nb.id}")
+            print("  (skipping web research and source addition)")
+            print()
+        else:
+            print("→ Creating NotebookLM notebook...")
+            try:
+                nb = await client.notebooks.create(f"{args.slug} — agent-newsroom")
+                print(f"  notebook id: {nb.id}")
+            except Exception as e:
+                err_log.add("notebook_create", e)
+                err_log.flush()
+                return 2
 
-            status = await client.research.wait_for_completion(
-                nb.id, research_task_id, timeout=timeout, interval=10
-            )
+        if not requery_mode:
+            # ── 2. Web research (3-step flow + cascade + recovery + fallback) ──
+            # Strategy (A+C+P0 combined):
+            #   A. Try mode="deep" with extended timeout (1800s = 30 min)
+            #   A. If "no_research" timeout → retry mode="fast" (smaller, more reliable)
+            #   P0. After fast finishes, RE-POLL the deep task — it may have completed
+            #       in the background (Google's deep queue is slow but eventually finishes)
+            #   C. If still < 5 sources → add Rin's pre-curated web URLs directly
+            print("→ Running NotebookLM web research…")
 
-            discovered = status.get("sources", [])
-            web_only = [
-                s for s in discovered
-                if s.get("result_type") in (1, None)
-                and (s.get("url") or "").startswith("http")
-            ]
-            print(f"    discovered: {len(discovered)} entries ({len(web_only)} importable)")
+            async def _attempt_research(mode: str, timeout: int) -> tuple[str | None, int]:
+                """Run start → wait → import. Returns (task_id, imported_count).
+                task_id is preserved even on timeout so we can poll it later (P0 recovery)."""
+                print(f"  attempting mode='{mode}' (timeout {timeout}s)...")
+                result = await client.research.start(
+                    nb.id, brief["refined"], source="web", mode=mode
+                )
+                if result is None:
+                    err_log.warn(f"research_start_{mode}", "research.start returned None")
+                    return None, 0
+                tid = result.get("task_id")
+                print(f"    task_id: {tid}")
+                status = await client.research.wait_for_completion(
+                    nb.id, tid, timeout=timeout, interval=10
+                )
+                return tid, await _import_from_status(tid, status)
 
-            if web_only:
+            async def _import_from_status(tid: str, status: dict) -> int:
+                """Filter status.sources to web-importable, then import via API."""
+                discovered = status.get("sources", [])
+                web_only = [
+                    s for s in discovered
+                    if s.get("result_type") in (1, None)
+                    and (s.get("url") or "").startswith("http")
+                ]
+                print(f"    discovered: {len(discovered)} entries ({len(web_only)} importable)")
+                if not web_only:
+                    return 0
                 imported = await client.research.import_sources(
-                    nb.id, research_task_id, web_only[:30]
+                    nb.id, tid, web_only[:30]
                 )
                 return len(imported)
-            return 0
 
-        # Attempt 1: deep mode, 30 min timeout
-        try:
-            research_imported = await try_research("deep", timeout=1800)
-        except Exception as e:
-            err_log.add("web_research_deep", e)
-            research_imported = 0
-
-        # Attempt 2: fast mode fallback if deep didn't deliver
-        if research_imported < 1:
-            print("→ Deep mode returned 0 — trying fast mode...")
+            # Attempt 1: deep mode, 30 min timeout
             try:
-                research_imported = await try_research("fast", timeout=600)
+                deep_task_id, deep_count = await _attempt_research("deep", timeout=1800)
+                if deep_count > 0:
+                    research_imported = deep_count
+                    research_mode_used = "deep"
+            except TimeoutError as e:
+                err_log.warn("web_research_deep_timeout",
+                             f"deep timed out, may finish later: {e}")
             except Exception as e:
-                err_log.add("web_research_fast", e)
-                research_imported = 0
+                err_log.add("web_research_deep", e)
 
-        # Attempt 3 (Fallback C): add Rin's pre-curated web URLs directly
-        if research_imported < 5 and web_fallback_urls:
-            print(f"→ Web research insufficient ({research_imported} sources) — "
-                  f"adding {len(web_fallback_urls)} fallback URLs directly...")
-            for url in web_fallback_urls:
+            # Attempt 2: fast mode fallback if deep didn't deliver
+            if research_imported < 1:
+                print("→ Deep mode produced 0 sources — trying fast mode...")
+                try:
+                    fast_task_id, fast_count = await _attempt_research("fast", timeout=600)
+                    if fast_count > 0:
+                        research_imported = fast_count
+                        research_mode_used = "fast"
+                except Exception as e:
+                    err_log.add("web_research_fast", e)
+
+            # P0: Recovery — if deep was started but we moved on, check if it's done by now
+            if deep_task_id and research_mode_used != "deep":
+                print(f"→ Polling deep task {deep_task_id} for late recovery...")
+                try:
+                    deep_status = await client.research.poll(nb.id, deep_task_id)
+                    status_str = (deep_status or {}).get("status", "unknown")
+                    print(f"    deep task status: {status_str}")
+                    if status_str == "completed":
+                        deep_recovered = await _import_from_status(deep_task_id, deep_status)
+                        if deep_recovered > 0:
+                            research_imported += deep_recovered
+                            research_mode_used = (research_mode_used or "deep") + "+deep_recovery"
+                            print(f"  ✓ Recovered {deep_recovered} sources from completed deep task")
+                    else:
+                        err_log.warn("deep_recovery_pending",
+                                     f"deep task still {status_str} — skipping recovery")
+                except Exception as e:
+                    err_log.warn("deep_recovery", f"could not recover deep task: {e}")
+
+            # Attempt 3 (Fallback C): add Rin's pre-curated web URLs directly
+            if research_imported < 5 and web_fallback_urls:
+                print(f"→ Web research insufficient ({research_imported} sources) — "
+                      f"adding {len(web_fallback_urls)} fallback URLs directly...")
+                for url in web_fallback_urls:
+                    try:
+                        await client.sources.add_url(nb.id, url, wait=True)
+                        web_fallback_added += 1
+                        print(f"  ✓ {url}")
+                    except Exception as e:
+                        err_log.add(f"web_fallback_add[{url}]", e, severity="warning")
+                print(f"  added {web_fallback_added}/{len(web_fallback_urls)} fallback URLs")
+
+            if research_imported == 0 and web_fallback_added == 0:
+                err_log.warn(
+                    "no_web_sources",
+                    "Neither NotebookLM research nor fallback URLs produced any web sources. "
+                    "Notebook will only contain YouTube videos."
+                )
+
+            # ── 3. Add YouTube sources ──────────────────────────────────
+            for url in youtube_urls:
+                print(f"→ Adding YouTube: {url}")
                 try:
                     await client.sources.add_url(nb.id, url, wait=True)
-                    web_fallback_added += 1
-                    print(f"  ✓ {url}")
+                    yt_added += 1
                 except Exception as e:
-                    err_log.add(f"web_fallback_add[{url}]", e, severity="warning")
-            print(f"  added {web_fallback_added}/{len(web_fallback_urls)} fallback URLs")
-
-        if research_imported == 0 and web_fallback_added == 0:
-            err_log.warn(
-                "no_web_sources",
-                "Neither NotebookLM research nor fallback URLs produced any web sources. "
-                "Notebook will only contain YouTube videos."
-            )
-
-        # ── 3. Add YouTube sources ──────────────────────────────────
-        yt_added = 0
-        for url in youtube_urls:
-            print(f"→ Adding YouTube: {url}")
-            try:
-                await client.sources.add_url(nb.id, url, wait=True)
-                yt_added += 1
-            except Exception as e:
-                err_log.add(f"add_youtube[{url}]", e, severity="warning")
+                    err_log.add(f"add_youtube[{url}]", e, severity="warning")
 
         # ── 4. List all sources in notebook ─────────────────────────
         try:
@@ -421,11 +464,11 @@ async def _main_inner(args, err_log: "ErrorLog") -> int:
         print("→ Generating infographic...")
         infographic_path: Path | None = output_dir / "infographic.png"
         try:
+            # Library v0.5+ removed the `detail` kwarg — only `orientation` accepted now
             if _HAS_INFOGRAPHIC_ENUMS:
                 ig = await client.artifacts.generate_infographic(
                     nb.id,
                     orientation=InfographicOrientation.LANDSCAPE,
-                    detail=InfographicDetail.STANDARD,
                 )
             else:
                 ig = await client.artifacts.generate_infographic(nb.id)
@@ -465,7 +508,9 @@ async def _main_inner(args, err_log: "ErrorLog") -> int:
             f"**Notebook:** {nb.id}",
             f"**Sources:** {len(sources_data)} ({web_count} web · {yt_count} YouTube)",
             f"**Web research:** mode={research_mode_used or 'failed'}, "
-            f"imported={research_imported}, fallback_added={web_fallback_added}",
+            f"imported={research_imported}, "
+            f"deep_recovered={deep_recovered}, "
+            f"fallback_added={web_fallback_added}",
             f"**Artifacts:** {artifacts_listed}",
         ]
         if err_log.entries:
@@ -501,14 +546,17 @@ async def _main_inner(args, err_log: "ErrorLog") -> int:
                 {
                     "notebook_id": nb.id,
                     "notebook_title": getattr(nb, "title", ""),
-                    "research_task_id": research_task_id,
+                    "deep_task_id": deep_task_id,
+                    "fast_task_id": fast_task_id,
                     "research_mode_used": research_mode_used,
                     "research_imported": research_imported,
+                    "deep_recovered": deep_recovered,
                     "web_fallback_added": web_fallback_added,
                     "youtube_added": yt_added,
                     "total_sources": len(sources_data),
                     "web_sources": web_count,
                     "video_sources": yt_count,
+                    "script_version": SCRIPT_VERSION,
                 },
                 indent=2,
             ),
@@ -529,6 +577,8 @@ async def main() -> int:
     parser.add_argument("--youtube", default="", help="comma-separated YouTube URLs")
     parser.add_argument("--web-urls", dest="web_urls", default="",
                         help="comma-separated web URLs (fallback if NotebookLM auto web research fails)")
+    parser.add_argument("--notebook-id", dest="notebook_id", default="",
+                        help="reuse existing notebook (skips creation, web research, source addition)")
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)

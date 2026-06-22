@@ -3,6 +3,9 @@
 #
 # Usage:
 #   ./scripts/deep-research.sh <slug> [<youtube-csv>] [<web-urls-csv>]
+#   ./scripts/deep-research.sh <slug> "" "" --requery <notebook-id>
+#
+# --requery <notebook-id>: skip notebook creation/web research, ask questions to existing notebook
 #
 # Robustness layers (P0-P2):
 #   - Pre-flight: verify venv, package import, and auth before invoking Python (P2)
@@ -17,6 +20,12 @@ cd "$REPO_ROOT"
 SLUG="${1:?slug required}"
 YOUTUBE_CSV="${2:-}"
 WEB_URLS_CSV="${3:-}"
+
+# Parse --requery <notebook-id> flag (arg 4 + 5)
+NOTEBOOK_ID=""
+if [[ "${4:-}" == "--requery" && -n "${5:-}" ]]; then
+  NOTEBOOK_ID="${5}"
+fi
 
 BRIEF="runs/$SLUG/brief.md"
 OUT="runs/$SLUG/deep-research"
@@ -94,6 +103,12 @@ echo "✓ pre-flight passed (uv ok, package importable, auth status=$AUTH_STATUS
 
 # P1: capture stderr to file while still letting it flow to terminal
 # We use `tee` via process substitution so stderr shows live AND lands on disk.
+REQUERY_ARGS=""
+if [[ -n "$NOTEBOOK_ID" ]]; then
+  echo "→ Requery mode: using existing notebook $NOTEBOOK_ID"
+  REQUERY_ARGS="--notebook-id $NOTEBOOK_ID"
+fi
+
 uv run --directory tools/notebooklm \
   python scripts/research.py \
   --slug "$SLUG" \
@@ -101,6 +116,7 @@ uv run --directory tools/notebooklm \
   --output-dir "../../runs/$SLUG/deep-research" \
   --youtube "$YOUTUBE_CSV" \
   --web-urls "$WEB_URLS_CSV" \
+  $REQUERY_ARGS \
   2> >(tee "$STDERR_LOG" >&2)
 
 EXIT=$?
