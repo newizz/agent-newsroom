@@ -1,7 +1,47 @@
 {
-  "generated": "2026-06-20T01:30:57Z",
-  "count": 9,
+  "generated": "2026-06-22T00:00:00Z",
+  "count": 13,
   "published": [
+    {
+      "slug": "higher-order-thinking",
+      "url": "published/higher-order-thinking/",
+      "title": "ทักษะการคิดขั้นสูง (Higher Order Thinking Skills)",
+      "subtitle": "ภาพรวมครบถ้วน: Bloom's Taxonomy, 4 กรอบแนวคิด, วิธีพัฒนา และตัวอย่างจริง",
+      "template": "concept-explorer",
+      "mode": "deep",
+      "date": "2026-06-22",
+      "tags": ["education", "cognitive-skills", "bloom-taxonomy", "critical-thinking", "hots", "learning"]
+    },
+    {
+      "slug": "critical-thinking",
+      "url": "published/critical-thinking/",
+      "title": "การคิดเชิงวิพากษ์ (Critical Thinking)",
+      "subtitle": "ภาพรวมครบถ้วนของ Critical Thinking: กรอบแนวคิด ทักษะ กระบวนการ อคติที่ขัดขวาง และวิธีพัฒนาในชีวิตจริง",
+      "template": "concept-explorer",
+      "mode": "deep",
+      "date": "2026-06-22",
+      "tags": ["การคิด", "ทักษะ", "การศึกษา", "การพัฒนาตนเอง", "thai"]
+    },
+    {
+      "slug": "bias-overview-all-forms",
+      "url": "published/bias-overview-all-forms/",
+      "title": "อคติ: ภาพรวมครบทุกรูปแบบ",
+      "subtitle": "อคติทางความคิด สังคม สถิติ อัลกอริทึม สื่อ และองค์กร — พร้อมตัวอย่างจริงและกลยุทธ์ลดอคติเชิงหลักฐาน",
+      "template": "concept-explorer",
+      "mode": "deep",
+      "date": "2026-06-21",
+      "tags": ["อคติ", "จิตวิทยา", "ai-bias", "การตัดสินใจ", "ความคิดเชิงวิพากษ์", "thai"]
+    },
+    {
+      "slug": "skills-21st-century",
+      "url": "published/skills-21st-century/",
+      "title": "ทักษะแห่งศตวรรษที่ 21",
+      "subtitle": "กรอบทักษะจาก P21, OECD, WEF 2025 และ UNESCO: Analytical Thinking, AI Literacy, ความคิดสร้างสรรค์ และ EQ คือทักษะที่มนุษย์ต้องมีในยุคที่ 39% ของทักษะจะล้าสมัยภายใน 2030",
+      "template": "concept-explorer",
+      "mode": "deep",
+      "date": "2026-06-21",
+      "tags": ["education", "skills", "ai", "future-of-work", "thai"]
+    },
     {
       "slug": "logical-fallacies-overview",
       "url": "published/logical-fallacies-overview/",
