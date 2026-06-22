@@ -1,9 +1,9 @@
 {
   "slug": "industrial-ai-with-agentic-ai",
-  "title": "Industrial AI with Agentic AI",
-  "subtitle": "Shift from reactive copilots to autonomous systems-of-systems in manufacturing, semiconductors, logistics and energy.",
+  "title": "Industrial AI กับ Agentic AI",
+  "subtitle": "Agentic AI กำลังเปลี่ยนแปลง Industrial AI จากระบบ copilot แบบตอบโต้สู่ระบบอัตโนมัติแบบ systems of systems — ครอบคลุมการผลิต พลังงาน โลจิสติกส์ น้ำมัน & ก๊าซ และยา",
   "template": "data-story",
   "mode": "deep",
   "date": "2026-06-11",
-  "tags": ["ai", "agents", "manufacturing", "industry"]
+  "tags": ["ai", "agentic", "การผลิต", "อุตสาหกรรม", "thai"]
 }
