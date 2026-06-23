@@ -1,0 +1,9 @@
+{
+  "slug": "reliability-engineering",
+  "title": "วิศวกรรมความน่าเชื่อถือ — APM Loop: ACA→ASM→AHM→WEM→RCA→KM→ASO",
+  "subtitle": "กรอบงาน APM Loop ครบวงจร 7 ขั้นตอนเพื่อเพิ่มความน่าเชื่อถือสินทรัพย์อุตสาหกรรมและลดต้นทุนการดูแลรักษาอย่างยั่งยืน",
+  "template": "concept-explorer",
+  "mode": "deep",
+  "date": "2026-06-23",
+  "tags": ["reliability-engineering", "asset-management", "apm", "maintenance", "thai"]
+}

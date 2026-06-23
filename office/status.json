@@ -2,7 +2,7 @@
   "currentRun": null,
   "currentSlug": null,
   "currentMode": null,
-  "lastUpdate": "2026-06-22T21:59:14Z",
+  "lastUpdate": "2026-06-23T03:38:38Z",
   "agents": [
     {
       "id": "intake",
@@ -25,7 +25,7 @@
       "name": "Rin",
       "role": "Deep Researcher",
       "emoji": "🧬",
-      "status": "offline",
+      "status": "idle",
       "task": ""
     },
     {
