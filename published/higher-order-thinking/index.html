@@ -58,16 +58,25 @@ th { background: var(--accent-soft); font-weight: 600; }
 <!-- Scroll progress -->
 <div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
 
-<!-- Hero -->
-<header style="background:linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%);color:#fff;padding:3.5rem 1.5rem 2.5rem;">
-  <div class="max-w-5xl mx-auto">
-    <a href="../../" style="font-size:0.8rem;opacity:0.75;text-decoration:none;color:#fff;">← กลับหน้าหลัก</a>
-    <h1 style="font-size:2.4rem;font-weight:800;margin-top:1rem;line-height:1.2;">ทักษะการคิดขั้นสูง</h1>
-    <p style="font-size:1.1rem;opacity:0.9;margin-top:0.5rem;">Higher Order Thinking Skills (HOTS)</p>
-    <p style="font-size:0.9rem;opacity:0.75;margin-top:0.5rem;">ภาพรวมครบถ้วน: Bloom's Taxonomy, 4 กรอบแนวคิด, วิธีพัฒนา และตัวอย่างจริงในชีวิตและการทำงาน</p>
-    <div style="margin-top:1.5rem;font-size:0.8rem;opacity:0.7;">2026-06-22 · agent-newsroom · deep mode · 35 แหล่งข้อมูล (Ravi) + 30 แหล่ง (NotebookLM)</div>
+<header style="border-bottom:1px solid var(--border);">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      กลับหน้าหลัก
+    </a>
   </div>
 </header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-10">
+  <div class="flex flex-wrap gap-2 mb-4">
+    <span class="bg-accent-soft accent text-xs font-medium px-2 py-1 rounded-md">Concept Explainer</span>
+    <span class="bg-accent-soft accent text-xs font-medium px-2 py-1 rounded-md">การวิจัยเชิงลึก</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">ทักษะการคิดขั้นสูง (Higher Order Thinking Skills)</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">ภาพรวมครบถ้วน: Bloom's Taxonomy, 4 กรอบแนวคิด, วิธีพัฒนา และตัวอย่างจริงในชีวิตและการทำงาน — WEF 2025 ยืนยัน 70% ขององค์กรต้องการ Analytical Thinking มากที่สุด</p>
+  <div class="text-sm muted mt-4">2026-06-22 · deep mode · 35 แหล่งข้อมูล (Ravi) + 30 แหล่ง (NotebookLM)</div>
+</section>
 
 <!-- TOC -->
 <nav class="max-w-5xl mx-auto px-6 py-4">
@@ -548,7 +557,6 @@ th { background: var(--accent-soft); font-weight: 600; }
 
 <!-- Footer -->
 <footer class="max-w-5xl mx-auto px-6 py-8 text-center text-sm muted border-t" style="border-color:var(--border);">
-  <a href="../../" style="color:var(--accent);text-decoration:none;">กลับหน้าหลัก</a> ·
   สร้างโดย agent-newsroom · 2026-06-22 · deep mode
 </footer>
 
@@ -678,6 +686,7 @@ hotsLevels.forEach((h, i) => {
     ${h.examples.map(e => `<div class="text-xs" style="padding:5px 10px;border-radius:6px;background:var(--bg);margin-bottom:4px;">• ${e}</div>`).join('')}
   `;
   hotsContainer.appendChild(card);
+  io.observe(card);
 });
 
 // ── Method Cards ──────────────────────────────────────────────────────────────
@@ -707,6 +716,7 @@ methods.forEach((m, i) => {
     <div class="text-xs muted p-2 rounded" style="background:var(--bg);">${m.steps}</div>
   `;
   methodContainer.appendChild(card);
+  io.observe(card);
 });
 
 // ── Bias Cards ────────────────────────────────────────────────────────────────
@@ -732,6 +742,7 @@ biases.forEach((b, i) => {
     <div class="text-xs" style="color:#10B981;">✓ วิธีต้านทาน: ${b.fix}</div>
   `;
   biasContainer.appendChild(card);
+  io.observe(card);
 });
 
 // ── Self-development Cards ────────────────────────────────────────────────────
@@ -763,6 +774,7 @@ selfMethods.forEach((s, i) => {
     </div>
   `;
   selfContainer.appendChild(card);
+  io.observe(card);
 });
 
 // ── Glossary ──────────────────────────────────────────────────────────────────
