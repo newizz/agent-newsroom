@@ -1,0 +1,200 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "7 Step Root Cause Analysis Work Process",
+      "url": "https://www.youtube.com/watch?v=R-FTRtULDQQ",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 2,
+      "title": "ASSET STRATEGY MANAGEMENT (ASM) - ARMS Reliability",
+      "url": "https://www.armsreliability.com/icms_docs/324193_complete-guide-to-asset-strategy-management-preview.pdf?utm_source=6sense&utm_medium=Display+Ad&utm_content=Complete+Guide+to+ASM&utm_campaign=ABM",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 3,
+      "title": "ASSET STRATEGY MANAGEMENT (ASM) - ARMS Reliability",
+      "url": "https://www.armsreliability.com/icms_docs/321481_complete-guide-to-asm.pdf",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 4,
+      "title": "AVEVA Asset Strategy Optimization",
+      "url": "https://cdn.osisoft.com/osi/presentations/2022-AVEVA-Amsterdam/UC22EU-D3AP030-AVEVA-Willekens-Asset-Strategy-Optimization.pdf",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 5,
+      "title": "Agile Asset Criticality Assessment (ACA) Approach using Decision Making Grid (DMG) - Portsmouth Research Portal",
+      "url": "https://researchportal.port.ac.uk/files/22223030/LABIB_2020_cright_Agile_Asset_Criticality_Assessment_Approach_using_Decision_Making_Grid.pdf",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 6,
+      "title": "An Integrated Approach to APM: Seamless Management of Asset Strategy and Health",
+      "url": "https://www.bakerhughes.com/cordant/blog/integrated-approach-apm-seamless-management-asset-strategy-and-health",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 7,
+      "title": "Asset Performance Management (APM) in Manufacturing",
+      "url": "https://www.youtube.com/watch?v=oCscnUyCWWA",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 8,
+      "title": "Asset Performance Management (APM) with the combined PI System and AVEVA stack",
+      "url": "https://cdn.osisoft.com/osi/presentations/2021-aveva-pi-world/UC21NA-D0PI010-Capgemini-Willekens-Asset-Performance.pdf",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 9,
+      "title": "BP Webinar: Use root cause analysis & failure modes to build a total condition maintenance strategy",
+      "url": "https://www.youtube.com/watch?v=ZzhLyrNi0AY",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 10,
+      "title": "Comprehensive Guide to Reliability Engineering: Responsibilities, Skills, & Improvement Approaches",
+      "url": "https://www.youtube.com/watch?v=uotYuMg4sgc",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 11,
+      "title": "HOW TO CREATE MAINTENANCE STRATEGY & IT'S CONCEPTS AT FIELD LEVEL(SAP PM MODULE TUTORIAL)",
+      "url": "https://www.youtube.com/watch?v=DXIOSMxepaA",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 12,
+      "title": "Integrating RCA with Asset Strategy Management to drive improvement - Baker Hughes",
+      "url": "https://www.bakerhughes.com/cordant/blog/integrating-rca-asset-strategy-management-drive-improvement",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 13,
+      "title": "Machine Learning for IoT Explained: Predictive Maintenance & Anomalies",
+      "url": "https://www.youtube.com/watch?v=7xIOIVwXEC0",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 14,
+      "title": "Maintenance Management & Reliability Engineering Course - Introduction",
+      "url": "https://www.youtube.com/watch?v=j0SPDKaW3tA",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 15,
+      "title": "Making the case for integrated Asset Performance Management | Baker Hughes",
+      "url": "https://www.bakerhughes.com/sites/bakerhughes/files/2024-01/introduction_to_integrated-asset_performance_management_ebook_v9_1_0.pdf",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 16,
+      "title": "Mastering Root Cause Analysis: Methods & Tools | Upkeep Video Guide",
+      "url": "https://www.youtube.com/watch?v=DwLroIeUPH4",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 17,
+      "title": "Maximizing Asset Performance with APM Systems | UpKeep",
+      "url": "https://www.youtube.com/watch?v=w1u5iJqhElk",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 18,
+      "title": "Reliability Asset Management Program (RAMP) Model for Asset & Resource Performance Excellence",
+      "url": "https://www.youtube.com/watch?v=WXwydpiGR90",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 19,
+      "title": "Reliability Consultants & Consulting",
+      "url": "https://www.alliedreliability.com/reliability-consulting",
+      "type": "unknown",
+      "kind": "web"
+    },
+    {
+      "id": 20,
+      "title": "Reliability Engineering Explained | RAMS, Safety & System Complexity",
+      "url": "https://www.youtube.com/watch?v=g9B0BoyafMs",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 21,
+      "title": "Reliability Engineering Fundamentals",
+      "url": "https://www.youtube.com/watch?v=BFoHPnMwOf4",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 22,
+      "title": "Role of IoT and Machine Learning in Predictive Maintenance, By  Hossein V  Farahani, CAT IV,",
+      "url": "https://www.youtube.com/watch?v=sEe2Hj3qZ0A",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 23,
+      "title": "SAP Asset Performance Management (APM) | Optimize Maintenance with Predictive Insights",
+      "url": "https://www.youtube.com/watch?v=ssyeNJZ3UtQ",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 24,
+      "title": "Stop Fixing, Start Predicting: Mastering Predictive Maintenance with IoT Data Analytics and AI",
+      "url": "https://www.youtube.com/watch?v=JEl8kP7BmWY",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 25,
+      "title": "The Core Principles of Reliability Engineering",
+      "url": "https://www.youtube.com/watch?v=A6nxauWcpBU",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 26,
+      "title": "Uncover & Solve Complex Maintenance Challenges with Root Cause Analysis | UpKeep Tutorial",
+      "url": "https://www.youtube.com/watch?v=MTSUSDjRt8M",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 27,
+      "title": "Why Practical Root Cause Analysis Improves Plant Performance",
+      "url": "https://www.youtube.com/watch?v=JKYiZRLUSaY",
+      "type": "unknown",
+      "kind": "youtube"
+    },
+    {
+      "id": 28,
+      "title": "knowledge management for maintenance activities in the manufacturing sector - Semantic Scholar",
+      "url": "https://www.semanticscholar.org/paper/KNOWLEDGE-MANAGEMENT-FOR-MAINTENANCE-ACTIVITIES-IN-Mansor-Ohsato/c5230cb368bdfc2d39254c4968e6e6fa26c998e3",
+      "type": "unknown",
+      "kind": "web"
+    }
+  ]
+}

@@ -1,0 +1,314 @@
+{
+  "sources": [
+    {
+      "id": 1,
+      "title": "A Beginner's Guide to Asset Performance Management (APM)",
+      "url": "https://www.unite.ai/a-beginners-guide-to-asset-performance-management-apm/",
+      "publisher": "Unite.AI",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 2,
+      "title": "Asset Criticality Assessment (ACA) — MBG Corporate Services",
+      "url": "https://www.mbgcorp.com/ae/insights/asset-criticality-assessment-aca/",
+      "publisher": "MBG Corporate Services",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 3,
+      "title": "Criticality Analysis: How It's Done and Why It Matters",
+      "url": "https://www.emaint.com/rank-assets-by-criticalness-for-a-more-effective-aca/",
+      "publisher": "eMaint (Fluke)",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 4,
+      "title": "Evaluating Different Maintenance Management Strategies",
+      "url": "https://fiixsoftware.com/maintenance-strategies/evaluating-maintenance-strategies-select-model-asset-management/",
+      "publisher": "Fiix Software (Rockwell Automation)",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 5,
+      "title": "Preventive vs Predictive Maintenance Guide",
+      "url": "https://www.assetwatch.com/blog/preventive-vs-predictive-maintenance",
+      "publisher": "AssetWatch",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 6,
+      "title": "Digital Asset Strategy Management — APM Strategy",
+      "url": "https://www.gevernova.com/software/products/asset-performance-management/asset-strategy-management",
+      "publisher": "GE Vernova",
+      "author": "",
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 7,
+      "title": "Asset Health Index (AHI) Definition",
+      "url": "https://www.maintainnow.app/learn/definitions/asset-health-index-ahi",
+      "publisher": "MaintainNow",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 8,
+      "title": "Asset Condition Monitoring — Condition-based Maintenance (GE Vernova APM Health)",
+      "url": "https://www.gevernova.com/software/products/asset-performance-management/condition-monitoring",
+      "publisher": "GE Vernova",
+      "author": "",
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 9,
+      "title": "MTBF, MTTR, OEE: Maintenance KPIs Complete Guide 2026",
+      "url": "https://oxmaint.com/article/mtbf-mttr-oee-maintenance-kpis",
+      "publisher": "OxMaint",
+      "author": "",
+      "date": "2026",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 10,
+      "title": "Reliabilityweb — Maintenance Work Execution Management",
+      "url": "https://reliabilityweb.com/maintenance-work-order",
+      "publisher": "ReliabilityWeb",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 11,
+      "title": "Reliabilityweb — Developing and Implementing a Work Execution Management Improvement Process",
+      "url": "https://reliabilityweb.com/improving-work-execution-management",
+      "publisher": "ReliabilityWeb",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 12,
+      "title": "Systematic Root Cause Analysis for Industrial Reliability: A Comparative Guide to 5-Why, Fishbone, and Fault Tree Methodologies",
+      "url": "https://www.unitecd.com/systematic-root-cause-analysis-for-industrial-reliability-a-comparative-guide-to-5-why-fishbone-and-fault-tree-methodologies/",
+      "publisher": "UNITEC Industrial Procurement",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 13,
+      "title": "Root Cause Analysis Methods Compared: 5 Whys vs. Fishbone vs. Fault Tree vs. Pareto",
+      "url": "https://fivewhys.ai/blog/root-cause-analysis-methods-compared",
+      "publisher": "fivewhys.ai",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 14,
+      "title": "Why Root Cause Analysis Matters for Maintenance Reliability",
+      "url": "https://www.maxgrip.com/resource/root-cause-analysis-rca-a-key-component-of-maintenance-reliability-engineering/",
+      "publisher": "MaxGrip",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 15,
+      "title": "ASO Records — GE APM Meridium Documentation",
+      "url": "https://www.ge.com/digital/documentation/meridium/Help/V43070/r_apm_aso_asoffd.html",
+      "publisher": "GE Digital (GE Vernova)",
+      "author": "",
+      "date": "2023",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 16,
+      "title": "Overview of the Asset Strategy Optimization Module — Meridium APM V4.3.0.6.0",
+      "url": "https://www.ge.com/digital/documentation/meridium/Help/V43060/INWNhMmJmZDktMThlYi00YjkzLThmOWYtMGQ4YWUyOWM3Mzlk.html",
+      "publisher": "GE Digital (GE Vernova)",
+      "author": "",
+      "date": "2023",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 17,
+      "title": "Predictive Maintenance Trends for Steel Industry 2026: AI, IIoT & Digital Twins",
+      "url": "https://oxmaint.com/industries/steel-plant/predictive-maintenance-trends-steel-industry-2026-ai-iiot",
+      "publisher": "OxMaint",
+      "author": "",
+      "date": "2026",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 18,
+      "title": "Asset Performance Management Explained",
+      "url": "https://www.gevernova.com/software/blog/asset-performance-management-explained",
+      "publisher": "GE Vernova",
+      "author": "",
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 19,
+      "title": "Reliability Engineer Job Description Versus Maintenance Engineer Job Description",
+      "url": "https://reliabilityweb.com/articles/entry/re-vs-me",
+      "publisher": "ReliabilityWeb",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 20,
+      "title": "ISO 55000:2024 — Asset management — Vocabulary, overview and principles",
+      "url": "https://www.iso.org/standard/83053.html",
+      "publisher": "International Organization for Standardization (ISO)",
+      "author": "",
+      "date": "2024",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 21,
+      "title": "CMRP Certification — Society for Maintenance & Reliability Professionals",
+      "url": "https://smrp.org/Certification/CMRP-Certification",
+      "publisher": "SMRP (Society for Maintenance & Reliability Professionals)",
+      "author": "",
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 22,
+      "title": "Reliability Engineering & Quality Management Formulas (MTBF, MTTR, OEE, Availability, Weibull)",
+      "url": "https://reliabilitycalc.com/formulas/",
+      "publisher": "ReliabilityCalc",
+      "author": "",
+      "date": "2024",
+      "type": "reference",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 23,
+      "title": "Best Asset Performance Management (APM) Software in 2026: An Independent Comparison",
+      "url": "https://reliamag.com/guides/best-apm-software-2026/",
+      "publisher": "ReliaMag",
+      "author": "",
+      "date": "2026",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 24,
+      "title": "Maintenance and Asset Reliability Engineering Teams Explained",
+      "url": "https://spartakustech.com/reliability-blog/maintenance-and-reliability-engineering-teams-explained/",
+      "publisher": "Spartakus Technologies",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 25,
+      "title": "An Integrated Approach to APM: Seamless Management of Asset Strategy and Health",
+      "url": "https://www.bakerhughes.com/cordant/blog/integrated-approach-apm-seamless-management-asset-strategy-and-health",
+      "publisher": "Baker Hughes Cordant",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 26,
+      "title": "Asset Criticality Assessment: What Matters Most",
+      "url": "https://safetyculture.com/topics/asset-management-system/asset-criticality-assessment",
+      "publisher": "SafetyCulture",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 27,
+      "title": "A Systematic Review of Digital Twin-Driven Predictive Maintenance in Industrial Engineering",
+      "url": "https://arxiv.org/html/2509.24443v1",
+      "publisher": "arXiv (academic preprint)",
+      "author": "",
+      "date": "2025",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 28,
+      "title": "Asset Criticality Analysis — GE APM Classic V4.5 Documentation (PDF)",
+      "url": "https://www.gevernova.com/software/documentation/apm-classic/v45/help/pdf/Asset_Criticality_Analysis.pdf",
+      "publisher": "GE Vernova",
+      "author": "",
+      "date": "2023",
+      "type": "primary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 29,
+      "title": "Types of Maintenance Explained: Corrective, Preventive, Condition-based & Predictive",
+      "url": "https://ftmaintenance.com/maintenance-management/types-of-maintenance/",
+      "publisher": "FTMaintenance CMMS",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 30,
+      "title": "Maintenance KPIs: The 15 Metrics That Prove Reliability Is Improving",
+      "url": "https://ifactoryapp.com/blog/maintenance-kpis-metrics",
+      "publisher": "iFactory",
+      "author": "",
+      "date": "2025",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    },
+    {
+      "id": 31,
+      "title": "Maintenance Strategy — reliaSPACE (Thai industry context)",
+      "url": "https://www.reliaspace.com/ms-part-1",
+      "publisher": "reliaSPACE Co., Ltd. (Rayong, Thailand)",
+      "author": "",
+      "date": "2024",
+      "type": "secondary",
+      "accessed": "2026-06-23"
+    }
+  ]
+}

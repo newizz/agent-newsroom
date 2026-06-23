@@ -1,0 +1,171 @@
+{
+  "name": "Asset Strategy Management (ASM)",
+  "children": [
+    {
+      "name": "Definition and Core Concepts",
+      "children": [
+        {
+          "name": "Best practice approach"
+        },
+        {
+          "name": "Connects physical assets to central systems"
+        },
+        {
+          "name": "Enabled by people, technology, and data"
+        },
+        {
+          "name": "Focus: Deciding what tasks to do and when"
+        }
+      ]
+    },
+    {
+      "name": "Implementation Steps",
+      "children": [
+        {
+          "name": "1. Benchmarking",
+          "children": [
+            {
+              "name": "Self-assessment"
+            },
+            {
+              "name": "Asset availability and reliability metrics"
+            },
+            {
+              "name": "Unplanned maintenance percentage"
+            }
+          ]
+        },
+        {
+          "name": "2. Targets for Improvement",
+          "children": [
+            {
+              "name": "Measurable and attainable goals"
+            },
+            {
+              "name": "Cost saving predictions"
+            },
+            {
+              "name": "Operating context capacity"
+            }
+          ]
+        },
+        {
+          "name": "3. Blueprinting",
+          "children": [
+            {
+              "name": "Business process mapping"
+            },
+            {
+              "name": "Roles and responsibilities (RACI)"
+            },
+            {
+              "name": "Gap analysis"
+            }
+          ]
+        },
+        {
+          "name": "4. Building the Framework",
+          "children": [
+            {
+              "name": "Standardization and governance"
+            },
+            {
+              "name": "Enterprise system integration"
+            },
+            {
+              "name": "Data migration and standards"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Key Program Elements",
+      "children": [
+        {
+          "name": "Generic Strategies",
+          "children": [
+            {
+              "name": "Asset strategy library"
+            },
+            {
+              "name": "Component type definitions"
+            },
+            {
+              "name": "FMECA based tactics"
+            }
+          ]
+        },
+        {
+          "name": "Strategy Deployment",
+          "children": [
+            {
+              "name": "Local variations for operating context"
+            },
+            {
+              "name": "Task effectiveness analysis"
+            },
+            {
+              "name": "Change management tracking"
+            }
+          ]
+        },
+        {
+          "name": "Implementation rules",
+          "children": [
+            {
+              "name": "Work plan packaging rules"
+            },
+            {
+              "name": "Direct ERP/CMMS integration"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Continuous Improvement",
+      "children": [
+        {
+          "name": "Defect Elimination",
+          "children": [
+            {
+              "name": "Root Cause Analysis (RCA)"
+            },
+            {
+              "name": "Cause and effect charting"
+            }
+          ]
+        },
+        {
+          "name": "Performance Monitoring",
+          "children": [
+            {
+              "name": "KPI dashboards"
+            },
+            {
+              "name": "Prediction vs. actual reports"
+            },
+            {
+              "name": "Global updates and learning"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Integration with APM Ecosystem",
+      "children": [
+        {
+          "name": "Work Management (WM): Execution focus"
+        },
+        {
+          "name": "Asset Health Management (AHM): Condition monitoring"
+        },
+        {
+          "name": "Asset Strategy Optimization: Predictive analytics"
+        }
+      ]
+    }
+  ]
+}
