@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Engineering: Overview, Methods &amp; Real-World Applications — agent-newsroom</title>
+<link rel="preconnect" href="https://rsms.me">
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
+<style>
+:root {
+  --accent: #6366F1;
+  --accent-soft: rgba(99,102,241,0.09);
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --muted: #71717a;
+  --border: #e4e4e7;
+  --text: #18181b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #09090b;
+    --surface: #18181b;
+    --muted: #a1a1aa;
+    --border: #27272a;
+    --text: #fafafa;
+    --accent-soft: rgba(99,102,241,0.15);
+  }
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Scroll progress ── */
+#scroll-progress {
+  position: fixed; top: 0; left: 0;
+  height: 3px; width: 0%;
+  background: var(--accent);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* ── Surfaces ── */
+.surface { background: var(--surface); border: 1px solid var(--border); }
+.accent  { color: var(--accent); }
+.muted   { color: var(--muted); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Animations ── */
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up   { opacity: 0; transform: translateY(28px); transition: opacity .55s ease, transform .55s ease; }
+  .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .5s ease, transform .5s ease; }
+  .scale-in  { opacity: 0; transform: scale(0.92); transition: opacity .45s ease, transform .45s ease; }
+  .visible   { opacity: 1 !important; transform: none !important; }
+}
+
+/* ── Cards ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+.card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+.card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(99,102,241,.12); }
+
+/* ── Finding cards ── */
+.finding-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: .75rem;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.finding-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,.1); }
+.finding-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--accent);
+}
+.finding-number {
+  font-size: .7rem; font-weight: 700;
+  color: var(--accent);
+  text-transform: uppercase; letter-spacing: .05em;
+  margin-bottom: .4rem;
+}
+.finding-card h3 { font-size: .925rem; font-weight: 700; margin-bottom: .4rem; }
+.finding-card p { font-size: .85rem; color: var(--muted); line-height: 1.65; }
+
+/* ── Reel ── */
+.reel-dot {
+  width: 8px; height: 8px;
+  border-radius: 999px; border: none;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+.reel-dot:hover { transform: scale(1.3); }
+
+/* ── Markmap ── */
+.markmap > svg { width: 100% !important; height: 100% !important; display: block; }
+
+/* ── Tables ── */
+table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+th, td { border: 1px solid var(--border); padding: .55rem .85rem; text-align: left; }
+th { background: var(--accent-soft); font-weight: 600; color: var(--accent); }
+tr:nth-child(even) td { background: var(--accent-soft); }
+
+/* ── Stat counters ── */
+.stat-block { text-align: center; padding: 1.5rem 1rem; }
+.stat-number { font-size: 2.4rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.stat-label  { font-size: .75rem; color: var(--muted); margin-top: 5px; line-height: 1.4; }
+
+/* ── Code blocks ── */
+.code-block {
+  background: #111113; color: #e2e8f0;
+  border-radius: .5rem;
+  padding: 1rem 1.25rem;
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+  font-size: .8rem;
+  overflow-x: auto;
+  line-height: 1.65;
+  margin: .85rem 0;
+  white-space: pre;
+}
+@media (prefers-color-scheme: dark) {
+  .code-block { background: #0a0a0b; border: 1px solid var(--border); }
+}
+
+/* ── Timeline ── */
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 1.35rem;
+}
+.timeline-item::before {
+  content: '';
+  position: absolute; left: 0; top: 7px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.timeline-item::after {
+  content: '';
+  position: absolute; left: 4px; top: 17px;
+  width: 2px; bottom: 0;
+  background: var(--border);
+}
+.timeline-item:last-child::after { display: none; }
+
+/* ── Synthesis callout ── */
+.synthesis-callout {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  border-radius: 0 .75rem .75rem 0;
+  padding: 1.25rem 1.5rem;
+}
+
+/* ── Prose ── */
+.prose p { margin-bottom: 1em; line-height: 1.75; }
+.prose p:last-child { margin-bottom: 0; }
+.prose strong { color: var(--accent); font-weight: 600; }
+.prose ul, .prose ol { margin: .75em 0 .75em 1.5em; }
+.prose li { margin-bottom: .5em; line-height: 1.7; }
+.prose h3 { font-size: 1.0rem; font-weight: 700; margin: 1.5em 0 .6em; }
+
+/* ── Glossary ── */
+.glossary dl { display: grid; gap: 1rem; }
+.glossary dt { font-weight: 600; font-size: .9rem; margin-bottom: .15rem; }
+.glossary dd { color: var(--muted); font-size: .855rem; line-height: 1.65; margin-left: 0; }
+
+/* ── TOC ── */
+.toc-link {
+  font-size: .85rem;
+  padding: .35rem .75rem;
+  border-radius: .4rem;
+  transition: background .15s;
+  display: inline-block;
+}
+.toc-link:hover { background: var(--accent-soft); text-decoration: none; }
+.toc-link.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+/* ── Print ── */
+@media print {
+  nav, footer button, #scroll-progress { display: none; }
+  .surface { border: 1px solid #ccc; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Scroll Progress -->
+<div id="scroll-progress"></div>
+
+<!-- Header -->
+<header style="border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:var(--surface);">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition" style="color:var(--muted);">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      agent-newsroom
+    </a>
+    <div class="text-xs muted">financial-engineering &middot; 2026-06-29</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-8 fade-up">
+  <div class="flex flex-wrap gap-2 mb-4">
+    <span style="background:var(--accent-soft);color:var(--accent);font-size:.73rem;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:.03em;">Concept Explainer</span>
+    <span style="background:var(--accent-soft);color:var(--accent);font-size:.73rem;font-weight:700;padding:3px 10px;border-radius:6px;letter-spacing:.03em;">Deep Research</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">Financial Engineering</h1>
+  <p style="font-size:1.15rem;color:var(--muted);max-width:720px;line-height:1.75;">
+    An interdisciplinary discipline fusing applied mathematics, statistics, computer science, and financial theory to design instruments, price derivatives, manage risk, and build quantitative trading strategies — going far beyond what traditional finance or economics alone can accomplish.
+  </p>
+  <div style="font-size:.82rem;color:var(--muted);margin-top:1rem;">2026-06-29 &middot; deep mode &middot; 28 sources (10 web + 18 YouTube via NotebookLM)</div>
+</section>
+
+<!-- Insight Reel -->
+<section class="max-w-5xl mx-auto px-6 mb-10 fade-up">
+  <div class="surface rounded-2xl overflow-hidden card-hover" id="reel" tabindex="0" style="cursor:default;">
+    <div id="reelSlides" style="position:relative;min-height:155px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 mb-14">
+  <div class="surface rounded-xl p-4">
+    <div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem;">Contents</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.25rem;">
+      <a href="#infographic" class="toc-link">Visual Overview</a>
+      <a href="#synthesis" class="toc-link">Deep Synthesis</a>
+      <a href="#mindmap" class="toc-link">Mind Map</a>
+      <a href="#findings" class="toc-link">Key Findings</a>
+      <a href="#background" class="toc-link">Background</a>
+      <a href="#math" class="toc-link">Math Foundations</a>
+      <a href="#derivatives" class="toc-link">Derivatives</a>
+      <a href="#risk" class="toc-link">Risk Management</a>
+      <a href="#structured" class="toc-link">Structured Products</a>
+      <a href="#algo" class="toc-link">Algo &amp; ML</a>
+      <a href="#career" class="toc-link">Career &amp; Education</a>
+      <a href="#timeline" class="toc-link">Timeline</a>
+      <a href="#data" class="toc-link">Data</a>
+      <a href="#examples" class="toc-link">Worked Examples</a>
+      <a href="#glossary" class="toc-link">Glossary</a>
+      <a href="#sources" class="toc-link">Sources</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Visual Overview -->
+<section id="infographic" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="image" class="w-5 h-5 accent"></i> Visual Overview
+  </h2>
+  <div class="surface rounded-xl overflow-hidden">
+    <img src="infographic.png" alt="Financial Engineering — Visual Overview generated by NotebookLM" class="w-full h-auto block" loading="lazy"/>
+  </div>
+  <div style="font-size:.75rem;color:var(--muted);margin-top:.5rem;">Generated by NotebookLM during the deep research phase</div>
+</section>
+
+<!-- Deep Synthesis Callout -->
+<section id="synthesis" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="microscope" class="w-5 h-5 accent"></i> Deep Synthesis
+  </h2>
+  <div class="synthesis-callout">
+    <div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;">
+      Rin (NotebookLM) &mdash; Synthesised from 28 sources (10 web &middot; 18 YouTube)
+    </div>
+    <p style="font-size:.95rem;line-height:1.78;margin-bottom:.85rem;">
+      <strong>Financial engineering</strong> is a multidisciplinary discipline that applies <strong>engineering methodologies and technical tools</strong> to solve complex problems in the financial world. It functions by integrating financial theory with methods from <strong>applied mathematics, computer science, statistics, and economics</strong> to convert theoretical frameworks into practical market applications. The field emerged prominently in the early 1990s, driven in part by a &ldquo;Superconducting Super Collider generation&rdquo; of physicists who transitioned to Wall Street and catalysed the growth of quantitative finance. Rather than traditional engineering, it focuses on <strong>modelling uncertainty</strong>, predicting future price movements, and designing innovative financial products through rigorous quantitative analysis.
+    </p>
+    <p style="font-size:.95rem;line-height:1.78;">
+      The discipline employs a vast array of quantitative methods, most notably <strong>stochastic calculus</strong>, which uses Brownian motion and Ito&rsquo;s Lemma to model the random trajectory of asset prices. A cornerstone tool is the <strong>Black-Scholes model</strong> &mdash; a partial differential equation used to determine fair option prices and manage risk through &ldquo;Greeks&rdquo; like delta and gamma. Computational techniques are equally vital: <strong>Monte Carlo simulations</strong> allow practitioners to estimate unknown parameters by generating thousands of random market scenarios, while <strong>finite difference and Fourier transform methods</strong> provide numerical solutions for complex derivatives. These methods are implemented using programming languages such as <strong>Python, R, C++, and MATLAB</strong>, alongside specialised libraries like QuantLib for pricing and Pandas for data analysis.
+    </p>
+  </div>
+</section>
+
+<!-- Mind Map -->
+<section id="mindmap" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="brain" class="w-5 h-5 accent"></i> Interactive Mind Map
+  </h2>
+  <div class="surface rounded-xl p-2" style="height:640px;">
+    <div class="markmap" style="width:100%;height:100%;">
+      <script type="text/template">
+# Financial Engineering
+
+## Mathematical Foundations
+### Stochastic Processes
+- Geometric Brownian Motion: dS = muS dt + sigmaS dW
+- Brownian Motion / Wiener Process
+- Ito Calculus (non-zero quadratic variation)
+- Risk-Neutral Measure Q
+- Girsanov's Theorem (change of measure)
+### Partial Differential Equations
+- Black-Scholes PDE
+- Feynman-Kac Formula (PDE = expectation)
+- Finite Difference Methods (explicit / implicit / Crank-Nicolson)
+### Numerical Methods
+- Monte Carlo Simulation
+- Variance Reduction (antithetic, control variates)
+- Fourier Transform Methods (Heston model)
+
+## Derivatives Pricing
+### Black-Scholes-Merton (1973)
+- European Call: C = S0·N(d1) - K·exp(-rT)·N(d2)
+- Put-Call Parity
+- Option Greeks: Delta, Gamma, Theta, Vega, Rho
+- Delta Hedging (continuous rebalancing)
+- Volatility Smile / Skew
+### Model Extensions
+- Heston Stochastic Volatility (1993)
+- Local Volatility - Dupire (1994)
+- SABR Model (2002)
+- Merton Jump-Diffusion
+### Interest Rate Models
+- Vasicek (1977)
+- Cox-Ingersoll-Ross (1985)
+- Hull-White
+- LIBOR Market Model (LMM / BGM)
+### Numerical Pricing
+- Binomial Trees (Cox-Ross-Rubinstein, 1979)
+- Trinomial Trees
+- Monte Carlo (path-dependent / exotic options)
+
+## Risk Management
+### Market Risk
+- Value at Risk (VaR): parametric / historical / Monte Carlo
+- Expected Shortfall (CVaR)
+- FRTB effective 2025 — VaR replaced by ES
+### Credit Risk
+- CVA = (1-R) integral D(t)·EE(t)·dPD(t)
+- XVA framework: DVA, FVA, KVA, MVA
+- Potential Future Exposure (PFE)
+- Credit Default Swap (CDS) pricing
+### Stress Testing
+- DFAST (US regulatory stress tests)
+- EBA stress tests (EU)
+- Historical scenario replay
+
+## Structured Products
+### Mortgage-Backed Securities (MBS)
+- Pool diversification of idiosyncratic risk
+- Tranche waterfall (senior / mezzanine / equity)
+- Prepayment modelling
+### CDOs
+- CDO-squared structures
+- Gaussian copula correlation model
+- 2008 failure: correlation spike in downturn
+### Swaps
+- Interest Rate Swaps (IRS): fixed vs floating
+- LIBOR to SOFR transition (2022)
+- Total Return Swaps / CDS
+### ETFs
+- Leveraged and inverse ETFs
+- Daily rebalancing mechanism
+- Beta slippage / volatility decay
+
+## Algorithmic Trading
+### Strategy Families
+- Statistical Arbitrage (cointegration, PCA, Kalman filters)
+- Market Making (Avellaneda-Stoikov model)
+- Momentum / Trend Following (CTA funds)
+- Index Arbitrage
+- High-Frequency Trading: 73% of US equity flow (2% of firms, 2009)
+### Machine Learning Integration
+- Return forecasting: XGBoost, LightGBM, LSTM
+- Volatility forecasting: deep learning > GARCH
+- NLP sentiment: BERT and GPT on earnings calls
+- Reinforcement learning for trade execution
+- Neural networks to accelerate XVA Greeks
+### Tools and Infrastructure
+- Python, C++, R, MATLAB
+- QuantLib, NumPy, Pandas, SciPy
+- Low-latency co-location infrastructure
+
+## Career and Education
+### Academic Programmes
+- MFE / Computational Finance / Mathematical Finance
+- Baruch College (CUNY) — top employment outcomes
+- Princeton ORFE — highest average starting salary
+- Carnegie Mellon MSCF
+- UC Berkeley Haas MFE
+- NYU Tandon MSFE — first IAQF-certified programme
+### Certifications
+- CFA: $177K total comp (investment management focus)
+- FRM: $128K total comp (risk management focus)
+- CQF (Fitch Learning) — quant methods focus
+- Dual CFA+FRM: 25 to 40% salary premium
+### Career Tracks
+- Desk Quant / Strategist
+- Quantitative Researcher (highest-paid at hedge funds)
+- Risk Management Analyst
+- Model Validation (SR 11-7 regulatory requirement)
+- Structurer
+- Quantitative Developer
+- Systematic Portfolio Manager
+
+## Key Milestones
+- 1900: Bachelier first stochastic price model
+- 1952: Markowitz mean-variance optimisation
+- 1973: Black-Scholes-Merton option formula
+- 1979: Cox-Ross-Rubinstein binomial tree
+- 1987: Black Monday 22.6% single-day crash
+- 1993: JPMorgan RiskMetrics / VaR popularised
+- 1997: Nobel Prize to Scholes and Merton
+- 1998: LTCM collapse $4.6B loss in 4 months
+- 1999: Gaussian copula published (David Li)
+- 2008: Global Financial Crisis copula failure
+- 2022: LIBOR replaced by SOFR and SONIA
+- 2025: FRTB effective Expected Shortfall replaces VaR
+      </script>
+    </div>
+  </div>
+  <div style="font-size:.75rem;color:var(--muted);margin-top:.5rem;">Mind map generated from research synthesis (Tier 2 fallback &mdash; no mindmap.json in this run)</div>
+</section>
+
+<!-- Key Findings -->
+<section id="findings" class="max-w-5xl mx-auto px-6 mb-14">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="zap" class="w-5 h-5 accent"></i> Key Findings
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4">
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 01 &mdash; Application-First Discipline</div>
+      <h3>FE is explicitly constructive, not descriptive</h3>
+      <p>Unlike economics (which describes markets) or accounting (which records them), financial engineering <em>builds</em> — pricing models, trading algorithms, risk systems, and novel financial instruments. The first accredited MFE curriculum launched at NYU Polytechnic in 1992. <a href="https://en.wikipedia.org/wiki/Financial_engineering" target="_blank">[1]</a></p>
+    </div>
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 02 &mdash; Stochastic Calculus is the Lingua Franca</div>
+      <h3>Ito&rsquo;s Lemma corrects ordinary calculus for random paths</h3>
+      <p>Brownian motion paths are continuous but nowhere differentiable &mdash; ordinary calculus fails. Ito&rsquo;s Lemma adds the second-order correction term (dW&sup2; = dt), directly yielding the Black-Scholes PDE that underpins a multi-trillion-dollar derivatives market. <a href="https://www.quantstart.com/articles/derivatives-pricing-i-pricing-under-the-black-scholes-model/" target="_blank">[9]</a></p>
+    </div>
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 03 &mdash; Black-Scholes is Indispensable yet Flawed</div>
+      <h3>The constant-volatility assumption is contradicted by every market</h3>
+      <p>Black Monday 1987 was 20+ standard deviations under BSM&rsquo;s lognormal assumption. Traders now use BSM as a <em>quoting convention</em> via the implied volatility surface. Extensions &mdash; Heston, SABR, local vol (Dupire) &mdash; were developed to close these gaps. <a href="https://www.macroption.com/black-scholes-assumptions/" target="_blank">[7]</a></p>
+    </div>
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 04 &mdash; VaR vs CVA: Two Risk Lenses</div>
+      <h3>VaR gives a loss threshold; CVA prices counterparty default risk</h3>
+      <p>A 99% 1-day VaR of $34,890 on a $1M portfolio means 1% probability of exceeding that loss. CVA &mdash; requiring Monte Carlo simulation over thousands of scenarios &mdash; prices the risk that a derivatives counterparty defaults. Basel III mandates explicit capital for both. <a href="https://www.numberanalytics.com/blog/complete-guide-credit-value-adjustment-cva" target="_blank">[10]</a></p>
+    </div>
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 05 &mdash; 2008 GFC: Model Risk at Industrial Scale</div>
+      <h3>Gaussian copula catastrophically underestimated correlated defaults</h3>
+      <p>31% of all AAA-rated structured-finance tranches were downgraded in the first three quarters of 2008. The copula&rsquo;s single correlation parameter could not capture that in a systemic downturn, mortgage defaults become near-perfectly correlated. <a href="https://en.wikipedia.org/wiki/Financial_engineering" target="_blank">[1]</a></p>
+    </div>
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 06 &mdash; HFT Dominates but Compresses Margins</div>
+      <h3>2% of firms generated 73% of order flow; revenues fell 75%</h3>
+      <p>By 2009, HFT firms &mdash; just 2% of all US trading firms &mdash; generated 73% of equity order volume. Peak revenues of $5B in 2009 collapsed to $1.25B by 2012 as strategies became commoditised. ML now augments rather than replaces classical FE. <a href="https://en.wikipedia.org/wiki/High-frequency_trading" target="_blank">[16]</a></p>
+    </div>
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 07 &mdash; Credentials Command Premium Pay</div>
+      <h3>Dual CFA+FRM holders earn 25&ndash;40% more than single-cert peers</h3>
+      <p>CFA charterholders average $177K total compensation; FRM holders average $128K. Top MFE programmes (Baruch, Princeton, CMU) consistently place graduates into six-figure roles. The field is one of the highest-paying globally. <a href="https://quintedge.com/cfa-vs-frm/" target="_blank">[19]</a></p>
+    </div>
+
+    <div class="finding-card fade-up card-hover">
+      <div class="finding-number">Finding 08 &mdash; FRTB Replaces VaR with Expected Shortfall</div>
+      <h3>Basel III&rsquo;s 2025 rules move the industry from threshold to tail</h3>
+      <p>Expected Shortfall captures the average loss in the tail beyond VaR &mdash; making it a coherent risk measure (VaR is not sub-additive). Simultaneously, the 2022 LIBOR-to-SOFR transition required recalibrating rate models across hundreds of trillions in swap contracts. <a href="https://en.wikipedia.org/wiki/Credit_valuation_adjustment" target="_blank">[11]</a></p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Background & History -->
+<section id="background" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> Background &amp; History
+  </h2>
+  <div class="surface rounded-xl p-8 prose">
+    <p>Financial Engineering emerged as a named field in the 1980s and 1990s, though its intellectual roots trace to Harry Markowitz&rsquo;s 1952 mean-variance portfolio theory, William Sharpe&rsquo;s Capital Asset Pricing Model (1964), and Fischer Black, Myron Scholes, and Robert Merton&rsquo;s option-pricing formula (1973). The informal descriptor &ldquo;rocket scientist&rdquo; was coined on Wall Street in the late 1970s as physicists and engineers &mdash; fluent in differential equations and numerical methods &mdash; migrated from aerospace departments to trading desks.</p>
+    <p>What made their approach genuinely novel was a single deceptively simple constraint: price financial instruments so that no risk-free profit (arbitrage) exists. Combined with stochastic calculus, this no-arbitrage condition yields remarkably precise pricing formulas. The discipline&rsquo;s engineering orientation &mdash; build something deployable, test it against market data, hedge it, iterate &mdash; distinguishes it from both academic mathematical finance (theorem-proof rigour) and quantitative economics (macroeconomic inference).</p>
+    <p>By the 1990s, structured products &mdash; interest rate swaps, MBS, CDOs, and credit default swaps &mdash; generated outsized bank revenues. The <strong>2008 Global Financial Crisis</strong> demonstrated both the extraordinary capability of FE (funding trillions of housing loans) and its catastrophic failure modes when model assumptions diverged from reality. Post-crisis, regulatory reform (Basel III, Dodd-Frank) demanded more rigorous risk measurement, and the explosion of alternative data and machine learning opened new systematic trading frontiers.</p>
+    <p><strong>What distinguishes FE from adjacent fields:</strong> Traditional finance uses DCF and ratio analysis; economics describes market behaviour; applied mathematics provides tools without financial focus; computer science provides infrastructure. FE uniquely combines all four &mdash; its practitioners are expected to <strong>build</strong> pricing models and trading systems, not merely interpret them.</p>
+  </div>
+</section>
+
+<!-- Key Stats Strip -->
+<section class="max-w-5xl mx-auto px-6 mb-14">
+  <div class="surface rounded-xl" style="display:grid;grid-template-columns:repeat(4,1fr);border-color:var(--border);">
+    <div class="stat-block scale-in" style="border-right:1px solid var(--border);">
+      <div class="stat-number" data-target="73" data-suffix="%">0%</div>
+      <div class="stat-label">US equity order flow<br>from HFT (2009)</div>
+    </div>
+    <div class="stat-block scale-in" style="border-right:1px solid var(--border);">
+      <div class="stat-number" data-target="31" data-suffix="%">0%</div>
+      <div class="stat-label">AAA CDO tranches<br>downgraded in 2008</div>
+    </div>
+    <div class="stat-block scale-in" style="border-right:1px solid var(--border);">
+      <div class="stat-number" data-target="80" data-suffix="%">0%</div>
+      <div class="stat-label">Forex orders executed<br>algorithmically (2016)</div>
+    </div>
+    <div class="stat-block scale-in">
+      <div class="stat-number" data-target="177" data-prefix="$" data-suffix="K">$0K</div>
+      <div class="stat-label">CFA avg total<br>compensation (US, 2025)</div>
+    </div>
+  </div>
+</section>
+
+<!-- Mathematical Foundations -->
+<section id="math" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="sigma" class="w-5 h-5 accent"></i> Mathematical Foundations
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <div class="prose">
+      <h3>A. Geometric Brownian Motion (GBM)</h3>
+      <p>The standard model for stock price dynamics: the <strong>proportional</strong> change in price follows Brownian motion with drift.</p>
+    </div>
+    <div class="code-block">dS = &mu;S dt + &sigma;S dW
+
+S = asset price | &mu; = drift | &sigma; = annualised volatility | dW = Wiener process increment</div>
+    <div class="prose">
+      <p>GBM ensures prices remain non-negative and that log-returns are normally distributed &mdash; the lognormal assumption embedded in Black-Scholes. Because percentage moves are proportional to price, GBM reflects the empirical observation that $1 moves matter differently for a $10 stock than a $1,000 stock.</p>
+      <h3>B. Ito&rsquo;s Lemma &mdash; The Stochastic Chain Rule</h3>
+      <p>Brownian motion paths have <strong>non-zero quadratic variation</strong> (dW&sup2; = dt), so the ordinary chain rule fails for functions of stochastic processes. Ito&rsquo;s Lemma provides the correct stochastic derivative for a smooth function F(t, S):</p>
+    </div>
+    <div class="code-block">dF = (&part;F/&part;t + &mu;S &part;F/&part;S + &frac12;&sigma;&sup2;S&sup2; &part;&sup2;F/&part;S&sup2;) dt + &sigma;S &part;F/&part;S dW
+         &uarr;___________________________________&uarr;              &uarr;_________________&uarr;
+                deterministic component                  stochastic component
+
+The term &frac12;&sigma;&sup2;S&sup2;(&part;&sup2;F/&part;S&sup2;)dt is the "Ito correction" &mdash; absent from ordinary calculus.</div>
+    <div class="prose">
+      <p>Under the Black-Scholes hedging argument, constructing a delta-neutral portfolio eliminates the stochastic dW term, yielding a deterministic PDE for the option price.</p>
+      <h3>C. Risk-Neutral Pricing (Girsanov&rsquo;s Theorem)</h3>
+      <p>In arbitrage-free markets there exists a probability measure Q &mdash; the <strong>risk-neutral measure</strong> &mdash; under which all discounted asset prices are martingales. Girsanov&rsquo;s Theorem shifts assets from drifting at &mu; (real world P) to drifting at r (risk-free rate, Q). Under Q, option pricing is simply:</p>
+    </div>
+    <div class="code-block">V&sub0; = e^(-rT) &middot; E^Q[Payoff(S_T)]
+
+Option price = discounted expected payoff under Q &mdash; no risk premium needed.</div>
+    <div class="prose">
+      <h3>D. The Black-Scholes PDE</h3>
+    </div>
+    <div class="code-block">&part;F/&part;t + rS &part;F/&part;S + &frac12;&sigma;&sup2;S&sup2; &part;&sup2;F/&part;S&sup2; &minus; rF = 0
+
+&rarr; Parabolic PDE; closed-form solutions exist for European calls and puts.
+&rarr; Numerical methods (finite differences) required for American / exotic options.</div>
+    <div class="prose">
+      <p>The Feynman-Kac theorem formally establishes the equivalence between PDE solutions and risk-neutral expectations, connecting the two approaches.</p>
+      <h3>E. Monte Carlo Simulation</h3>
+      <p>When PDEs become intractable &mdash; path-dependent options (Asian, barrier, lookback), high-dimensional baskets, CDO portfolios &mdash; Monte Carlo simulates thousands of price paths under Q and averages the discounted payoff. Variance reduction techniques (antithetic variates, control variates, importance sampling) are critical for achieving acceptable accuracy within practical compute budgets.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Derivatives Pricing -->
+<section id="derivatives" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="trending-up" class="w-5 h-5 accent"></i> Derivatives Pricing
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <div class="prose">
+      <h3>Black-Scholes-Merton (1973)</h3>
+      <p>The BSM model gives closed-form prices for European calls (C) and puts (P):</p>
+    </div>
+    <div class="code-block">C = S&sub0;&middot;N(d&sub1;) &minus; K&middot;e^(&minus;rT)&middot;N(d&sub2;)
+P = K&middot;e^(&minus;rT)&middot;N(&minus;d&sub2;) &minus; S&sub0;&middot;N(&minus;d&sub1;)
+
+d&sub1; = [ln(S&sub0;/K) + (r + &sigma;&sup2;/2)&middot;T] / (&sigma;&middot;&radic;T)
+d&sub2; = d&sub1; &minus; &sigma;&middot;&radic;T
+
+N(&middot;) = cumulative standard normal CDF
+S&sub0; = current price | K = strike | T = time to expiry (years)
+r = continuously compounded risk-free rate | &sigma; = annualised volatility</div>
+
+    <p style="font-size:.87rem;color:var(--muted);margin:1rem 0;">The Option Greeks measure how the option price changes with each input:</p>
+
+    <div style="overflow-x:auto;margin:.75rem 0;">
+      <table>
+        <thead>
+          <tr><th>Greek</th><th>Symbol</th><th>Measures</th><th>BSM Formula (call)</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Delta</td><td>&Delta;</td><td>Sensitivity to underlying price change</td><td>N(d&sub1;)</td></tr>
+          <tr><td>Gamma</td><td>&Gamma;</td><td>Rate of change of Delta (convexity)</td><td>N&prime;(d&sub1;) / (S&sub0;&sigma;&radic;T)</td></tr>
+          <tr><td>Theta</td><td>&Theta;</td><td>Time decay (loss per unit time)</td><td>Negative for long options</td></tr>
+          <tr><td>Vega</td><td>&nu;</td><td>Sensitivity to volatility change</td><td>S&sub0;&middot;N&prime;(d&sub1;)&middot;&radic;T</td></tr>
+          <tr><td>Rho</td><td>&rho;</td><td>Sensitivity to interest rate change</td><td>K&middot;T&middot;e^(&minus;rT)&middot;N(d&sub2;)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="prose">
+      <h3>Where BSM Breaks Down</h3>
+      <ul>
+        <li><strong>Constant volatility</strong> &mdash; violated by every options market. The volatility smile/skew (implied vol varying by strike and expiry) is universal evidence of fatter tails than lognormal predicts.</li>
+        <li><strong>Lognormal returns</strong> &mdash; Black Monday 1987 was 20+ standard deviations under BSM&rsquo;s assumption; equity returns exhibit negative skewness and fat tails.</li>
+        <li><strong>Continuous trading, zero transaction costs</strong> &mdash; impossible in practice; discrete hedging intervals and transaction costs mean perfect delta hedging is prohibitively expensive.</li>
+        <li><strong>European exercise only</strong> &mdash; approximately 85&ndash;90% of real equity options are American-style; BSM materially undervalues American puts.</li>
+      </ul>
+      <h3>Model Extensions</h3>
+      <ul>
+        <li><strong>Heston stochastic volatility (1993)</strong> &mdash; volatility follows a mean-reverting CIR process, producing implied vol smiles consistent with market observation.</li>
+        <li><strong>SABR model (2002)</strong> &mdash; widely used for interest rate derivatives; captures the vol smile analytically with a closed-form approximation.</li>
+        <li><strong>Local volatility (Dupire, 1994)</strong> &mdash; extracts a deterministic surface &sigma;(S,t) from market option prices, perfectly fitting the observed smile.</li>
+        <li><strong>Merton jump-diffusion</strong> &mdash; adds Poisson jumps to GBM to capture sudden large market moves.</li>
+        <li><strong>Interest rate models</strong> &mdash; Vasicek (1977), CIR (1985), Hull-White, LIBOR Market Model &mdash; each modelling the stochastic yield curve for pricing caps, floors, and swaptions.</li>
+      </ul>
+      <h3>Binomial Trees (Cox-Ross-Rubinstein, 1979)</h3>
+      <p>The CRR tree discretises GBM: at each step the price moves up (u = e^{&sigma;&radic;&Delta;t}) or down (d = 1/u) with risk-neutral probability p = (e^{r&Delta;t} &minus; d)/(u &minus; d). The tree is built forward, then option values are computed by backward induction. American options are handled by comparing continuation value against immediate exercise at each node. As steps &rarr; &infin;, CRR converges to the BSM formula for European options.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Risk Management -->
+<section id="risk" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="shield" class="w-5 h-5 accent"></i> Risk Management (VaR, CVA, Stress Testing)
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <div class="prose">
+      <h3>Value at Risk (VaR)</h3>
+      <p>VaR answers: &ldquo;With X% confidence, what is the most we could lose over N days?&rdquo; Three calculation approaches exist:</p>
+      <ol>
+        <li><strong>Parametric (Variance-Covariance)</strong> &mdash; assumes normally distributed returns. VaR = &minus;(&mu; &minus; z&middot;&sigma;) &times; Portfolio Value, where z is the confidence z-score (1.645 for 95%, 2.326 for 99%).</li>
+        <li><strong>Historical Simulation</strong> &mdash; replays actual historical return observations ranked worst to best; reads off the appropriate percentile. No distributional assumption required.</li>
+        <li><strong>Monte Carlo</strong> &mdash; generates thousands of hypothetical future scenarios from a statistical model. Most flexible but computationally intensive.</li>
+      </ol>
+      <p><strong>VaR&rsquo;s limitations:</strong> It says nothing about losses <em>beyond</em> the threshold, can underestimate tail risk when calibrated on benign historical periods, and failed badly in 2008. Basel III&rsquo;s FRTB (effective 2025) formally moves banks to <strong>Expected Shortfall (ES)</strong> as the primary regulatory risk metric, because ES captures the expected loss in the tail, not merely its boundary.</p>
+      <h3>Conditional VaR / Expected Shortfall</h3>
+      <p>CVaR = average loss in the worst (1 &minus; confidence level)% of scenarios. For Apple daily returns at 95% confidence, CVaR &asymp; &minus;0.82% vs VaR &asymp; &minus;0.63% &mdash; meaning the average loss on the worst 5% of days exceeds the VaR threshold by about 30%. ES is a <strong>coherent risk measure</strong>; VaR is not (it fails sub-additivity).</p>
+      <h3>Credit Valuation Adjustment (CVA)</h3>
+      <p>CVA prices the counterparty default risk embedded in OTC derivatives &mdash; the market value of the risk that a counterparty defaults before contract maturity:</p>
+    </div>
+    <div class="code-block">CVA = (1 &minus; R) &int;&sub0;&sup;T D(0,t) &middot; EE(t) &middot; dPD(0,t)
+
+where:
+  R       = Recovery Rate (typically 40% for investment-grade corporates)
+  D(0,t)  = Discount factor to time t
+  EE(t)   = Expected Exposure at t = E^Q[max(V(t), 0)]
+  PD(0,t) = Cumulative default probability (derived from CDS spreads)</div>
+    <div class="prose">
+      <p>CVA computation requires Monte Carlo over thousands of market scenarios. Modern XVA desks integrate CVA with Debit Valuation Adjustment (DVA), Funding Valuation Adjustment (FVA), Capital Valuation Adjustment (KVA), and Margin Valuation Adjustment (MVA) into a unified XVA framework. Basel III mandates explicit regulatory capital against CVA risk.</p>
+      <h3>Stress Testing</h3>
+      <p>Unlike VaR &mdash; which uses distributions fitted to recent data &mdash; stress tests apply predetermined extreme-but-plausible shock scenarios: a 30% equity market decline, a 200bp interest rate spike, a sovereign debt crisis. The goal is to identify portfolio vulnerabilities that statistical models miss, especially correlation breakdowns and liquidity crises. Post-2008 regulatory stress tests (DFAST in the US, EBA tests in Europe) are now mandatory for systemically important financial institutions.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Salary Chart -->
+<section class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="bar-chart-2" class="w-5 h-5 accent"></i> Certification Salary Comparison
+  </h2>
+  <div class="surface rounded-xl p-6">
+    <canvas id="salaryChart" style="max-height:280px;"></canvas>
+    <div style="font-size:.75rem;color:var(--muted);margin-top:.75rem;text-align:center;">
+      Source: CareerEmployer 2025, Quintedge 2026 &mdash; US market, figures in USD. Dual est. applies 30% premium to FRM total.
+    </div>
+  </div>
+</section>
+
+<!-- Structured Products & 2008 GFC -->
+<section id="structured" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="layers" class="w-5 h-5 accent"></i> Structured Products &amp; the 2008 GFC
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <div class="prose">
+      <h3>Mortgage-Backed Securities (MBS)</h3>
+      <p>MBS are bonds collateralised by pools of mortgage loans. Pooling diversifies idiosyncratic default risk; <strong>tranching</strong> creates senior (safest, paid first) and junior/equity (riskiest but highest yield) slices. Financial engineers use collateral cash flow models and Monte Carlo simulation to price and rate each tranche &mdash; genuinely recycling illiquid mortgage loans into liquid, rated bonds before misuse amplified systemic risk.</p>
+      <h3>Collateralised Debt Obligations (CDOs)</h3>
+      <p>CDOs took MBS tranching further by pooling mezzanine tranches from multiple MBS and re-tranching them &mdash; creating CDO-squared instruments. The correlation model was the <strong>Gaussian copula</strong> &mdash; a single-parameter function mapping individual default probabilities into joint probabilities. Its fatal assumption: that housing markets behave independently. In a nationwide downturn, mortgage defaults become near-perfectly correlated. When correlations spiked in 2007&ndash;2008, AAA-rated senior tranches suffered catastrophic losses.</p>
+      <h3>Four Lessons from the 2008 Global Financial Crisis</h3>
+      <ol>
+        <li><strong>Model risk is real and systemic.</strong> The Gaussian copula was not a fringe error &mdash; it was an industry-wide consensus model embedded in trillions of dollars of contracts and ratings agency methodologies alike.</li>
+        <li><strong>Correlation assumptions break down in crises.</strong> Assets that appear uncorrelated in normal conditions frequently become correlated precisely when diversification is most needed.</li>
+        <li><strong>Incentive misalignment amplifies risk.</strong> The &ldquo;originate-to-distribute&rdquo; model meant mortgage originators had little incentive to monitor credit quality once loans were securitised and off their balance sheets.</li>
+        <li><strong>Liquidity risk was undermodelled.</strong> Mark-to-model valuations masked the illiquidity of CDO tranches; when the secondary market disappeared, fire-sale dynamics amplified losses system-wide.</li>
+      </ol>
+      <h3>Interest Rate Swaps (IRS)</h3>
+      <p>An IRS is a bilateral OTC contract where one party pays a fixed rate and receives a floating rate (now SOFR post-LIBOR reform) on a notional principal. Swaps convert floating-rate liabilities to fixed (or vice versa), managing interest rate duration risk. With hundreds of trillions in notional outstanding, IRS is the world&rsquo;s largest derivatives market by notional amount. The 2022 LIBOR-to-SOFR transition required recalibrating IRS models globally.</p>
+      <h3>Post-2008 Regulatory Reforms</h3>
+      <ul>
+        <li><strong>Dodd-Frank Act (2010)</strong> &mdash; Mandated CCP clearing for standardised OTC derivatives, trade reporting to swap data repositories, and margin requirements for non-cleared swaps.</li>
+        <li><strong>Basel III</strong> &mdash; Imposed stricter CET1 capital ratios, leverage ratios, LCR, NSFR, explicit CVA capital charges, and the FRTB market risk framework.</li>
+        <li><strong>EMIR (EU)</strong> &mdash; Mirrored Dodd-Frank with European reporting and clearing mandates.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Algorithmic Trading & ML -->
+<section id="algo" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="cpu" class="w-5 h-5 accent"></i> Algorithmic Trading &amp; Machine Learning
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <div class="prose">
+      <h3>Algorithmic Trading Landscape</h3>
+      <p>By 2016, approximately 80% of all forex orders and 60&ndash;73% of US equity orders were executed algorithmically. Key strategy families:</p>
+      <ul>
+        <li><strong>Statistical Arbitrage (StatArb)</strong> &mdash; Identifies cointegrated pairs or baskets whose prices share a long-run equilibrium. Deviations trigger mean-reversion trades. Core tools: cointegration testing, principal component analysis (PCA), Kalman filters.</li>
+        <li><strong>Market Making</strong> &mdash; Posts simultaneous bid and ask quotes, earning the spread while managing inventory risk. Optimal models (Avellaneda-Stoikov, Ho-Stoll) use stochastic optimal control theory.</li>
+        <li><strong>Momentum / Trend Following</strong> &mdash; Captures persistence in asset returns using moving averages and time-series momentum; the dominant approach in managed futures (CTA) funds.</li>
+        <li><strong>High-Frequency Trading (HFT)</strong> &mdash; Operates at microsecond horizons, exploiting fleeting mispricings through extremely low-latency infrastructure. In 2009, HFT firms constituted just 2% of all US trading firms but generated 73% of equity order flow.</li>
+      </ul>
+      <h3>Machine Learning Integration</h3>
+      <p>Classical FE makes strong parametric assumptions; ML relaxes them and learns patterns from data. Current applications:</p>
+      <ul>
+        <li><strong>Return forecasting</strong> &mdash; Gradient-boosted trees (XGBoost, LightGBM) and LSTM networks forecast short-horizon returns from technical, fundamental, and alternative data features.</li>
+        <li><strong>Volatility forecasting</strong> &mdash; Deep learning architectures consistently outperform GARCH variants on high-frequency data.</li>
+        <li><strong>NLP and sentiment</strong> &mdash; Transformer models (BERT, GPT-based) extract alpha signals from earnings call transcripts, SEC filings, and news feeds.</li>
+        <li><strong>Reinforcement learning</strong> &mdash; Deep RL enables adaptive execution algorithms that learn optimal trading policies from market interaction without distributional assumptions.</li>
+        <li><strong>XVA Greeks acceleration</strong> &mdash; Neural networks approximate complex risk sensitivities, dramatically reducing Monte Carlo computation time for CVA/XVA desks.</li>
+      </ul>
+      <p><strong>Key tension:</strong> ML models are flexible but opaque and prone to overfitting on limited financial data. Classical FE models are transparent and economically grounded but may be misspecified. Best practice in the industry combines both: ML for signal generation, classical FE for risk attribution and hedging.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Career & Education -->
+<section id="career" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="graduation-cap" class="w-5 h-5 accent"></i> Career Paths &amp; Certifications
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="surface rounded-xl p-6">
+      <div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;">Top MFE Programmes (QuantNet 2026)</div>
+      <ul style="font-size:.875rem;line-height:1.9;list-style:none;padding:0;">
+        <li><span style="color:var(--accent);">&#9670;</span> <strong>Baruch College (CUNY)</strong> &mdash; top employment outcomes</li>
+        <li><span style="color:var(--accent);">&#9670;</span> <strong>Princeton ORFE</strong> &mdash; highest avg starting salary historically</li>
+        <li><span style="color:var(--accent);">&#9670;</span> <strong>Carnegie Mellon MSCF</strong></li>
+        <li><span style="color:var(--accent);">&#9670;</span> <strong>UC Berkeley Haas MFE</strong></li>
+        <li><span style="color:var(--accent);">&#9670;</span> <strong>NYU Tandon MSFE</strong> &mdash; first IAQF-certified programme</li>
+        <li><span style="color:var(--muted);">&#9670;</span> Columbia, University of Chicago, Cornell</li>
+      </ul>
+    </div>
+    <div class="surface rounded-xl p-6">
+      <div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;">Professional Certifications</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Credential</th><th>Body</th><th>Base Salary</th><th>Total Comp</th></tr></thead>
+          <tbody>
+            <tr><td><strong>CFA</strong></td><td>CFA Institute</td><td>$126K</td><td>$177K</td></tr>
+            <tr><td><strong>FRM</strong></td><td>GARP</td><td>$102K</td><td>$128K</td></tr>
+            <tr><td><strong>CQF</strong></td><td>Fitch Learning</td><td>&mdash;</td><td>Premium</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:.75rem;">Dual CFA+FRM holders earn 25&ndash;40% more than single-certification peers in hybrid roles.</p>
+    </div>
+  </div>
+  <div class="surface rounded-xl p-6 mt-6">
+    <div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;">Eight Career Tracks</div>
+    <div class="grid md:grid-cols-2 gap-4" style="font-size:.875rem;line-height:1.7;">
+      <div>
+        <p><strong>1. Desk Quant / Strategist</strong> &mdash; Develops and maintains pricing/risk models for a specific trading desk (rates, credit, equities, FX). Typically requires MFE or PhD.</p>
+        <p><strong>2. Quantitative Researcher</strong> &mdash; Systematic research into trading signals and factor models; often the highest-paid quant role at hedge funds.</p>
+        <p><strong>3. Risk Management Analyst</strong> &mdash; Calculates VaR, CVA, and stress test results; validates models. FRM credential highly valued.</p>
+        <p><strong>4. Model Validation</strong> &mdash; Independent review of trading desk models; a regulatory requirement under SR 11-7 (Federal Reserve).</p>
+      </div>
+      <div>
+        <p><strong>5. Structurer</strong> &mdash; Designs bespoke structured products for institutional clients, combining fixed income with derivatives overlays.</p>
+        <p><strong>6. Quantitative Developer (Quant Dev)</strong> &mdash; Implements pricing and risk models in production systems (C++, Python); bridges the quant-tech divide.</p>
+        <p><strong>7. Systematic Portfolio Manager</strong> &mdash; Runs systematic strategies using quantitative signals; often at hedge funds or quantitative asset managers.</p>
+        <p><strong>Employers:</strong> Goldman Sachs, JPMorgan, Morgan Stanley, Citadel, Two Sigma, Renaissance Technologies, D.E. Shaw, BlackRock, AQR, central banks, regulators.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Timeline -->
+<section id="timeline" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="calendar" class="w-5 h-5 accent"></i> Key Milestones
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <div style="max-width:700px;">
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1900</span> &mdash; Louis Bachelier proposes the first mathematical model of financial markets using Brownian motion for stock prices, in his Paris doctoral thesis.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1952</span> &mdash; Harry Markowitz publishes &ldquo;Portfolio Selection&rdquo; &mdash; mean-variance optimisation and the efficient frontier; the founding paper of modern portfolio theory.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1964</span> &mdash; William Sharpe introduces the Capital Asset Pricing Model (CAPM) &mdash; the first equilibrium model of risk and return.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1973</span> &mdash; Black-Scholes-Merton option formula published. The Chicago Board Options Exchange (CBOE) opens simultaneously; BSM is adopted by traders almost immediately.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1979</span> &mdash; Cox, Ross, and Rubinstein publish the Binomial Option Pricing Model &mdash; making BSM accessible without stochastic calculus.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1980s</span> &mdash; &ldquo;Rocket scientists&rdquo; (physicists, mathematicians, engineers) migrate from academia to Wall Street trading desks.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1987</span> &mdash; Black Monday (19 Oct) &mdash; Dow Jones falls 22.6% in one day; highlights BSM&rsquo;s lognormal assumption limitations and sparks the development of volatility skew models.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1992</span> &mdash; NYU Polytechnic launches the first IAQF-accredited MFE programme in the United States.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1993</span> &mdash; JPMorgan RiskMetrics popularises Value at Risk (VaR) as the industry standard for market risk measurement.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1997</span> &mdash; Nobel Prize in Economics awarded to Myron Scholes and Robert Merton for the BSM model. Fischer Black had died in 1995.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1998</span> &mdash; Long-Term Capital Management (LTCM) collapses &mdash; the fund (co-run by Scholes and Merton) loses <strong>$4.6 billion</strong> in four months following Russia&rsquo;s sovereign default. Profound lesson in model risk and tail events.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">1999</span> &mdash; David Li publishes the Gaussian copula model for credit portfolio correlation; rapidly adopted by banks and rating agencies.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">2007&ndash;08</span> &mdash; Global Financial Crisis. Gaussian copula fails; <strong>31% of all AAA-rated structured-finance tranches</strong> are downgraded in Q1&ndash;Q3 2008. Lehman Brothers collapses (September 2008).</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">2010</span> &mdash; Dodd-Frank Act (US) mandates central clearing and reporting of OTC derivatives.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">2011&ndash;19</span> &mdash; Basel III implementation: higher capital ratios (CET1), LCR/NSFR, explicit CVA capital charges, XVA frameworks at major banks.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">2013&ndash;20</span> &mdash; Machine learning enters mainstream quant finance: deep learning for price forecasting, NLP for text-based signals, reinforcement learning for execution optimisation.</div></div>
+      <div class="timeline-item"><div><span style="font-weight:700;color:var(--accent);">2022</span> &mdash; LIBOR replaced globally by SOFR (US), SONIA (UK), &euro;STR (EU) &mdash; a major transition affecting hundreds of trillions of dollars in swap contracts.</div></div>
+      <div class="timeline-item" style="padding-bottom:0;"><div><span style="font-weight:700;color:var(--accent);">2025</span> &mdash; Basel III FRTB effective &mdash; banks switch from VaR to Expected Shortfall as the primary regulatory market risk metric.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Data Table -->
+<section id="data" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="database" class="w-5 h-5 accent"></i> Key Data &amp; Numbers
+  </h2>
+  <div class="surface rounded-xl p-4" style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr><th>Metric</th><th>Value</th><th>Year</th><th>Source</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>BSM at-the-money call (S=$100, K=$100, T=1yr, r=5%, &sigma;=20%)</td><td><strong>$10.45</strong></td><td>Illustrative</td><td>[6]</td></tr>
+        <tr><td>Daily 99% parametric VaR, $1M portfolio (&sigma;=1.5%/day)</td><td><strong>$34,890</strong></td><td>Illustrative</td><td>[13]</td></tr>
+        <tr><td>Apple daily VaR (95% confidence)</td><td>&minus;0.63% of portfolio</td><td>Illustrative</td><td>[14]</td></tr>
+        <tr><td>Apple daily CVaR (95% confidence)</td><td>&minus;0.82% of portfolio</td><td>Illustrative</td><td>[14]</td></tr>
+        <tr><td>CVA Recovery Rate assumption (investment-grade corporate)</td><td>40%</td><td>2024</td><td>[10]</td></tr>
+        <tr><td>HFT share of US equity order volume (from just 2% of firms)</td><td><strong>73%</strong></td><td>2009</td><td>[16]</td></tr>
+        <tr><td>Forex orders executed algorithmically</td><td>~80%</td><td>2016</td><td>[21]</td></tr>
+        <tr><td>HFT estimated peak annual revenues</td><td>$5 billion</td><td>2009</td><td>[16]</td></tr>
+        <tr><td>HFT revenues (post-competition decline)</td><td>$1.25 billion</td><td>2012</td><td>[16]</td></tr>
+        <tr><td>CFA avg base salary (US)</td><td>$126,000</td><td>2025</td><td>[18]</td></tr>
+        <tr><td>CFA avg total compensation (US)</td><td><strong>$177,000</strong></td><td>2025</td><td>[18]</td></tr>
+        <tr><td>FRM avg base salary (US)</td><td>$102,000</td><td>2025</td><td>[18]</td></tr>
+        <tr><td>FRM avg total compensation (US)</td><td>$128,000</td><td>2025</td><td>[18]</td></tr>
+        <tr><td>Dual CFA+FRM salary premium over single-cert peers</td><td>25&ndash;40%</td><td>2026</td><td>[19]</td></tr>
+        <tr><td>LTCM losses (4 months, 1998)</td><td><strong>$4.6 billion</strong></td><td>1998</td><td>[1]</td></tr>
+        <tr><td>AAA CDO tranches downgraded (Q1&ndash;Q3 2008)</td><td><strong>31% of all AAA</strong></td><td>2008</td><td>[1]</td></tr>
+        <tr><td>Fraction of equity options that are European-style</td><td>~10&ndash;15%</td><td>2005</td><td>[8]</td></tr>
+        <tr><td>CFA study hours required (3 levels)</td><td>~900 hours</td><td>2025</td><td>[19]</td></tr>
+        <tr><td>FRM study hours required (2 parts)</td><td>~500 hours</td><td>2025</td><td>[19]</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Worked Examples -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-14">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> Worked Examples
+  </h2>
+  <div class="grid md:grid-cols-2 gap-6">
+
+    <div class="card card-hover fade-up">
+      <div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;">Example 1 &mdash; Black-Scholes Call Pricing</div>
+      <p style="font-size:.875rem;color:var(--muted);margin-bottom:.75rem;"><strong>Scenario:</strong> Price a European call on a non-dividend-paying stock with five inputs.</p>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem;">Inputs: S&sub0;=$100, K=$100, T=1yr, r=5%, &sigma;=20%</p>
+      <div class="code-block" style="font-size:.75rem;">
+d&sub1; = [ln(100/100)+(0.05+0.02)&middot;1] / (0.20&middot;1)
+   = 0.07/0.20 = 0.35
+d&sub2; = 0.35 &minus; 0.20 = 0.15
+
+N(0.35) &asymp; 0.6368  |  N(0.15) &asymp; 0.5596
+
+C = 100&times;0.6368 &minus; 100&times;e^(&minus;0.05)&times;0.5596
+  = 63.68 &minus; 53.23 &asymp; <strong>$10.45</strong></div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:.5rem;">&Delta; = N(d&sub1;) = 0.6368: a dealer who sold 100 calls must hold ~63.68 shares to remain delta-neutral. A $1 stock rise gains $63.68 on the hedge, offsetting the $63.68 gain on the short call position. This hedge requires continuous (or frequent) rebalancing &mdash; the cost of which <em>is</em> the option price.</p>
+    </div>
+
+    <div class="card card-hover fade-up">
+      <div style="font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.75rem;">Example 2 &mdash; VaR &amp; CVaR (Parametric)</div>
+      <p style="font-size:.875rem;color:var(--muted);margin-bottom:.75rem;"><strong>Scenario:</strong> Compute 1-day 99% VaR for a $1,000,000 single-asset portfolio.</p>
+      <p style="font-size:.78rem;color:var(--muted);margin-bottom:.5rem;">Inputs: Portfolio=$1M, &mu;=0%, &sigma;=1.5%/day, confidence=99% &rarr; z=2.326</p>
+      <div class="code-block" style="font-size:.75rem;">
+VaR = &minus;(&mu; &minus; z&middot;&sigma;) &times; Portfolio Value
+    = &minus;(0 &minus; 2.326 &times; 0.015) &times; 1,000,000
+    = 0.03489 &times; 1,000,000
+    = <strong>$34,890</strong>
+
+CVaR &asymp; &sigma; &times; &phi;(z)/(1&minus;0.99) &times; Portfolio Value
+      &asymp; 0.015 &times; 0.0267/0.01 &times; 1,000,000
+      &asymp; <strong>$40,050</strong></div>
+      <p style="font-size:.8rem;color:var(--muted);margin-top:.5rem;">VaR: 99% confidence of not losing more than $34,890 in one trading day. CVaR reveals the average loss on the worst 1% of days is ~$40,050 &mdash; 15% worse. Under FRTB (effective 2025), banks must use CVaR/ES rather than VaR for regulatory capital.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Glossary -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> Glossary
+  </h2>
+  <div class="surface rounded-xl p-8 glossary">
+    <dl>
+      <div><dt>Arbitrage</dt><dd>A risk-free profit obtained by simultaneously buying and selling equivalent assets at different prices in different markets. The no-arbitrage constraint is the cornerstone of derivatives pricing theory.</dd></div>
+      <div><dt>Black-Scholes-Merton (BSM)</dt><dd>The landmark 1973 closed-form formula for pricing European options on non-dividend-paying stocks using stochastic calculus and the no-arbitrage argument. Underpins a multi-trillion-dollar global derivatives market; Scholes and Merton received the 1997 Nobel Prize in Economics for this work.</dd></div>
+      <div><dt>Brownian Motion (Wiener Process)</dt><dd>A continuous-time stochastic process with independent, normally distributed increments; continuous everywhere but differentiable nowhere. The core random driver of asset price models in continuous time.</dd></div>
+      <div><dt>CDO (Collateralised Debt Obligation)</dt><dd>A structured product that pools assets (e.g. MBS tranches) and issues new tranched securities with different risk/return profiles. Central to the 2008 Global Financial Crisis due to Gaussian copula model failures.</dd></div>
+      <div><dt>CVA (Credit Valuation Adjustment)</dt><dd>The market value of counterparty default risk embedded in OTC derivatives &mdash; the price charged to account for the probability that a counterparty defaults before contract maturity. Basel III mandates explicit CVA capital charges.</dd></div>
+      <div><dt>CVaR / Expected Shortfall (ES)</dt><dd>The expected loss given that the loss exceeds the VaR threshold &mdash; the average of all tail losses. A coherent risk measure; Basel III FRTB (effective 2025) replaces VaR with ES for regulatory capital across systemically important banks.</dd></div>
+      <div><dt>Delta (&Delta;)</dt><dd>The partial derivative of an option price with respect to the underlying asset price; equals N(d&sub1;) for a BSM call. Used to construct delta-neutral hedges that eliminate first-order directional market risk.</dd></div>
+      <div><dt>Gaussian Copula</dt><dd>A single-parameter function modelling joint default probabilities from individual default probabilities using a correlation parameter. Its failure to capture systemic correlation spikes in a housing downturn drove catastrophic CDO losses in 2008.</dd></div>
+      <div><dt>Geometric Brownian Motion (GBM)</dt><dd>The standard model for stock prices: dS = &mu;S dt + &sigma;S dW. Ensures prices remain non-negative and log-returns are normally distributed; the foundational assumption of the Black-Scholes model.</dd></div>
+      <div><dt>Girsanov&rsquo;s Theorem</dt><dd>A theorem enabling a change of probability measure from the real-world measure P to the risk-neutral measure Q by altering the drift of a stochastic process. Foundational to risk-neutral pricing of all derivative instruments.</dd></div>
+      <div><dt>Greeks</dt><dd>Partial derivatives of an option price with respect to its inputs: Delta (&Delta;), Gamma (&Gamma;), Theta (&Theta;), Vega (&nu;), Rho (&rho;). Used to quantify and dynamically manage risk exposures on options desks.</dd></div>
+      <div><dt>HFT (High-Frequency Trading)</dt><dd>Algorithmic trading characterised by extremely short holding periods (microseconds to milliseconds), high order volumes, and strategies exploiting fleeting market inefficiencies. In 2009, HFT firms &mdash; just 2% of all US trading firms &mdash; generated 73% of equity order volume.</dd></div>
+      <div><dt>Ito&rsquo;s Lemma</dt><dd>The stochastic calculus equivalent of the chain rule; provides the differential of a function of a stochastic process, including a second-order correction term (the &ldquo;Ito correction&rdquo;) arising because dW&sup2; = dt. Absent from ordinary calculus; essential for deriving the Black-Scholes PDE.</dd></div>
+      <div><dt>MBS (Mortgage-Backed Security)</dt><dd>A bond collateralised by a pool of mortgage loans; cash flows from mortgage payments pass through to investors, often in tranched form. A genuine innovation in recycling illiquid mortgage loans into liquid, rated bonds.</dd></div>
+      <div><dt>MFE (Master of Financial Engineering)</dt><dd>The standard graduate credential for entering quantitative finance; curriculum covers stochastic calculus, derivatives pricing, numerical methods, risk management, and C++/Python programming.</dd></div>
+      <div><dt>Monte Carlo Simulation</dt><dd>A computational method generating thousands to millions of random scenarios to estimate probabilities and expected values. The workhorse technique for pricing path-dependent derivatives and computing VaR/CVA where PDEs are intractable.</dd></div>
+      <div><dt>Risk-Neutral Measure (Q)</dt><dd>An artificial probability measure under which all assets grow at the risk-free rate; enables option pricing by computing discounted expected payoffs without risk premiums. Girsanov&rsquo;s Theorem provides the mathematical machinery to construct Q.</dd></div>
+      <div><dt>VaR (Value at Risk)</dt><dd>The maximum expected portfolio loss over a specified horizon at a given confidence level. A 99% 1-day VaR of $34,890 means a 1% daily probability of exceeding that loss. Replaced by Expected Shortfall under FRTB (effective 2025) for regulatory capital calculations.</dd></div>
+      <div><dt>Volatility Smile / Skew</dt><dd>The empirical pattern where BSM implied volatility varies with strike price and expiry, contradicting BSM&rsquo;s constant-volatility assumption. Universal market evidence that participants price tail risks beyond what lognormal models predict.</dd></div>
+      <div><dt>XVA</dt><dd>Collective term for valuation adjustments &mdash; CVA (counterparty credit risk), DVA (own credit risk), FVA (funding cost), KVA (capital cost), MVA (margin cost) &mdash; that banks compute to reflect the full economics of OTC derivative positions.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- Sources -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-14 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> Sources
+  </h2>
+  <div class="surface rounded-xl p-8" style="font-size:.87rem;">
+    <ol style="list-style:decimal;padding-left:1.5rem;line-height:2.1;">
+      <li>Financial Engineering &mdash; Wikipedia. <a href="https://en.wikipedia.org/wiki/Financial_engineering" target="_blank">en.wikipedia.org/wiki/Financial_engineering</a></li>
+      <li>Financial Engineering: Definition, Uses, Examples &mdash; Corporate Finance Institute. <a href="https://corporatefinanceinstitute.com/resources/financial-modeling/financial-engineering/" target="_blank">corporatefinanceinstitute.com</a></li>
+      <li>What is Financial Engineering? &mdash; CQF / Fitch Learning. <a href="https://www.cqf.com/blog/what-financial-engineering" target="_blank">cqf.com</a></li>
+      <li>Financial Engineering vs. Quantitative Finance &mdash; Harbourfront Technologies. <a href="https://harbourfronts.com/financial-engineering-vs-quantitative-finance/" target="_blank">harbourfronts.com</a></li>
+      <li>Quantitative Finance &mdash; CFI. <a href="https://corporatefinanceinstitute.com/resources/data-science/quantitative-finance/" target="_blank">corporatefinanceinstitute.com</a></li>
+      <li>Black-Scholes-Merton Model &mdash; CFI. <a href="https://corporatefinanceinstitute.com/resources/derivatives/black-scholes-merton-model/" target="_blank">corporatefinanceinstitute.com</a></li>
+      <li>Black-Scholes Model Assumptions &mdash; Macroption. <a href="https://www.macroption.com/black-scholes-assumptions/" target="_blank">macroption.com</a></li>
+      <li>Black-Scholes Model Overview &mdash; Strike.money. <a href="https://www.strike.money/options/black-scholes-model" target="_blank">strike.money</a></li>
+      <li>Derivatives Pricing under Black-Scholes &mdash; QuantStart. <a href="https://www.quantstart.com/articles/derivatives-pricing-i-pricing-under-the-black-scholes-model/" target="_blank">quantstart.com</a></li>
+      <li>Complete Guide to Credit Value Adjustment (CVA) &mdash; Number Analytics. <a href="https://www.numberanalytics.com/blog/complete-guide-credit-value-adjustment-cva" target="_blank">numberanalytics.com</a></li>
+      <li>Credit Valuation Adjustment &mdash; Wikipedia. <a href="https://en.wikipedia.org/wiki/Credit_valuation_adjustment" target="_blank">en.wikipedia.org/wiki/Credit_valuation_adjustment</a></li>
+      <li>CVA and Its Role in Risk Management &mdash; ElysianNxt. <a href="https://www.elysiannxt.com/what-is-credit-valuation-adjustment-cva-and-its-role-in-risk-management/" target="_blank">elysiannxt.com</a></li>
+      <li>Value at Risk (VaR) &mdash; FE Training. <a href="https://www.fe.training/free-resources/financial-markets/value-at-risk-var/" target="_blank">fe.training</a></li>
+      <li>Conditional Value at Risk &mdash; FE Training. <a href="https://www.fe.training/free-resources/portfolio-management/conditional-value-at-risk/" target="_blank">fe.training</a></li>
+      <li>Structured Product &mdash; Wikipedia. <a href="https://en.wikipedia.org/wiki/Structured_product" target="_blank">en.wikipedia.org/wiki/Structured_product</a></li>
+      <li>High-Frequency Trading &mdash; Wikipedia. <a href="https://en.wikipedia.org/wiki/High-frequency_trading" target="_blank">en.wikipedia.org/wiki/High-frequency_trading</a></li>
+      <li>Career Paths &mdash; UC Berkeley Haas MFE. <a href="https://mfe.haas.berkeley.edu/careers/career-paths" target="_blank">mfe.haas.berkeley.edu</a></li>
+      <li>CFA vs FRM (2025) &mdash; CareerEmployer. <a href="https://careeremployer.com/financial-analyst/cfa-vs-frm/" target="_blank">careeremployer.com</a></li>
+      <li>CFA vs FRM: Honest Comparison (2026) &mdash; Quintedge. <a href="https://quintedge.com/cfa-vs-frm/" target="_blank">quintedge.com</a></li>
+      <li>Interest Rate Derivatives &mdash; CQF. <a href="https://www.cqf.com/blog/interest-rate-derivatives-what-you-need-know" target="_blank">cqf.com</a></li>
+      <li>Algorithmic Trading &mdash; Wikipedia. <a href="https://en.wikipedia.org/wiki/Algorithmic_trading" target="_blank">en.wikipedia.org/wiki/Algorithmic_trading</a></li>
+    </ol>
+    <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.8rem;color:var(--muted);">
+      Deep research sources: 10 web + 18 YouTube via NotebookLM &mdash; see <code>runs/financial-engineering/deep-research/sources.json</code>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="border-top:1px solid var(--border);margin-top:3rem;padding:2rem 0;">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4" style="font-size:.875rem;color:var(--muted);">
+    <div>Generated by <a href="../../">agent-newsroom</a> on 2026-06-29</div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <button onclick="window.print()" style="background:none;border:none;cursor:pointer;color:var(--muted);display:flex;align-items:center;gap:.25rem;font-size:.875rem;">
+        <i data-lucide="printer" class="w-4 h-4"></i> Print
+      </button>
+      <a href="../../" style="display:flex;align-items:center;gap:.25rem;">
+        <i data-lucide="home" class="w-4 h-4"></i> Office
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── Scroll Progress Bar ───────────────────────────────────────────────────────
+const progressBar = document.getElementById('scroll-progress');
+window.addEventListener('scroll', function() {
+  const scrolled = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+  progressBar.style.width = scrolled + '%';
+}, { passive: true });
+
+// ── Entrance Animations ───────────────────────────────────────────────────────
+const io = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.07 });
+document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(function(el) {
+  io.observe(el);
+});
+
+// ── Animated Stat Counters ────────────────────────────────────────────────────
+const statEls = document.querySelectorAll('.stat-number[data-target]');
+const statObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      const el = e.target;
+      const target = parseFloat(el.dataset.target);
+      const prefix = el.dataset.prefix || '';
+      const suffix = el.dataset.suffix || '';
+      let start = null;
+      const duration = 1500;
+      function step(ts) {
+        if (!start) start = ts;
+        const progress = Math.min((ts - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.round(eased * target);
+        el.textContent = prefix + current + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+      statObserver.unobserve(el);
+    }
+  });
+}, { threshold: 0.5 });
+statEls.forEach(function(el) { statObserver.observe(el); });
+
+// ── Insight Reel ──────────────────────────────────────────────────────────────
+var insights = [
+  {
+    stat: '73%',
+    statLabel: 'of US equity order flow\nfrom HFT firms in 2009',
+    headline: 'A Tiny Club Dominates the Market',
+    body: 'Just 2% of all US trading firms generated 73% of all equity order volume by 2009. HFT peak revenues hit $5B before declining to $1.25B by 2012 as strategies became commoditised.',
+    color: '#6366F1'
+  },
+  {
+    stat: '31%',
+    statLabel: 'of AAA CDO tranches\ndowngraded in Q1–3 of 2008',
+    headline: 'When "Safe" Became Catastrophic',
+    body: 'The Gaussian copula model catastrophically underestimated correlated mortgage defaults. 31% of all AAA-rated structured-finance tranches were downgraded in the first three quarters of 2008.',
+    color: '#EF4444'
+  },
+  {
+    stat: '$4.6B',
+    statLabel: 'lost by LTCM in just\n4 months in 1998',
+    headline: 'When Nobel Prize Models Fail at Scale',
+    body: 'Long-Term Capital Management — co-run by Scholes and Merton — lost $4.6 billion in four months after Russia\'s sovereign default. Model risk can become systemic, not merely individual.',
+    color: '#F59E0B'
+  },
+  {
+    stat: '$10.45',
+    statLabel: 'BSM call price:\nS=$100, K=$100, T=1yr, σ=20%',
+    headline: 'One Formula, a Multi-Trillion Market',
+    body: 'The Black-Scholes model prices a 1-year at-the-money call at $10.45 from just five inputs. This formula — published in 1973 — launched a global listed options market at the CBOE almost immediately.',
+    color: '#10B981'
+  },
+  {
+    stat: '80%',
+    statLabel: 'of all forex orders\nexecuted algorithmically (2016)',
+    headline: 'Algorithms Now Run the Markets',
+    body: 'By 2016, approximately 80% of all foreign exchange orders were executed by algorithms. Statistical arbitrage, market making, and momentum strategies have replaced most manual order flow.',
+    color: '#8B5CF6'
+  },
+  {
+    stat: '$177K',
+    statLabel: 'avg total compensation\nfor CFA charterholders (US, 2025)',
+    headline: 'The Premium on Quantitative Credentials',
+    body: 'CFA charterholders average $177K total compensation; FRM holders average $128K. Professionals holding both certifications earn 25–40% more than single-credential peers in hybrid roles.',
+    color: '#6366F1'
+  }
+];
+
+var reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function buildSlide(ins) {
+  var lines = ins.statLabel.split('\n');
+  var labelHtml = lines.join('<br>');
+  return '<div style="display:flex;align-items:center;gap:2rem;padding:1.75rem 2.5rem;flex-wrap:wrap;">'
+    + '<div style="text-align:center;min-width:115px;flex-shrink:0;">'
+    + '<div style="font-size:2.5rem;font-weight:800;color:' + ins.color + ';line-height:1;">' + ins.stat + '</div>'
+    + '<div style="font-size:.68rem;color:var(--muted);margin-top:5px;line-height:1.45;max-width:125px;">' + labelHtml + '</div>'
+    + '</div>'
+    + '<div style="flex:1;min-width:180px;">'
+    + '<div style="font-size:1.05rem;font-weight:700;margin-bottom:6px;">' + ins.headline + '</div>'
+    + '<div style="font-size:.875rem;color:var(--muted);line-height:1.62;">' + ins.body + '</div>'
+    + '</div></div>';
+}
+
+function showSlide(idx, animate) {
+  if (reelAnimating) return;
+  reelAnimating = true;
+  reelIdx = ((idx % insights.length) + insights.length) % insights.length;
+  var wrap = document.getElementById('reelSlides');
+  if (animate !== false) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .3s ease, transform .3s ease';
+  }
+  setTimeout(function() {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'none';
+    reelAnimating = false;
+  }, animate !== false ? 300 : 0);
+  document.querySelectorAll('.reel-dot').forEach(function(d, i) {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+  var bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(function() {
+    bar.style.transition = 'width 4s linear';
+    bar.style.width = '100%';
+  });
+}
+
+var dotsWrap = document.getElementById('reelDots');
+insights.forEach(function(_, i) {
+  var d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.setAttribute('aria-label', 'Slide ' + (i + 1));
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s,transform .2s;';
+  d.style.background = i === 0 ? 'var(--accent)' : '#d4d4d8';
+  d.onclick = function() {
+    clearInterval(reelTimer);
+    showSlide(i);
+    reelTimer = setInterval(function() { showSlide(reelIdx + 1); }, 4000);
+  };
+  dotsWrap.appendChild(d);
+});
+
+var reelEl = document.getElementById('reel');
+reelEl.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') { clearInterval(reelTimer); showSlide(reelIdx + 1); reelTimer = setInterval(function() { showSlide(reelIdx + 1); }, 4000); }
+  if (e.key === 'ArrowLeft')  { clearInterval(reelTimer); showSlide(reelIdx - 1); reelTimer = setInterval(function() { showSlide(reelIdx + 1); }, 4000); }
+});
+reelEl.addEventListener('mouseenter', function() { clearInterval(reelTimer); });
+reelEl.addEventListener('mouseleave', function() { reelTimer = setInterval(function() { showSlide(reelIdx + 1); }, 4000); });
+
+showSlide(0, false);
+reelTimer = setInterval(function() { showSlide(reelIdx + 1); }, 4000);
+
+// ── Salary Chart (Chart.js) ───────────────────────────────────────────────────
+var isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+var textColor = isDark ? '#a1a1aa' : '#71717a';
+var gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
+
+var ctx = document.getElementById('salaryChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['CFA Base', 'CFA Total', 'FRM Base', 'FRM Total', 'Dual CFA+FRM (est.)'],
+    datasets: [{
+      label: 'Compensation (USD)',
+      data: [126000, 177000, 102000, 128000, 218000],
+      backgroundColor: [
+        'rgba(99,102,241,0.45)',
+        'rgba(99,102,241,0.85)',
+        'rgba(99,102,241,0.3)',
+        'rgba(99,102,241,0.6)',
+        'rgba(16,185,129,0.8)'
+      ],
+      borderColor: ['#6366F1','#6366F1','#6366F1','#6366F1','#10B981'],
+      borderWidth: 1.5,
+      borderRadius: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(c) { return ' $' + c.parsed.y.toLocaleString(); }
+        }
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(v) { return '$' + (v / 1000) + 'K'; },
+          color: textColor
+        },
+        grid: { color: gridColor }
+      },
+      x: {
+        ticks: { color: textColor, font: { size: 11 } },
+        grid: { display: false }
+      }
+    },
+    animation: { duration: 1200, easing: 'easeOutQuart' }
+  }
+});
+
+// ── Lucide Icons ──────────────────────────────────────────────────────────────
+lucide.createIcons();
+</script>
+</body>
+</html>

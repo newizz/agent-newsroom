@@ -2,7 +2,7 @@
   "currentRun": null,
   "currentSlug": null,
   "currentMode": null,
-  "lastUpdate": "2026-06-23T04:28:06Z",
+  "lastUpdate": "2026-06-29T12:11:17Z",
   "agents": [
     {
       "id": "intake",
@@ -41,7 +41,7 @@
       "name": "Rosa",
       "role": "Reporter",
       "emoji": "📋",
-      "status": "idle",
+      "status": "offline",
       "task": ""
     }
   ]
