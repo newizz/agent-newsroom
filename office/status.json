@@ -2,7 +2,7 @@
   "currentRun": null,
   "currentSlug": null,
   "currentMode": null,
-  "lastUpdate": "2026-06-29T12:11:17Z",
+  "lastUpdate": "2026-06-30T00:54:37Z",
   "agents": [
     {
       "id": "intake",
@@ -33,8 +33,8 @@
       "name": "Bram",
       "role": "Dashboard Builder",
       "emoji": "🎨",
-      "status": "busy",
-      "task": "writing dashboard"
+      "status": "offline",
+      "task": ""
     },
     {
       "id": "reporter",
