@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EV vs Hybrid — เปรียบเทียบรถยนต์ไฟฟ้าและไฮบริดสำหรับผู้ใช้งานในไทย — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
+<style>
+:root {
+  --accent: #6366F1;
+  --accent-soft: rgba(99,102,241,0.10);
+  --accent-border: rgba(99,102,241,0.40);
+}
+html { font-family: 'Inter var', 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body { background: #fafafa; color: #18181b; }
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  body { background: #0a0a0b; color: #e4e4e7; }
+  .surface { background: #131316 !important; border-color: #27272a !important; }
+  .surface-2 { background: #1c1c20 !important; border-color: #3f3f46 !important; }
+  .muted { color: #a1a1aa !important; }
+  .border-soft { border-color: #27272a !important; }
+  .row-hover:hover { background: #1c1c20 !important; }
+  .badge-indigo { background: #1e1b4b !important; color: #a5b4fc !important; }
+  .badge-green { background: #14532d !important; color: #86efac !important; }
+  .badge-amber { background: #451a03 !important; color: #fcd34d !important; }
+  .reel-dot { background: #52525b !important; }
+  .comp-table tbody tr { border-top-color: #27272a !important; }
+  .comp-table th { background: #131316 !important; border-bottom-color: #27272a !important; }
+  .score-bar { background: #27272a !important; }
+  header { background: rgba(10,10,11,0.90) !important; border-bottom-color: #27272a !important; }
+  .callout-box { background: rgba(99,102,241,0.08) !important; border-color: rgba(99,102,241,0.30) !important; }
+  .incentive-card { background: #131316 !important; }
+  .model-card { background: #131316 !important; border-color: #27272a !important; }
+}
+
+/* Layout utilities */
+.surface { background: #fff; border: 1px solid #e4e4e7; }
+.surface-2 { background: #f4f4f5; border: 1px solid #e4e4e7; }
+.muted { color: #71717a; }
+.border-soft { border-color: #e4e4e7; }
+
+/* Accent */
+.accent { color: var(--accent); }
+.bg-accent { background: var(--accent); }
+.bg-accent-soft { background: var(--accent-soft); }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Scroll progress */
+#progress-bar {
+  position: fixed; top: 0; left: 0; height: 3px;
+  background: var(--accent); z-index: 9999; width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* Badges */
+.badge-indigo { background: #eef2ff; color: var(--accent); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+.badge-green  { background: #f0fdf4; color: #15803d; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+.badge-amber  { background: #fffbeb; color: #b45309; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+
+/* Insight reel */
+.reel-wrapper { overflow: hidden; border-radius: 1rem; }
+.reel-track { display: flex; transition: transform 0.5s ease; will-change: transform; }
+@media (prefers-reduced-motion: reduce) { .reel-track { transition: none; } }
+.reel-slide {
+  min-width: 100%; padding: 2.5rem 2rem;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; min-height: 200px; gap: 0.75rem;
+}
+.reel-dot { width: 8px; height: 8px; border-radius: 9999px; background: #d4d4d8; cursor: pointer; transition: background .2s, transform .2s; border: none; padding: 0; }
+.reel-dot.active { background: var(--accent); transform: scale(1.25); }
+.reel-stat { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; color: var(--accent); line-height: 1; }
+.reel-label { font-size: 1.1rem; font-weight: 600; }
+.reel-sub { font-size: 0.85rem; }
+
+/* Score bar */
+.score-bar { height: 6px; background: #f4f4f5; border-radius: 9999px; overflow: hidden; min-width: 80px; }
+.score-fill { height: 100%; background: var(--accent); border-radius: 9999px; transition: width .6s cubic-bezier(.4,0,.2,1); }
+
+/* Comparison table */
+.comp-table { border-collapse: collapse; width: 100%; }
+.comp-table th { padding: 0.75rem 1rem; background: #f9f9fb; font-weight: 600; font-size: 0.85rem; border-bottom: 2px solid #e4e4e7; text-align: left; }
+.comp-table td { padding: 0.75rem 1rem; font-size: 0.875rem; vertical-align: top; }
+.comp-table tbody tr { border-top: 1px solid #e4e4e7; }
+.comp-table tbody tr:hover { background: rgba(99,102,241,0.04); }
+.winner { color: var(--accent); font-weight: 600; }
+.dim-label { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* Model card */
+.model-card {
+  background: #fff; border: 1px solid #e4e4e7; border-radius: 0.75rem;
+  padding: 1.25rem; transition: transform .2s, box-shadow .2s;
+}
+.model-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(99,102,241,0.14); }
+.model-price { font-size: 1.25rem; font-weight: 700; color: var(--accent); }
+
+/* Callout box */
+.callout-box {
+  background: rgba(99,102,241,0.05);
+  border: 1px solid rgba(99,102,241,0.20);
+  border-left: 4px solid var(--accent);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+/* Incentive card */
+.incentive-card { background: #fff; border: 1px solid #e4e4e7; border-radius: 0.75rem; padding: 1.5rem; }
+
+/* Animations */
+.fade-in { animation: fadeIn .5s ease-out both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fade-in, .model-card, .reel-dot { animation: none; transition: none; } .model-card:hover { transform: none; } }
+
+/* Markmap container */
+.markmap-wrap { height: 500px; }
+.markmap-wrap .markmap { height: 100%; }
+
+/* Prose */
+.prose p { margin-bottom: 0.9em; line-height: 1.75; }
+.prose p:last-child { margin-bottom: 0; }
+.prose strong { color: var(--accent); font-weight: 700; }
+
+/* Section spacing */
+.section { max-width: 72rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
+.section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem; }
+
+/* Grid */
+.models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.stats-grid  { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; }
+
+/* Responsive table */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Option cards */
+.option-card {
+  background: #fff; border: 2px solid #e4e4e7; border-radius: 0.875rem;
+  padding: 1.5rem; flex: 1; min-width: 220px;
+  transition: border-color .2s;
+}
+.option-card:hover { border-color: var(--accent); }
+@media (prefers-color-scheme: dark) { .option-card { background: #131316; border-color: #27272a; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Scroll Progress Bar -->
+<div id="progress-bar" aria-hidden="true"></div>
+
+<!-- Header -->
+<header class="border-b border-soft sticky top-0 z-50 backdrop-blur-sm" style="background:rgba(250,250,250,0.92);">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> กลับหน้าหลัก
+    </a>
+    <div class="text-xs muted flex items-center gap-2">
+      <span class="badge-indigo">Deep Research</span>
+      <span>ev-vs-hybrid-thai · 30 มิ.ย. 2569</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="section pt-14 pb-8 fade-in">
+  <div class="mb-4">
+    <span class="badge-indigo">เปรียบเทียบ</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-5 leading-tight">
+    EV vs Hybrid<br><span class="accent">ควรเลือกอะไรในปี 2569?</span>
+  </h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+    รถ EV มีต้นทุนการใช้งาน (ค่าไฟ + ค่าซ่อม) ต่ำกว่า Hybrid อย่างมีนัยสำคัญ แต่ราคาซื้อสูงกว่า —
+    โครงการ EV 3.5 ชดเชยด้วยเงินอุดหนุนสูงสุด <strong>100,000 บาท</strong>
+    แต่สถานีชาร์จยังกระจุกกรุงเทพฯ <strong>70%</strong> และมูลค่าขายต่อยังน่าเป็นห่วง
+  </p>
+</section>
+
+<!-- ===== DEEP RESEARCH CALLOUT ===== -->
+<section class="section pb-10">
+  <div class="callout-box">
+    <div class="flex flex-wrap items-center gap-2 mb-3">
+      <i data-lucide="sparkles" class="w-4 h-4 accent"></i>
+      <span class="badge-indigo">การวิจัยเชิงลึก — สังเคราะห์จาก 41 แหล่ง (26 เว็บ + 15 YouTube) ผ่าน NotebookLM</span>
+    </div>
+    <div class="prose">
+      <p>
+        การตัดสินใจเลือกระหว่างรถยนต์ไฟฟ้า (BEV) และรถยนต์ไฮบริด (HEV/PHEV) สำหรับผู้ใช้งานในประเทศไทย
+        ต้องพิจารณาจาก <strong>ต้นทุนรวมตลอดการใช้งาน (TCO)</strong> และสิทธิประโยชน์จากรัฐบาลเป็นอันดับแรก
+        รถ EV มีความโดดเด่นอย่างมากในเรื่องค่าพลังงานที่ต่ำเพียง 0.6–1.3 บาทต่อกิโลเมตร
+        ซึ่งประหยัดกว่ารถยนต์น้ำมันที่ต้องจ่ายเฉลี่ย 2.5–3.3 บาทต่อกิโลเมตร
+        รวมถึงมีค่าบำรุงรักษาต่ำกว่าประมาณ 30–50% เนื่องจากมีชิ้นส่วนเคลื่อนไหวน้อยกว่า
+      </p>
+      <p>
+        อย่างไรก็ตาม ผู้ใช้ EV ต้องเผชิญกับค่าเสื่อมราคาที่สูงกว่าและราคาขายต่อที่ลดลงเร็วกว่ารถไฮบริดในตลาดปัจจุบัน
+        ในด้านสิทธิประโยชน์ รัฐบาลสนับสนุน EV ผ่านนโยบาย <strong>EV 3.5</strong>
+        ที่มอบเงินอุดหนุนสูงสุด 100,000 บาทและลดภาษีสรรพสามิตเหลือ 2%
+        ขณะที่รถไฮบริดและ PHEV จะได้รับสิทธิประโยชน์ทางภาษีสรรพสามิตใหม่ในปี 2569
+        ซึ่งเน้นไปที่ระยะทางการขับขี่ด้วยไฟฟ้าและการปล่อย CO₂
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VISUAL OVERVIEW ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="image" class="w-5 h-5 accent"></i> ภาพรวม — อินโฟกราฟิก
+  </h2>
+  <div class="surface rounded-xl overflow-hidden p-3">
+    <img src="infographic.png" alt="EV vs Hybrid ไทย — อินโฟกราฟิกเปรียบเทียบ" class="w-full rounded-lg" loading="lazy">
+    <p class="text-xs muted mt-2 text-center">สร้างโดย NotebookLM ในระหว่างการวิจัยเชิงลึก</p>
+  </div>
+</section>
+
+<!-- ===== MIND MAP ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="git-branch" class="w-5 h-5 accent"></i> แผนที่ความคิด
+  </h2>
+  <div class="surface rounded-xl p-4">
+    <p class="text-xs muted italic mb-3">แผนที่ความคิดสร้างจากการสังเคราะห์งานวิจัย (NotebookLM ไม่มีแผนที่ความคิดสำหรับรอบนี้)</p>
+    <div class="markmap-wrap">
+<div class="markmap">
+<script type="text/template">
+---
+markmap:
+  colorFreezeLevel: 2
+  maxWidth: 300
+---
+# EV vs Hybrid ไทย
+## รถยนต์ไฟฟ้า (BEV)
+### รุ่นยอดนิยม
+#### BYD Atto 1 · 429,900 บาท
+#### BYD Dolphin · 449,900–599,900 บาท
+#### BYD Atto 3 · 699,900 บาท
+#### BYD Seal · 999,900 บาท
+#### Tesla Model 3 · 1,149,000+ บาท
+### ต้นทุนพลังงาน
+#### ชาร์จบ้าน: 0.33–0.80 บาท/กม.
+#### DC Fast สาธารณะ: 1.0–1.3 บาท/กม.
+### ข้อดี
+#### Regenerative Braking ประหยัดในเมือง
+#### ค่าซ่อม ~5,346 บาท/ปี (ต่ำสุด)
+#### รัฐอุดหนุน 50,000–100,000 บาท
+### ข้อเสีย
+#### มูลค่าขายต่อต่ำ (~22.9% เสียทันที)
+#### รอชาร์จ 20–45 นาที (DC Fast)
+#### ประกันแพงกว่า HEV ~30%
+## รถยนต์ไฮบริด (HEV)
+### รุ่นยอดนิยม
+#### Toyota Yaris Ativ HEV · 569,000 บาท
+#### Toyota Corolla Cross HEV · 989,000+ บาท
+#### Toyota Camry HEV · 1,455,000+ บาท
+#### Honda CR-V e:HEV · 1,399,000+ บาท
+### ต้นทุนพลังงาน
+#### 1.5–2.0 บาท/กม.
+### ข้อดี
+#### เติมน้ำมันทุกปั๊ม ไม่ต้องวางแผน
+#### มูลค่าขายต่อสูง (Toyota HEV ดีเยี่ยม)
+#### ไม่มี Range Anxiety
+### ข้อเสีย
+#### ไม่มีสิทธิประโยชน์รัฐ
+#### ค่าซ่อม ~12,000 บาท/ปี
+## ปลั๊กอินไฮบริด (PHEV)
+### รุ่นยอดนิยม
+#### BYD Seal 5 DM-i · 599,900–699,900 บาท
+#### BYD Sealion 6 DM-i · 899,900–999,900 บาท
+### วิ่งไฟฟ้าล้วน 40–100 กม.
+### รับสิทธิ์รัฐเหมือน BEV
+### ยืดหยุ่นสูงสุดในทุกสถานการณ์
+## TCO 5 ปี (วิ่ง 20,000 กม./ปี)
+### BYD Atto 3 (BEV) · 921,600 บาท
+### BYD Seal 5 DM-i (PHEV) · 944,900 บาท
+### Toyota Corolla Cross HEV · 1,314,000 บาท
+### Breakeven BEV vs HEV · ~4.8–5.3 ปี
+## มาตรการรัฐบาล
+### EV 3.0 (2565–2567)
+#### อุดหนุนสูงสุด 150,000 บาท
+#### 84,000 คันนำเข้าในโครงการ
+### EV 3.5 (2567–2570)
+#### 2567: 100,000 บาท
+#### 2568: 75,000 บาท
+#### 2569–2570: 50,000 บาท
+#### ภาษีสรรพสามิต 2%
+## โครงสร้างพื้นฐานชาร์จ
+### 11,467 จุดสาธารณะ (ธ.ค. 2567)
+### 70% กระจุกกรุงเทพฯ/ปริมณฑล
+### PTT EV Station PluZ · ~30% ส่วนแบ่ง
+### EA Anywhere · ~16% ส่วนแบ่ง
+### PEA Volta · ~13% ส่วนแบ่ง
+## สิ่งแวดล้อม
+### กริดไฟฟ้าไทย
+#### ก๊าซธรรมชาติ ~55%
+#### ถ่านหิน ~15%
+#### พลังงานสะอาด ~14%
+### CO2 per km (use-phase)
+#### BEV: ~70–90 gCO2/กม.
+#### HEV: ~90–110 gCO2/กม.
+#### ICE: ~150–200 gCO2/กม.
+### LCA ภาพรวมวงจรชีวิต
+#### BEV ดีกว่า ICE ~14% บนกริดไทย
+</script>
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ANIMATED INSIGHT REEL ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="zap" class="w-5 h-5 accent"></i> สถิติสำคัญ
+  </h2>
+  <div class="surface rounded-xl overflow-hidden">
+    <div class="reel-wrapper">
+      <div class="reel-track" id="reelTrack">
+
+        <div class="reel-slide bg-accent-soft">
+          <div class="reel-stat">0.6–1.3</div>
+          <div class="reel-label">บาท/กม. ค่าพลังงาน BEV (ชาร์จบ้าน)</div>
+          <div class="reel-sub muted">เทียบกับรถน้ำมัน ICE ที่ 2.5–3.3 บาท/กม. — ประหยัดกว่า 3–5 เท่า</div>
+        </div>
+
+        <div class="reel-slide" style="background:rgba(16,185,129,0.08)">
+          <div class="reel-stat" style="color:#059669">921,600</div>
+          <div class="reel-label">บาท TCO 5 ปี — BYD Atto 3 (BEV)</div>
+          <div class="reel-sub muted">เทียบกับ Toyota Corolla Cross HEV ที่ 1,314,000 บาท — ถูกกว่า 392,400 บาท</div>
+        </div>
+
+        <div class="reel-slide" style="background:rgba(245,158,11,0.08)">
+          <div class="reel-stat" style="color:#d97706">11,467</div>
+          <div class="reel-label">จุดชาร์จสาธารณะทั่วไทย (ธ.ค. 2567)</div>
+          <div class="reel-sub muted">DC Fast 5,782 จุด + AC 5,685 จุด — แต่ 70% กระจุกกรุงเทพฯ/ปริมณฑล</div>
+        </div>
+
+        <div class="reel-slide" style="background:rgba(239,68,68,0.07)">
+          <div class="reel-stat" style="color:#dc2626">-22.9%</div>
+          <div class="reel-label">มูลค่าเสียไปทันทีเมื่อซื้อ BEV มือสอง</div>
+          <div class="reel-sub muted">Toyota HEV ยังคงมูลค่าดีกว่าอย่างมีนัยสำคัญในตลาดมือสองไทย</div>
+        </div>
+
+        <div class="reel-slide" style="background:rgba(99,102,241,0.08)">
+          <div class="reel-stat">50–60%</div>
+          <div class="reel-label">ลด CO₂ use-phase ของ BEV เทียบ ICE</div>
+          <div class="reel-sub muted">แต่กริดไฟฟ้าไทย ~70% ฟอสซิล (ก๊าซ 55% + ถ่านหิน 15%) ทำให้ LCA ลดได้เพียง ~14%</div>
+        </div>
+
+        <div class="reel-slide" style="background:rgba(16,185,129,0.08)">
+          <div class="reel-stat" style="color:#059669">100,000</div>
+          <div class="reel-label">บาท เงินอุดหนุน EV 3.5 ปี 2567 (แบต ≥50 kWh)</div>
+          <div class="reel-sub muted">ลดเหลือ 75,000 บาทในปี 2568 และ 50,000 บาทในปี 2569–2570</div>
+        </div>
+
+      </div>
+    </div>
+    <div class="flex items-center justify-center gap-2 py-4">
+      <button class="reel-dot active" onclick="goReel(0)" aria-label="สไลด์ 1"></button>
+      <button class="reel-dot" onclick="goReel(1)" aria-label="สไลด์ 2"></button>
+      <button class="reel-dot" onclick="goReel(2)" aria-label="สไลด์ 3"></button>
+      <button class="reel-dot" onclick="goReel(3)" aria-label="สไลด์ 4"></button>
+      <button class="reel-dot" onclick="goReel(4)" aria-label="สไลด์ 5"></button>
+      <button class="reel-dot" onclick="goReel(5)" aria-label="สไลด์ 6"></button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== OPTION CARDS + RADAR ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="bar-chart-2" class="w-5 h-5 accent"></i> สรุปจุดเด่นแต่ละประเภท
+  </h2>
+
+  <!-- Option Cards -->
+  <div class="flex flex-wrap gap-4 mb-8" id="optionCards"></div>
+
+  <!-- Radar Chart -->
+  <div class="surface rounded-xl p-6">
+    <h3 class="font-semibold mb-4 text-sm muted uppercase tracking-wide">เรดาร์เปรียบเทียบ 8 มิติ (คะแนน 0–10)</h3>
+    <div class="max-w-lg mx-auto">
+      <canvas id="radarChart" aria-label="เรดาร์เปรียบเทียบ BEV HEV PHEV" role="img"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ===== COMPARISON MATRIX TABLE (10 มิติ) ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="table-2" class="w-5 h-5 accent"></i> ตารางเปรียบเทียบเชิงลึก 10 มิติ
+  </h2>
+  <div class="surface rounded-xl overflow-hidden">
+    <div class="table-scroll">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th class="w-48">มิติเปรียบเทียบ</th>
+            <th><span class="badge-indigo">BEV — รถไฟฟ้า</span></th>
+            <th><span class="badge-green">HEV — ไฮบริด</span></th>
+            <th><span class="badge-amber">PHEV — ปลั๊กอินไฮบริด</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-hover">
+            <td class="dim-label">ราคารถ (เริ่มต้น)</td>
+            <td class="winner">429,900–1,949,000 บาท<br><span class="text-xs font-normal muted">BYD Atto 1 ถึง Tesla Model Y</span></td>
+            <td>569,000–1,904,000 บาท<br><span class="text-xs muted">Yaris Ativ HEV ถึง Camry HEV</span></td>
+            <td>599,900–999,900 บาท<br><span class="text-xs muted">BYD Seal 5 DM-i ถึง Sealion 6 DM-i</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">ต้นทุนรวม 5 ปี (TCO)</td>
+            <td class="winner">~921,600 บาท<br><span class="text-xs font-normal muted">BYD Atto 3 · 20,000 กม./ปี</span></td>
+            <td>~1,314,000 บาท<br><span class="text-xs muted">Toyota Corolla Cross HEV</span></td>
+            <td>~944,900 บาท<br><span class="text-xs muted">BYD Seal 5 DM-i</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">ค่าเชื้อเพลิง / พลังงาน</td>
+            <td class="winner">12,000–20,000 บาท/ปี<br><span class="text-xs font-normal muted">0.33–0.80 บาท/กม. (ชาร์จบ้าน)</span></td>
+            <td>25,000–45,000 บาท/ปี<br><span class="text-xs muted">1.5–2.0 บาท/กม.</span></td>
+            <td>15,000–30,000 บาท/ปี<br><span class="text-xs muted">แบบผสม (ไฟ+น้ำมัน)</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">ค่าซ่อมบำรุง</td>
+            <td class="winner">~5,346 บาท/ปี<br><span class="text-xs font-normal muted">ชิ้นส่วนเคลื่อนไหวน้อยกว่า</span></td>
+            <td>~12,000–15,000 บาท/ปี<br><span class="text-xs muted">ระบบซับซ้อนกว่า BEV</span></td>
+            <td>~8,000 บาท/ปี<br><span class="text-xs muted">ระหว่าง BEV และ HEV</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">สถานีชาร์จ / ความสะดวก</td>
+            <td>ต้องวางแผน<br><span class="text-xs muted">DC Fast 20–45 นาที / AC 4–8 ชม.</span></td>
+            <td class="winner">สะดวกมาก<br><span class="text-xs font-normal muted">เติมน้ำมันทุกปั๊มใน 5 นาที</span></td>
+            <td>ยืดหยุ่น<br><span class="text-xs muted">ชาร์จ + เติมน้ำมันได้ทั้งสองแบบ</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">เหมาะกับกรุงเทพฯ</td>
+            <td class="winner">ดีมาก<br><span class="text-xs font-normal muted">Regen braking ในการจราจรติดขัด</span></td>
+            <td>ดี<br><span class="text-xs muted">Stop-start อัตโนมัติ</span></td>
+            <td class="winner">ดีมาก<br><span class="text-xs font-normal muted">EV mode ระยะสั้นในเมือง</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">เหมาะกับต่างจังหวัด</td>
+            <td>ปานกลาง<br><span class="text-xs muted">ต้องวางแผนสถานีชาร์จ DC Fast</span></td>
+            <td class="winner">ดีมาก<br><span class="text-xs font-normal muted">เติมน้ำมันได้ทุกที่ ไม่ต้องวางแผน</span></td>
+            <td class="winner">ดีมาก<br><span class="text-xs font-normal muted">เครื่องยนต์ backup ไม่มี Range Anxiety</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">มูลค่าขายต่อ</td>
+            <td>ต่ำกว่าค่าเฉลี่ย<br><span class="text-xs muted">เสียมูลค่า 22.9% ทันที หลัง 5 ปี เหลือ ~20–30%</span></td>
+            <td class="winner">สูง<br><span class="text-xs font-normal muted">Toyota HEV รักษามูลค่าได้ดีเยี่ยม</span></td>
+            <td>ปานกลาง<br><span class="text-xs muted">ตลาดมือสองยังพัฒนาอยู่</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">ผลกระทบสิ่งแวดล้อม</td>
+            <td class="winner">ลด CO₂ use-phase 50–60% vs ICE<br><span class="text-xs font-normal muted">แต่ LCA ดีกว่า ICE เพียง ~14% บนกริดไทย</span></td>
+            <td>ลด CO₂ use-phase 35–45% vs ICE<br><span class="text-xs muted">~90–110 gCO₂/กม.</span></td>
+            <td class="winner">ลด CO₂ use-phase 45–55% vs ICE<br><span class="text-xs font-normal muted">ขึ้นกับสัดส่วนวิ่งไฟฟ้าล้วน</span></td>
+          </tr>
+          <tr class="row-hover">
+            <td class="dim-label">สิทธิประโยชน์รัฐบาล</td>
+            <td class="winner">50,000–100,000 บาท (ปี 2569)<br><span class="text-xs font-normal muted">EV 3.5 + ภาษีสรรพสามิต 2%</span></td>
+            <td>ไม่มีปัจจุบัน<br><span class="text-xs muted">อาจได้รับสิทธิ์ภาษีสรรพสามิตใหม่ปี 2569</span></td>
+            <td class="winner">50,000–100,000 บาท (ปี 2569)<br><span class="text-xs font-normal muted">EV 3.5 + ภาษีสรรพสามิต 2%</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs muted px-4 py-3">อ้างอิง: research.md บรรทัด 195–199, 206, 248–252 · TCO คำนวณจากการขับขี่ 20,000 กม./ปี เป็นเวลา 5 ปี</p>
+  </div>
+</section>
+
+<!-- ===== POPULAR MODELS ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="car" class="w-5 h-5 accent"></i> รุ่นยอดนิยมในไทย
+  </h2>
+
+  <!-- BEV Models -->
+  <h3 class="font-semibold mb-3 flex items-center gap-2">
+    <span class="badge-indigo">BEV — รถยนต์ไฟฟ้า</span>
+  </h3>
+  <div class="models-grid mb-6">
+    <div class="model-card">
+      <div class="font-bold mb-1">BYD Atto 1</div>
+      <div class="model-price">429,900 บาท</div>
+      <p class="text-xs muted mt-2">พิสัย ~300 กม. · รถ Entry-level ราคาจับต้องได้ · เข้าร่วม EV 3.5</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">BYD Dolphin</div>
+      <div class="model-price">449,900–599,900 บาท</div>
+      <p class="text-xs muted mt-2">พิสัย 340–490 กม. · ขายดีที่สุดในกลุ่มราคาประหยัด · ประกอบในไทย</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">BYD Atto 3</div>
+      <div class="model-price">699,900 บาท</div>
+      <p class="text-xs muted mt-2">พิสัย 480 กม. · TCO 5 ปี ~921,600 บาท · ครอสโอเวอร์ยอดนิยม</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">MG4 Electric</div>
+      <div class="model-price">579,000 บาท</div>
+      <p class="text-xs muted mt-2">พิสัย ~350 กม. · ราคาต่อพิสัยดีมาก · ผลิตในไทย</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">BYD Seal</div>
+      <div class="model-price">999,900 บาท</div>
+      <p class="text-xs muted mt-2">พิสัย 570 กม. · ซีดานพรีเมียม · แข่งขันกับ Tesla Model 3</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">Tesla Model 3</div>
+      <div class="model-price">1,149,000–1,439,000 บาท</div>
+      <p class="text-xs muted mt-2">พิสัย 513–629 กม. · Supercharger network · ซอฟต์แวร์ดีที่สุด</p>
+    </div>
+  </div>
+
+  <!-- HEV / PHEV Models -->
+  <h3 class="font-semibold mb-3 flex items-center gap-2">
+    <span class="badge-green">HEV/PHEV — ไฮบริด/ปลั๊กอินไฮบริด</span>
+  </h3>
+  <div class="models-grid">
+    <div class="model-card">
+      <div class="font-bold mb-1">Toyota Yaris Ativ HEV</div>
+      <div class="model-price">569,000 บาท</div>
+      <p class="text-xs muted mt-2">HEV เล็กราคาจับต้องได้ · ประหยัดน้ำมันดี · มูลค่าขายต่อเยี่ยม</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">Toyota Corolla Cross HEV</div>
+      <div class="model-price">989,000–1,254,000 บาท</div>
+      <p class="text-xs muted mt-2">SUV ขายดีสุด · TCO 5 ปี ~1,314,000 บาท · ขายต่อดีมาก</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">BYD Seal 5 DM-i <span class="badge-amber">PHEV</span></div>
+      <div class="model-price">599,900–699,900 บาท</div>
+      <p class="text-xs muted mt-2">วิ่งไฟฟ้า ~80 กม. · TCO 5 ปี ~944,900 บาท · รับสิทธิ์ EV 3.5</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">BYD Sealion 6 DM-i <span class="badge-amber">PHEV</span></div>
+      <div class="model-price">899,900–999,900 บาท</div>
+      <p class="text-xs muted mt-2">SUV PHEV · วิ่งไฟฟ้า ~100 กม. · ยืดหยุ่นสูงสุด</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">Honda CR-V e:HEV</div>
+      <div class="model-price">1,399,000–1,729,000 บาท</div>
+      <p class="text-xs muted mt-2">HEV พรีเมียม · ระบบ i-MMD · เหมาะเดินทางต่างจังหวัด</p>
+    </div>
+    <div class="model-card">
+      <div class="font-bold mb-1">Toyota Camry HEV</div>
+      <div class="model-price">1,455,000–1,789,000 บาท</div>
+      <p class="text-xs muted mt-2">ซีดานพรีเมียม · ชื่อเสียงด้านความน่าเชื่อถือ · มูลค่าขายต่อดีที่สุด</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TCO CHART ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="trending-down" class="w-5 h-5 accent"></i> ต้นทุนรวม 5 ปี (TCO) — กราฟเปรียบเทียบ
+  </h2>
+  <div class="surface rounded-xl p-6">
+    <p class="text-sm muted mb-4">สมมติฐาน: วิ่ง 20,000 กม./ปี · ชาร์จบ้าน TOU off-peak 2.60 บาท/kWh · น้ำมัน 38 บาท/ลิตร · รวมค่าติดตั้ง Wallbox 30,000 บาทสำหรับ BEV/PHEV</p>
+    <div style="max-height:400px; position:relative;">
+      <canvas id="tcoChart" aria-label="กราฟ TCO 5 ปีเปรียบเทียบ BEV PHEV HEV" role="img"></canvas>
+    </div>
+    <div class="flex flex-wrap gap-4 mt-4 text-xs justify-center">
+      <span class="flex items-center gap-1"><span style="width:14px;height:14px;background:#6366F1;border-radius:3px;display:inline-block;"></span>ราคารถ + ชาร์จเจอร์</span>
+      <span class="flex items-center gap-1"><span style="width:14px;height:14px;background:#10B981;border-radius:3px;display:inline-block;"></span>ค่าพลังงาน 5 ปี</span>
+      <span class="flex items-center gap-1"><span style="width:14px;height:14px;background:#F59E0B;border-radius:3px;display:inline-block;"></span>ค่าซ่อมบำรุง 5 ปี</span>
+      <span class="flex items-center gap-1"><span style="width:14px;height:14px;background:#EC4899;border-radius:3px;display:inline-block;"></span>ประกันภัย 5 ปี</span>
+    </div>
+    <p class="text-xs muted mt-3 text-center">ที่มา: research.md · Motorist Thailand · Silkspan</p>
+  </div>
+</section>
+
+<!-- ===== GOVERNMENT INCENTIVES ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="landmark" class="w-5 h-5 accent"></i> มาตรการส่งเสริม EV จากรัฐบาลไทย
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4 mb-4">
+
+    <!-- EV 3.0 -->
+    <div class="incentive-card surface">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="badge-indigo">EV 3.0</span>
+        <span class="text-sm muted">พ.ศ. 2565–2567</span>
+      </div>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>เงินอุดหนุนสูงสุด <strong>150,000 บาท</strong> (แบต &gt;30 kWh ราคาไม่เกิน 2 ล้านบาท)</span></li>
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>ลดภาษีสรรพสามิตเหลือ <strong>2%</strong></span></li>
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>ยกเว้นอากรนำเข้า CBU สูงสุด <strong>40%</strong></span></li>
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>นำเข้ารวม <strong>84,000 คัน</strong> ในโครงการ</span></li>
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>เงื่อนไขผลิตชดเชย 1:1 ภายใน 2 ปี</span></li>
+      </ul>
+    </div>
+
+    <!-- EV 3.5 -->
+    <div class="incentive-card surface" style="border-color: var(--accent-border); border-left: 4px solid var(--accent);">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="badge-indigo">EV 3.5 ✦ ปัจจุบัน</span>
+        <span class="text-sm muted">พ.ศ. 2567–2570</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="text-sm w-full mb-3">
+          <thead>
+            <tr class="text-xs muted border-b border-soft">
+              <th class="text-left pb-2 font-medium">ปี พ.ศ.</th>
+              <th class="text-left pb-2 font-medium">แบต ≥50 kWh</th>
+              <th class="text-left pb-2 font-medium">แบต &lt;50 kWh</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y border-soft">
+            <tr><td class="py-1.5">2567</td><td class="py-1.5 font-semibold accent">100,000 บาท</td><td class="py-1.5">50,000 บาท</td></tr>
+            <tr><td class="py-1.5">2568</td><td class="py-1.5 font-semibold">75,000 บาท</td><td class="py-1.5">35,000 บาท</td></tr>
+            <tr><td class="py-1.5">2569–70</td><td class="py-1.5 font-semibold">50,000 บาท</td><td class="py-1.5">25,000 บาท</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>ภาษีสรรพสามิต <strong>2%</strong> (เท่ากับ EV 3.0)</span></li>
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>เงื่อนไขผลิตชดเชย <strong>1:2</strong> (ปี 2569) · <strong>1:3</strong> (ปี 2570)</span></li>
+        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i><span>ครอบคลุม BEV และ PHEV ที่ผ่านเกณฑ์</span></li>
+        <li class="flex items-start gap-2"><i data-lucide="alert-circle" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5"></i><span class="muted">สิทธิ์ลดลงทุกปี — ยิ่งซื้อเร็วยิ่งได้ส่วนลดมาก</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- PHEV 2026 note -->
+  <div class="surface-2 rounded-xl p-4 text-sm">
+    <div class="flex items-start gap-2">
+      <i data-lucide="info" class="w-4 h-4 accent flex-shrink-0 mt-0.5"></i>
+      <div>
+        <strong>สิทธิประโยชน์ PHEV ปี 2569:</strong>
+        รัฐบาลมีแผนมาตรการภาษีสรรพสามิตใหม่สำหรับ PHEV โดยเน้นที่ระยะทางการขับขี่ด้วยไฟฟ้า (EV Range) และอัตราการปล่อย CO₂ ซึ่งจะทำให้ PHEV ที่มีพิสัยไฟฟ้าสูงได้รับอัตราภาษีที่ดีขึ้น
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CHARGING INFRASTRUCTURE ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="zap" class="w-5 h-5 accent"></i> โครงสร้างพื้นฐานการชาร์จในไทย
+  </h2>
+
+  <!-- Stat Cards -->
+  <div class="stats-grid mb-6">
+    <div class="surface rounded-xl p-4 text-center">
+      <div class="text-3xl font-extrabold accent">11,467</div>
+      <div class="text-sm font-medium mt-1">จุดชาร์จสาธารณะ</div>
+      <div class="text-xs muted mt-1">ธ.ค. 2567</div>
+    </div>
+    <div class="surface rounded-xl p-4 text-center">
+      <div class="text-3xl font-extrabold" style="color:#059669">5,782</div>
+      <div class="text-sm font-medium mt-1">DC Fast Charge</div>
+      <div class="text-xs muted mt-1">ชาร์จใน 20–45 นาที</div>
+    </div>
+    <div class="surface rounded-xl p-4 text-center">
+      <div class="text-3xl font-extrabold" style="color:#d97706">5,685</div>
+      <div class="text-sm font-medium mt-1">AC Slow Charge</div>
+      <div class="text-xs muted mt-1">ชาร์จใน 4–8 ชั่วโมง</div>
+    </div>
+    <div class="surface rounded-xl p-4 text-center">
+      <div class="text-3xl font-extrabold" style="color:#dc2626">70%</div>
+      <div class="text-sm font-medium mt-1">กระจุกกรุงเทพฯ</div>
+      <div class="text-xs muted mt-1">ต่างจังหวัดยังขาดแคลน</div>
+    </div>
+    <div class="surface rounded-xl p-4 text-center">
+      <div class="text-3xl font-extrabold accent">13,977</div>
+      <div class="text-sm font-medium mt-1">หัวชาร์จ (Connectors)</div>
+      <div class="text-xs muted mt-1">ม.ค. 2569 (EVAT)</div>
+    </div>
+    <div class="surface rounded-xl p-4 text-center">
+      <div class="text-3xl font-extrabold" style="color:#059669">12,000</div>
+      <div class="text-sm font-medium mt-1">DC Fast Charge (เป้าหมาย)</div>
+      <div class="text-xs muted mt-1">ภายในปี 2573 &gt;30% นอก กทม.</div>
+    </div>
+  </div>
+
+  <!-- Charging Rates -->
+  <div class="surface rounded-xl p-5 mb-4">
+    <h3 class="font-semibold mb-3 text-sm">อัตราค่าไฟฟ้าสำหรับชาร์จ EV</h3>
+    <div class="grid sm:grid-cols-3 gap-4 text-sm">
+      <div>
+        <div class="font-semibold">ชาร์จที่บ้าน (ปกติ)</div>
+        <div class="text-2xl font-bold accent">3.88 <span class="text-sm font-normal">บาท/kWh</span></div>
+        <div class="muted text-xs">~0.64 บาท/กม. (Atto 3)</div>
+      </div>
+      <div>
+        <div class="font-semibold">TOU Off-peak (22:00–09:00)</div>
+        <div class="text-2xl font-bold" style="color:#059669">2.60 <span class="text-sm font-normal">บาท/kWh</span></div>
+        <div class="muted text-xs">~0.43 บาท/กม. — ประหยัดสุด</div>
+      </div>
+      <div>
+        <div class="font-semibold">DC Fast Charge สาธารณะ</div>
+        <div class="text-2xl font-bold" style="color:#d97706">5.30–9.00 <span class="text-sm font-normal">บาท/kWh</span></div>
+        <div class="muted text-xs">~0.88–1.49 บาท/กม.</div>
+      </div>
+    </div>
+    <p class="text-xs muted mt-3">ค่าติดตั้ง Wallbox ที่บ้าน: 20,000–50,000 บาท (รวม RCD Type B + เมตรแยก)</p>
+  </div>
+
+  <!-- Provider Table -->
+  <div class="surface rounded-xl overflow-hidden">
+    <h3 class="font-semibold p-4 border-b border-soft text-sm">ผู้ให้บริการหลัก</h3>
+    <div class="table-scroll">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th>ผู้ให้บริการ</th>
+            <th>ส่วนแบ่งตลาด</th>
+            <th>หมายเหตุ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-hover"><td>PTT EV Station PluZ</td><td>~30%</td><td class="muted">สถานีปั๊มน้ำมัน PTT ทั่วไทย · 650+ สถานี</td></tr>
+          <tr class="row-hover"><td>EA Anywhere</td><td>~16%</td><td class="muted">DC Fast ตามทางหลวง · 550+ สถานี</td></tr>
+          <tr class="row-hover"><td>PEA Volta</td><td>~13%</td><td class="muted">การไฟฟ้าส่วนภูมิภาค · 420+ สถานี</td></tr>
+          <tr class="row-hover"><td>MEA EV</td><td>~8%</td><td class="muted">การไฟฟ้านครหลวง · เน้น กทม.</td></tr>
+          <tr class="row-hover"><td>ผู้ให้บริการอื่น</td><td>~33%</td><td class="muted">On-Ion, EVOLT, Shell Recharge, ฯลฯ</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="text-xs muted px-4 py-3">ม.ค. 2569: 4,643 สถานี · 13,977 หัวชาร์จ (DC CCS2: 8,184 · DC CHAdeMO: 411 · AC Type 2: 5,382) — ที่มา: EVAT</p>
+  </div>
+</section>
+
+<!-- ===== WARRANTY & BATTERY ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="shield-check" class="w-5 h-5 accent"></i> ประกันแบตเตอรี่และการรับประกัน
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="surface rounded-xl p-5">
+      <div class="font-semibold mb-3">BYD (BEV/PHEV)</div>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4 accent"></i><span><strong>8 ปี หรือ 250,000 กม.</strong> (SOH ≥70%)</span></li>
+        <li class="flex items-center gap-2"><i data-lucide="thermometer" class="w-4 h-4 accent"></i><span>ระบบ TMS ควบคุมอุณหภูมิรับมือสภาพอากาศไทย</span></li>
+        <li class="flex items-center gap-2"><i data-lucide="droplets" class="w-4 h-4 accent"></i><span>กันน้ำ IP67–IP69 — ปลอดภัยขับในน้ำท่วมตื้น</span></li>
+      </ul>
+    </div>
+    <div class="surface rounded-xl p-5">
+      <div class="font-semibold mb-3">Toyota / Honda (HEV)</div>
+      <ul class="space-y-2 text-sm">
+        <li class="flex items-center gap-2"><i data-lucide="shield" class="w-4 h-4" style="color:#059669"></i><span><strong>8 ปี หรือ 160,000 กม.</strong> สำหรับแบตเตอรี่ HEV</span></li>
+        <li class="flex items-center gap-2"><i data-lucide="wrench" class="w-4 h-4" style="color:#059669"></i><span>ศูนย์บริการครอบคลุมทั่วไทย</span></li>
+        <li class="flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4" style="color:#059669"></i><span>ชื่อเสียงด้านความทนทานและมูลค่าขายต่อ</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="surface-2 rounded-xl p-4 mt-4 text-sm">
+    <div class="flex items-start gap-2">
+      <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5"></i>
+      <div>
+        <strong>ค่าเปลี่ยนแบตเตอรี่:</strong> 150,000–400,000 บาท (ขึ้นกับรุ่น)
+        อัตราเสื่อมสภาพโดยเฉลี่ย 5.6–9.4% ต่อ 10,000 กม.
+        สภาพอากาศร้อนจัดของไทยอาจเร่งการเสื่อมสภาพ — ต้องดูแลไม่ชาร์จถึง 100% ทุกวัน
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SOURCES ===== -->
+<section class="section pb-10">
+  <h2 class="section-title">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> แหล่งอ้างอิง
+  </h2>
+
+  <!-- Ravi's Web Sources -->
+  <h3 class="text-sm font-semibold muted uppercase tracking-wide mb-3">แหล่งข้อมูลหลัก (Ravi — 36 แหล่ง)</h3>
+  <div class="surface rounded-xl p-4 mb-4">
+    <ol class="space-y-2 text-sm list-decimal list-inside">
+      <li><a href="https://autospinn.com/byd/" target="_blank" rel="noopener">AutoSpinn — BYD ราคาและรุ่นในไทย</a></li>
+      <li><a href="https://www.greenenergyth.com/ev-guide/" target="_blank" rel="noopener">Green Energy Thailand — คู่มือรถ EV ไทย 2025</a></li>
+      <li><a href="https://mg.co.th/new-cars/mg-zs-ev/" target="_blank" rel="noopener">MG Thailand — MG ZS EV ราคาและข้อมูล</a></li>
+      <li><a href="https://www.silkspan.com/ev35/" target="_blank" rel="noopener">Silkspan — นโยบาย EV 3.5 เทียบ EV 3.0</a></li>
+      <li><a href="https://www.motorist.co.th/th/article/5717/" target="_blank" rel="noopener">Motorist Thailand — เปรียบเทียบค่าใช้จ่าย EV vs น้ำมัน</a></li>
+      <li><a href="https://www.greenenergyth.com/ev-charging-cost/" target="_blank" rel="noopener">Green Energy Thailand — ค่าไฟชาร์จ EV</a></li>
+      <li><a href="https://www.motorist.co.th/th/article/charging-network/" target="_blank" rel="noopener">Motorist Thailand — เครือข่ายชาร์จ EV ไทย</a></li>
+      <li><a href="https://www.krungsri.com/en/research/research-intelligence/used-bevs-2024" target="_blank" rel="noopener">Krungsri Research — ตลาดรถ BEV มือสองไทย 2024</a></li>
+      <li><a href="https://lowcarbonpower.org/region/Thailand" target="_blank" rel="noopener">Low Carbon Power — สัดส่วนพลังงานสะอาดไทย</a></li>
+      <li><a href="https://www.sciencedirect.com/science/article/pii/S2352484722010629" target="_blank" rel="noopener">ScienceDirect — LCA Study EV Thailand</a></li>
+      <li><a href="https://www.zigwheels.co.th/" target="_blank" rel="noopener">ZigWheels Thailand — ราคารถยนต์ไทย</a></li>
+      <li><a href="https://paultan.org/category/ev/" target="_blank" rel="noopener">paultan.org — Southeast Asia EV News</a></li>
+      <li><a href="https://www.electrive.com/tag/thailand/" target="_blank" rel="noopener">Electrive.com — Thailand EV Market</a></li>
+      <li><a href="https://bydauto.co.th/" target="_blank" rel="noopener">BYD Thailand — รุ่นและราคาอย่างเป็นทางการ</a></li>
+      <li><a href="https://about.bnef.com/" target="_blank" rel="noopener">Bloomberg NEF — EV Outlook 2025</a></li>
+      <li><a href="https://www.rolandberger.com/" target="_blank" rel="noopener">Roland Berger — EV Charging Index Thailand 2025</a></li>
+      <li><a href="https://www.ceicdata.com/en/indicator/thailand/electricity-production" target="_blank" rel="noopener">CEIC Data — Thailand Electricity Production</a></li>
+      <li><a href="https://www.boi.go.th/" target="_blank" rel="noopener">BOI Thailand — มาตรการ EV 3.5</a></li>
+      <li><a href="https://www.aseanbriefing.com/news/how-boi-ev-3-5-shapes-the-future-of-ev-battery-investments-in-thailand/" target="_blank" rel="noopener">ASEAN Briefing — BOI EV 3.5 นโยบาย</a></li>
+      <li><a href="https://www.thairath.co.th/" target="_blank" rel="noopener">ไทยรัฐ — ข่าวรถยนต์ไฟฟ้าไทย 2568</a></li>
+      <li><a href="https://www.tqm.co.th/" target="_blank" rel="noopener">TQM Thailand — ประกันภัยรถ EV</a></li>
+      <li><a href="https://climateactiontracker.org/countries/thailand/" target="_blank" rel="noopener">Climate Action Tracker — Thailand</a></li>
+    </ol>
+  </div>
+
+  <!-- Rin's Additional Web Sources -->
+  <h3 class="text-sm font-semibold muted uppercase tracking-wide mb-3">แหล่งข้อมูลเพิ่มเติม (Rin / NotebookLM — 26 เว็บ)</h3>
+  <div class="surface rounded-xl p-4 mb-4">
+    <ol class="space-y-2 text-sm list-decimal list-inside">
+      <li><a href="https://www.aseanbriefing.com/news/how-boi-ev-3-5-shapes-the-future-of-ev-battery-investments-in-thailand/" target="_blank" rel="noopener">ASEAN Briefing — BOI EV 3.5 &amp; EV Battery Investment</a></li>
+      <li><a href="https://www.bangkokpost.com/auto/review/2373786/competition-heats-up" target="_blank" rel="noopener">Bangkok Post — Competition Heats Up (รถยนต์ไฟฟ้า)</a></li>
+      <li><a href="https://www.nationthailand.com/business/automobile/40050004" target="_blank" rel="noopener">Nation Thailand — Car Giants &amp; Hybrid Path to EV</a></li>
+      <li><a href="https://en.moneyandbanking.co.th/2026/241789/" target="_blank" rel="noopener">Money &amp; Banking — ประกัน EV ที่ต้องรู้</a></li>
+      <li><a href="https://www.motorist.co.th/en/article/5717/is-an-ev-really-cheaper-than-a-gasoline-car-in-thailand-explore-a-detailed-cost-comparison-including-per-km-expenses-monthly-savings-and-long-term-value" target="_blank" rel="noopener">Motorist Thailand — EV vs น้ำมัน เปรียบเทียบค่าใช้จ่าย/กม.</a></li>
+      <li><a href="https://www.roojai.com/en/article/road-tips/safe-driving-ev-car-through-flood/" target="_blank" rel="noopener">Roojai — ขับ EV ผ่านน้ำท่วมปลอดภัยอย่างไร</a></li>
+      <li><a href="https://www.boi.go.th/upload/content/EV%203.5ENG.pdf" target="_blank" rel="noopener">BOI — EV 3.5 นโยบาย (PDF ภาษาอังกฤษ)</a></li>
+      <li><a href="https://www.anariev.com/thailand-ev-charging-infrastructure-a-market-analysis/" target="_blank" rel="noopener">Anari EV — Thailand EV Charging Infrastructure Analysis</a></li>
+      <li><a href="https://en.thairath.co.th/news/auto/2926261" target="_blank" rel="noopener">Thairath — ปัญหาคิวชาร์จยาวช่วงสงกรานต์</a></li>
+      <li><a href="https://www.motorist.co.th/en/article/5881/summary-of-budget-and-steps-for-installing-an-electric-vehicle-charger-at-home-from-choosing-the-appropriate-electricity-meter-size-to-the-rcd-type-b-safety-standards-that-ev-users-must-know" target="_blank" rel="noopener">Motorist Thailand — ค่าติดตั้ง Wallbox ที่บ้าน</a></li>
+      <li><a href="https://www.motorist.co.th/en/article/3326/hybrid-cars-vs-evs-which-one-is-better-for-you" target="_blank" rel="noopener">Motorist Thailand — Hybrid vs EV ควรเลือกอะไร</a></li>
+      <li><a href="https://blog.tradewin.net/implications-of-thailands-ev-3.0-and-3.5-policy-changes" target="_blank" rel="noopener">Tradewin Blog — นัยสำคัญของการเปลี่ยนนโยบาย EV 3.0 / 3.5</a></li>
+      <li><a href="https://en.thairath.co.th/news/auto/2925067" target="_blank" rel="noopener">Thairath Spotlight — รถไฮบริดขายดีแม้ EV เติบโต</a></li>
+      <li><a href="https://evat.or.th/en/statistical-information/" target="_blank" rel="noopener">EVAT — สถิติรถยนต์ไฟฟ้าไทย</a></li>
+      <li><a href="https://thailand.go.th/issue-focus-detail/thailand-updates-ev3ev35-incentives-to-strengthen-position-as-regional-ev-hub" target="_blank" rel="noopener">Thailand.go.th — อัปเดต EV 3 / EV 3.5</a></li>
+      <li><a href="https://www.ey.com/en_gl/technical/tax-alerts/thailand---subsidies--duties--excise-tax-incentives-to-encourage" target="_blank" rel="noopener">EY Global — Thailand EV Tax Incentives</a></li>
+      <li><a href="https://www.aseanbriefing.com/news/thailands-2026-plug-in-hybrid-incentives-a-new-tax-strategy/" target="_blank" rel="noopener">ASEAN Briefing — PHEV Tax Incentives 2026</a></li>
+      <li><a href="https://www.globalfleet.com/en/manufacturers/global/features/thailands-ev-price-war-raises-residual-value-concerns" target="_blank" rel="noopener">Global Fleet — EV Price War &amp; Residual Value</a></li>
+      <li><a href="https://www.krungsri.com/en/research/research-intelligence/used-bevs-2024" target="_blank" rel="noopener">Krungsri Research — มูลค่าขายต่อ BEV ในไทย</a></li>
+      <li><a href="https://www.sciencedirect.com/science/article/pii/S2352484722010629" target="_blank" rel="noopener">ScienceDirect — TCO เปรียบเทียบ EV ในตลาดเอเชีย</a></li>
+      <li><a href="https://evat.or.th/wp-content/uploads/2026/04/EVAT01_Charging-Station-2026_Jan.pdf" target="_blank" rel="noopener">EVAT — สถิติสถานีชาร์จ ม.ค. 2569 (PDF)</a></li>
+      <li><a href="https://www.thairath.co.th/news/auto/news/2942619" target="_blank" rel="noopener">ไทยรัฐ — สูตรซื้อรถปี 2569 EV/Hybrid/น้ำมัน</a></li>
+      <li><a href="https://ev.iphonemod.net/popular-suv-hev-bev-2025/" target="_blank" rel="noopener">EVMoD — SUV ยอดนิยม HEV vs BEV ปี 2568</a></li>
+      <li><a href="https://www.boi.go.th/un/boi_event_detail?language=en&amp;module=news&amp;topic_id=136261" target="_blank" rel="noopener">BOI Thailand — รายละเอียดงาน EV 3.5</a></li>
+    </ol>
+  </div>
+
+  <!-- YouTube Sources -->
+  <h3 class="text-sm font-semibold muted uppercase tracking-wide mb-3">
+    <i data-lucide="youtube" class="w-4 h-4 inline text-red-500"></i> แหล่งวิดีโอ YouTube (15 รายการ)
+  </h3>
+  <div class="surface rounded-xl p-4">
+    <ol class="space-y-2 text-sm list-decimal list-inside">
+      <li><a href="https://www.youtube.com/watch?v=OMzqzi1ju5A" target="_blank" rel="noopener">BYD รุกหนักรับปี 2025 แคมเปญพิเศษ EV &amp; เปิดโชว์รูมใหม่</a></li>
+      <li><a href="https://www.youtube.com/watch?v=WAbtoAS5rzA" target="_blank" rel="noopener">EV ประหยัดกว่าจริงเหรอ? "ต้นทุนแฝง" ที่ต้องรู้ | Geek Talk EP153</a></li>
+      <li><a href="https://www.youtube.com/watch?v=03BpDS-iGFE" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (1)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=7w9x2MDzd_Q" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (2)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=8oO4t1NaBY0" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (3)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=HFAuXKEuXY0" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (4)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=Mu6x0AHZJ7Y" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (5)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=NNQ0qFtX_-k" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (6)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=PWepaB1WoQk" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (7)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=R0mZpTW5QtU" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (8)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=jd3Py7Ygwwk" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (9)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=s7UV6CQUROI" target="_blank" rel="noopener">YouTube — EV Review Thailand 2025 (10)</a></li>
+      <li><a href="https://www.youtube.com/watch?v=0f6gT-TS3Qo" target="_blank" rel="noopener">จัดอันดับรถไฟฟ้าขายดี 2025 | Ranking ที่สุดจัดให้ Ep.3</a></li>
+      <li><a href="https://www.youtube.com/watch?v=_eUUrXYSZsw" target="_blank" rel="noopener">ถ้าซื้อรถตอนนี้ Hybrid หรือ EV อะไรดีกว่ากัน | ลุงใจดี EP75</a></li>
+      <li><a href="https://www.youtube.com/watch?v=yoz0E18emsQ" target="_blank" rel="noopener">ส่อง 6 รุ่น EV เตรียมเปิดตัวในไทยปี 2025 | Car Raver</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="border-t border-soft mt-8">
+  <div class="max-w-6xl mx-auto px-6 py-8 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>
+      <div class="font-medium text-current">EV vs Hybrid — เปรียบเทียบรถยนต์ไฟฟ้าและไฮบริดสำหรับผู้ใช้งานในไทย</div>
+      <div class="mt-1">สร้างโดย <strong class="text-current">agent-newsroom</strong> · 30 มิถุนายน 2569 · Deep Research Mode</div>
+      <div class="mt-1">ข้อมูลอ้างอิง ณ มิถุนายน 2569 · ราคาและสิทธิประโยชน์อาจเปลี่ยนแปลงได้</div>
+    </div>
+    <a href="../../" class="flex items-center gap-1 hover:text-current transition-colors">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i> กลับหน้าหลัก
+    </a>
+  </div>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ─── Scroll Progress Bar ───────────────────────────────────────────
+(function() {
+  var bar = document.getElementById("progress-bar");
+  function updateProgress() {
+    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    var scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    var pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    bar.style.width = pct + "%";
+  }
+  window.addEventListener("scroll", updateProgress, { passive: true });
+})();
+
+// ─── Insight Reel ─────────────────────────────────────────────────
+var currentReel = 0;
+var reelCount = 6;
+var reelInterval = null;
+
+function goReel(index) {
+  currentReel = index;
+  var track = document.getElementById("reelTrack");
+  if (track) track.style.transform = "translateX(-" + (index * 100) + "%)";
+  var dots = document.querySelectorAll(".reel-dot");
+  dots.forEach(function(d, i) {
+    d.classList.toggle("active", i === index);
+  });
+}
+
+function startReelAuto() {
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduced) {
+    reelInterval = setInterval(function() {
+      goReel((currentReel + 1) % reelCount);
+    }, 4000);
+  }
+}
+
+startReelAuto();
+
+// ─── Option Cards Data ─────────────────────────────────────────────
+var options = [
+  {
+    name: "BEV — รถไฟฟ้า",
+    tagline: "ประหยัดพลังงานสูงสุด เหมาะสำหรับผู้ใช้งานในเมืองที่มีที่ชาร์จที่บ้าน",
+    color: "#6366F1",
+    pros: ["ค่าพลังงาน 0.33–0.80 บาท/กม.", "ค่าซ่อมบำรุง ~5,346 บาท/ปี", "เงินอุดหนุนรัฐ 50,000–100,000 บาท", "Regen braking เหมาะจราจรเมือง"],
+    cons: ["ต้องวางแผนสถานีชาร์จ", "รอชาร์จ 20–45 นาที (DC)", "มูลค่าขายต่อต่ำกว่า HEV", "ประกันภัยแพงกว่า ~30%"],
+    scores: [9, 9, 5, 9, 5, 3, 7, 9]
+  },
+  {
+    name: "HEV — ไฮบริด",
+    tagline: "ยืดหยุ่นสูง มูลค่าขายต่อดี เหมาะผู้เดินทางต่างจังหวัดหรือไม่มีที่ชาร์จ",
+    color: "#10B981",
+    pros: ["เติมน้ำมันทุกปั๊ม ไม่ต้องวางแผน", "มูลค่าขายต่อสูง (Toyota HEV)", "ไม่มี Range Anxiety", "ศูนย์บริการทั่วไทย"],
+    cons: ["ค่าพลังงาน 1.5–2.0 บาท/กม.", "ค่าซ่อม ~12,000 บาท/ปี", "ไม่มีสิทธิประโยชน์รัฐ", "TCO 5 ปีสูงกว่า BEV ในกลุ่มเดียวกัน"],
+    scores: [6, 5, 10, 8, 9, 8, 6, 2]
+  },
+  {
+    name: "PHEV — ปลั๊กอินไฮบริด",
+    tagline: "ยืดหยุ่นสูงสุด วิ่งไฟฟ้าในเมือง ใช้น้ำมันต่างจังหวัด",
+    color: "#F59E0B",
+    pros: ["วิ่งไฟฟ้าล้วน 40–100 กม.", "เครื่องยนต์ backup ต่างจังหวัด", "รับสิทธิประโยชน์รัฐเหมือน BEV", "ยืดหยุ่นกว่า BEV มาก"],
+    cons: ["ราคาสูงกว่า HEV รุ่นเดียวกัน", "ต้องชาร์จสม่ำเสมอเพื่อประหยัด", "ระบบซับซ้อนกว่า BEV และ HEV", "น้ำหนักมากกว่าเนื่องจากมี 2 ระบบ"],
+    scores: [8, 7, 7, 9, 8, 5, 7, 8]
+  }
+];
+
+var optionColors = ["#6366F1", "#10B981", "#F59E0B"];
+
+function renderOptionCards() {
+  var container = document.getElementById("optionCards");
+  if (!container) return;
+  var labels = ["ต้นทุนพลังงาน","ค่าซ่อมบำรุง","ความสะดวกเติมพลังงาน","เหมาะเมือง","เหมาะต่างจังหวัด","มูลค่าขายต่อ","สิ่งแวดล้อม","สิทธิประโยชน์รัฐ"];
+  options.forEach(function(opt, i) {
+    var prosHtml = opt.pros.map(function(p) {
+      return '<li class="flex items-start gap-1.5 text-sm"><span style="color:' + opt.color + ';margin-top:2px">&#10003;</span><span>' + p + "</span></li>";
+    }).join("");
+    var consHtml = opt.cons.map(function(c) {
+      return '<li class="flex items-start gap-1.5 text-sm"><span style="color:#ef4444;margin-top:2px">&#215;</span><span>' + c + "</span></li>";
+    }).join("");
+    var scoresHtml = labels.map(function(label, j) {
+      return '<div class="flex items-center gap-2 text-xs mb-1"><span class="muted w-28 shrink-0 truncate">' + label + "</span>" +
+        '<div class="score-bar flex-1"><div class="score-fill" style="width:' + (opt.scores[j] * 10) + '%;background:' + opt.color + '"></div></div>' +
+        '<span class="font-mono w-6 text-right">' + opt.scores[j] + "</span></div>";
+    }).join("");
+    var card = document.createElement("div");
+    card.className = "option-card";
+    card.style.borderColor = "#e4e4e7";
+    card.innerHTML =
+      '<div class="font-bold text-base mb-1" style="color:' + opt.color + '">' + opt.name + "</div>" +
+      '<p class="text-xs muted mb-3">' + opt.tagline + "</p>" +
+      '<ul class="space-y-1 mb-3">' + prosHtml + "</ul>" +
+      '<ul class="space-y-1 mb-4">' + consHtml + "</ul>" +
+      '<div>' + scoresHtml + "</div>";
+    container.appendChild(card);
+  });
+}
+
+renderOptionCards();
+
+// ─── Radar Chart ──────────────────────────────────────────────────
+(function() {
+  var ctx = document.getElementById("radarChart");
+  if (!ctx) return;
+  var isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var gridColor = isDark ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)";
+  var tickColor = isDark ? "#a1a1aa" : "#71717a";
+  new Chart(ctx, {
+    type: "radar",
+    data: {
+      labels: ["ต้นทุนพลังงาน","ค่าซ่อมบำรุง","ความสะดวกเติมพลังงาน","เหมาะเมือง","เหมาะต่างจังหวัด","มูลค่าขายต่อ","สิ่งแวดล้อม","สิทธิประโยชน์รัฐ"],
+      datasets: [
+        {
+          label: "BEV",
+          data: [9, 9, 5, 9, 5, 3, 7, 9],
+          backgroundColor: "rgba(99,102,241,0.15)",
+          borderColor: "#6366F1",
+          pointBackgroundColor: "#6366F1",
+          borderWidth: 2,
+          pointRadius: 3
+        },
+        {
+          label: "HEV",
+          data: [6, 5, 10, 8, 9, 8, 6, 2],
+          backgroundColor: "rgba(16,185,129,0.12)",
+          borderColor: "#10B981",
+          pointBackgroundColor: "#10B981",
+          borderWidth: 2,
+          pointRadius: 3
+        },
+        {
+          label: "PHEV",
+          data: [8, 7, 7, 9, 8, 5, 7, 8],
+          backgroundColor: "rgba(245,158,11,0.12)",
+          borderColor: "#F59E0B",
+          pointBackgroundColor: "#F59E0B",
+          borderWidth: 2,
+          pointRadius: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: tickColor, font: { family: "Inter", size: 12 } } }
+      },
+      scales: {
+        r: {
+          min: 0, max: 10, ticks: { stepSize: 2, color: tickColor, backdropColor: "transparent", font: { size: 10 } },
+          grid: { color: gridColor },
+          pointLabels: { color: tickColor, font: { size: 11, family: "Inter" } },
+          angleLines: { color: gridColor }
+        }
+      }
+    }
+  });
+})();
+
+// ─── TCO Chart ────────────────────────────────────────────────────
+(function() {
+  var ctx = document.getElementById("tcoChart");
+  if (!ctx) return;
+  var isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  var textColor = isDark ? "#e4e4e7" : "#18181b";
+  var gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)";
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["BYD Atto 3 (BEV)", "BYD Seal 5 DM-i (PHEV)", "Toyota Corolla Cross (HEV)"],
+      datasets: [
+        {
+          label: "ราคารถ + ชาร์จเจอร์",
+          data: [729900, 729900, 989000],
+          backgroundColor: "#6366F1",
+          borderRadius: 4
+        },
+        {
+          label: "ค่าพลังงาน 5 ปี",
+          data: [75000, 100000, 190000],
+          backgroundColor: "#10B981",
+          borderRadius: 4
+        },
+        {
+          label: "ค่าซ่อมบำรุง 5 ปี",
+          data: [26730, 40000, 60000],
+          backgroundColor: "#F59E0B",
+          borderRadius: 4
+        },
+        {
+          label: "ประกันภัย 5 ปี",
+          data: [90000, 75000, 75000],
+          backgroundColor: "#EC4899",
+          borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ": " + ctx.parsed.y.toLocaleString("th-TH") + " บาท";
+            },
+            footer: function(items) {
+              var total = items.reduce(function(sum, item) { return sum + item.parsed.y; }, 0);
+              return "รวม: " + total.toLocaleString("th-TH") + " บาท";
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          ticks: { color: textColor, font: { family: "Inter", size: 11 } },
+          grid: { display: false }
+        },
+        y: {
+          stacked: true,
+          ticks: {
+            color: textColor,
+            font: { family: "Inter", size: 11 },
+            callback: function(val) {
+              if (val >= 1000000) return (val / 1000000).toFixed(1) + "M";
+              if (val >= 1000) return (val / 1000).toFixed(0) + "K";
+              return val;
+            }
+          },
+          grid: { color: gridColor }
+        }
+      }
+    }
+  });
+})();
+
+// ─── Lucide Icons ─────────────────────────────────────────────────
+if (window.lucide) lucide.createIcons();
+</script>
+</body>
+</html>
