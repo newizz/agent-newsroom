@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>วิธีสร้างความมั่งคั่ง — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
+<style>
+  :root {
+    --accent: #6366F1;
+    --accent-soft: #6366F11A;
+  }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+  body { background: #fafafa; color: #18181b; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .card { background: #131316 !important; border-color: #27272a !important; }
+    dd { color: #a1a1aa !important; }
+    table.data-table th { background: #1c1c20 !important; }
+    table.data-table td, table.data-table th { border-color: #27272a !important; }
+  }
+  .surface { background: #ffffff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  .ring-accent { box-shadow: 0 0 0 2px var(--accent-soft); }
+  .step { counter-increment: step; }
+  .step::before {
+    content: counter(step);
+    display: inline-flex;
+    width: 28px; height: 28px;
+    align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 8px; font-weight: 600; font-size: 13px;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .steps { counter-reset: step; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .card { padding: 1.5rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,.13); }
+  .prose-content p { margin-bottom: 1em; line-height: 1.8; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  dl { display: grid; gap: 1em; }
+  dt { font-weight: 600; }
+  dd { margin-left: 0; color: #71717a; line-height: 1.7; }
+  table.data-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+  table.data-table th, table.data-table td { border: 1px solid #e4e4e7; padding: 0.6rem 0.8rem; text-align: left; }
+  table.data-table th { background: #f4f4f5; font-weight: 600; }
+  input[type=range] { accent-color: var(--accent); }
+  .preset-btn { transition: background .15s ease, color .15s ease; }
+  .preset-btn.active { background: var(--accent); color: #fff; }
+  @media print {
+    nav, footer button, #reel, #progress { display: none; }
+    .surface { border: 1px solid #ccc; box-shadow: none; }
+  }
+  /* Entrance animations — gated fully inside reduced-motion-safe media query */
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .55s ease, transform .55s ease; }
+    .scale-in  { opacity: 0; transform: scale(0.93);      transition: opacity .45s ease, transform .45s ease; }
+    .visible   { opacity: 1 !important; transform: none !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Header -->
+<header class="border-b border-soft">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      กลับหน้าหลัก
+    </a>
+    <div class="text-xs muted">how-to-be-wealthy-thai · 2026-07-01</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-12">
+  <div class="inline-flex items-center gap-2 text-xs font-medium muted mb-4">
+    <span class="bg-accent-soft accent px-2 py-1 rounded-md">Concept Explainer · Deep Research</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4">วิธีสร้างความมั่งคั่ง: หลักการออม การลงทุน และดอกเบี้ยทบต้น</h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">ทำความเข้าใจหลักการออม การลงทุน และพลังของดอกเบี้ยทบต้น ผ่านตัวอย่างตัวเลขจริงและเครื่องคำนวณแบบอินเทอร์แอกทีฟ สำหรับคนทั่วไปที่อยากสร้างความมั่งคั่งอย่างยั่งยืน ไม่ใช่รวยทางลัด</p>
+</section>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-4 flex flex-wrap gap-1">
+    <a href="#visual-overview" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ภาพรวม</a>
+    <a href="#mindmap" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แผนที่ความคิด</a>
+    <a href="#overview" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">สรุปหลักการ</a>
+    <a href="#how" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">กลไกและกรอบแนวคิด</a>
+    <a href="#simulator" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">เครื่องคำนวณ</a>
+    <a href="#examples" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ตัวอย่าง</a>
+    <a href="#mistakes" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ตำนานที่ต้องหักล้าง</a>
+    <a href="#thailand" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">บริบทไทย</a>
+    <a href="#data" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">ข้อมูล</a>
+    <a href="#glossary" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">อภิธานศัพท์</a>
+    <a href="#sources" class="text-sm px-3 py-1.5 rounded-md hover:bg-accent-soft transition">แหล่งข้อมูล</a>
+  </div>
+</nav>
+
+<!-- A. Visual overview (infographic) -->
+<section id="visual-overview" class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="image" class="w-5 h-5 accent"></i> ภาพรวม
+  </h2>
+  <div class="surface rounded-xl overflow-hidden card-hover">
+    <img src="infographic.png" alt="ภาพรวมสร้างโดย NotebookLM" class="w-full h-auto block"/>
+  </div>
+  <div class="text-xs muted mt-2">สร้างโดย NotebookLM ระหว่างการวิจัยเชิงลึก</div>
+</section>
+
+<!-- B. Interactive mind map (Tier 2 fallback) -->
+<section id="mindmap" class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2">
+    <i data-lucide="brain" class="w-5 h-5 accent"></i> แผนที่ความคิด
+  </h2>
+  <div class="surface rounded-xl p-4" style="height: 560px;">
+    <div class="markmap" style="width:100%; height:100%;">
+      <script type="text/template">
+# วิธีสร้างความมั่งคั่ง
+
+## สรุปสั้น
+- ออมและลงทุนอย่างสม่ำเสมอ ให้ดอกเบี้ยทบต้นทำงานแทน
+- เวลาสำคัญกว่าจำนวนเงิน ยิ่งเริ่มเร็วยิ่งได้เปรียบ
+
+## กลไกดอกเบี้ยทบต้น
+- สูตร A = P(1+r/n)^(nt) ดอกเบี้ยงอกจากดอกเบี้ยเดิม
+- กฎ 72 หารด้วยอัตราดอกเบี้ย = จำนวนปีเงินเพิ่มเป็น 2 เท่า
+- คนคิดแบบเส้นตรง แต่การทบต้นโตแบบทวีคูณ
+
+## กรอบแนวคิดการเงินที่พิสูจน์แล้ว
+- จ่ายตัวเองก่อน ออมก่อนใช้จ่ายที่เหลือ
+- กฎ 50/30/20 จำเป็น 50% อยากได้ 30% ออม 20%
+- กองทุนฉุกเฉิน 3-6 เดือนของค่าใช้จ่าย
+- กองทุนดัชนี กระจายความเสี่ยง ต้นทุนต่ำ
+- FIRE ออมสูง 30-60% เพื่อเกษียณเร็ว กฎ 25 เท่า
+
+## พฤติกรรมที่ทำลายความมั่งคั่ง
+- Lifestyle inflation ใช้จ่ายเพิ่มตามรายได้
+- อยากได้ทันที ไม่รอผลตอบแทนระยะยาว
+- หนี้เสีย ดอกเบี้ยสูงกัดกินเงินออม
+- กลัวการลงทุน ขายตอนตลาดตก loss aversion
+
+## รายได้และการกระจายความเสี่ยง
+- เพิ่มรายได้ช่วยเร่งอัตราการออม
+- รายได้เสริมลดความเสี่ยงพึ่งงานเดียว
+- ทักษะและอาชีพเติบโตในระยะยาว
+
+## ตำนานที่ต้องหักล้าง
+- รวยเร็วไม่มีจริง แชร์ลูกโซ่คือกับดัก
+- หุ้นรายตัวเสี่ยงสูง กองทุนดัชนีปลอดภัยกว่า
+- หนี้ดีสร้างทรัพย์สิน หนี้เสียบั่นทอนความมั่งคั่ง
+- รวยกับมั่งคั่งไม่เหมือนกัน มั่งคั่งคือสิ่งที่มองไม่เห็น
+
+## บริบทประเทศไทย
+- RMF ลดหย่อนภาษีสูงสุด 500,000 บาทต่อปี
+- กองทุนสำรองเลี้ยงชีพ นายจ้างสมทบให้
+- ดัชนี SET50 SET100 คล้าย S&P 500
+
+## ข้อมูล
+- ผลตอบแทน S&P 500 เฉลี่ยราว 10% ต่อปี
+- ออม 5,000 บาทต่อเดือน ที่ 7% นาน 30 ปี ได้ ~6.1 ล้านบาท
+- อัตราออมเพื่อ FIRE 30-60% ของรายได้
+- กองทุนฉุกเฉินทั่วไป 3-6 เดือนของรายจ่าย
+
+## แหล่งข้อมูล
+- SEC Investor.gov ดอกเบี้ยทบต้น
+- Fidelity ผลตอบแทน S&P 500
+- Wikipedia FIRE Movement
+- Psychology of Money โดย Morgan Housel
+- SCB ภาษี RMF Thai ESG SSF
+      </script>
+    </div>
+  </div>
+  <div class="text-xs muted mt-2">แผนที่ความคิดสร้างจากการสังเคราะห์งานวิจัย (NotebookLM ไม่มีแผนที่ความคิดสำหรับรอบนี้)</div>
+</section>
+
+<!-- C. Deep synthesis callout -->
+<aside class="max-w-5xl mx-auto px-6 mb-12 fade-up">
+  <div class="rounded-xl p-5 border-l-4" style="border-left-color: var(--accent); background: var(--accent-soft);">
+    <div class="text-xs font-medium accent mb-1">🔬 การวิจัยเชิงลึก — สังเคราะห์จาก 41 แหล่งข้อมูลผ่าน NotebookLM</div>
+    <p class="text-sm leading-relaxed">การวิจัยเชิงลึกยืนยันหลักการเดิมและเพิ่มมิติที่ลึกกว่าเดิม: คนส่วนใหญ่คิดเรื่องการเติบโตของเงินแบบ "เส้นตรง" (เช่น 8+8+8) ทั้งที่ดอกเบี้ยทบต้นเติบโตแบบ "ทวีคูณ" (เช่น 8×8×8) ซึ่งเป็นสาเหตุที่คนมองข้ามพลังของการออมสม่ำเสมอในระยะยาว<a href="#src-21" class="text-xs align-super">[21]</a> งานวิจัยยังชี้ว่า "อัตราการออม" คือปัจจัยเดียวที่อยู่ในการควบคุมของเราอย่างสมบูรณ์ ขณะที่ผลตอบแทนการลงทุนควบคุมไม่ได้ และนิยาม "การออม" ในเชิงพฤติกรรมว่าคือช่องว่างระหว่าง "อีโก้" กับ "รายได้" — ยิ่งลดอีโก้ (ความอยากเปรียบเทียบทางสังคม) ได้มากเท่าไร ก็ยิ่งออมได้มากเท่านั้น<a href="#src-21" class="text-xs align-super">[21]</a> ตัวอย่างที่ชัดเจนที่สุดคือกรณีของวอร์เรน บัฟเฟตต์ ซึ่งทรัพย์สินสุทธิกว่า 96% ของเขาเกิดขึ้น "หลัง" อายุ 65 ปี พิสูจน์ว่า "เวลา" สำคัญกว่าฝีมือการลงทุนเสียอีก และตรงข้ามกับภาพจำ Ronald Read ภารโรงธรรมดาที่ไม่มีรายได้สูงก็สามารถสะสมเงินได้หลายล้านดอลลาร์ด้วยการออมเล็กๆ น้อยๆ อย่างสม่ำเสมอเป็นเวลาหลายสิบปี<a href="#src-21" class="text-xs align-super">[21]</a> ในมุมพฤติกรรม การวิจัยเน้นว่าทักษะที่สำคัญที่สุดในเรื่องการเงินไม่ใช่ "ความฉลาด" แต่คือ "การอยู่รอด" — ความสามารถประคองตัวผ่านช่วงตลาดผันผวนโดยไม่ขายทิ้งตอนตกใจ และมองความผันผวนของตลาดเป็น "ค่าธรรมเนียม" ที่ต้องจ่ายเพื่อผลตอบแทนระยะยาว ไม่ใช่ "ค่าปรับ" ที่แปลว่าทำอะไรผิด<a href="#src-21" class="text-xs align-super">[21]</a> สำหรับบริบทไทย การวิจัยเชิงลึกยังพบวัฒนธรรมการออมที่น่าสนใจ เช่น การให้ความสำคัญกับการใช้หนี้ก่อนออม ค่านิยม "โชว์" ผ่านสินค้าแสดงสถานะ และการออมผ่านสลากออมทรัพย์ธนาคารออมสิน/ธ.ก.ส. ที่ได้รับความนิยมในกลุ่มผู้สูงวัย<a href="#src-24" class="text-xs align-super">[24]</a><a href="#src-25" class="text-xs align-super">[25]</a></p>
+  </div>
+</aside>
+
+<!-- Insight reel (required — first thing after hero/deep-mode extras) -->
+<section class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <div class="surface rounded-2xl overflow-hidden" id="reel">
+    <div id="reelSlides" style="position:relative; min-height:180px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- Overview -->
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> สรุปหลักการ
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content">
+    <p>คนทั่วไปสามารถสร้างความมั่งคั่งได้ด้วยหลักการเพียงไม่กี่ข้อที่พิสูจน์แล้วว่าได้ผลจริง คือ <strong>ใช้จ่ายน้อยกว่าที่หาได้และออมอย่างสม่ำเสมอ</strong> (อัตราการออมที่คุณควบคุมได้เอง) นำเงินส่วนเกินไป<strong>ลงทุน</strong>ในสินทรัพย์ที่กระจายความเสี่ยงและมีต้นทุนต่ำ เช่น กองทุนดัชนี เพื่อให้ดอกเบี้ยทบต้นทำงานแทนเมื่อเวลาผ่านไป <strong>เพิ่มและกระจายแหล่งรายได้</strong>เมื่อทำได้ และ<strong>ควบคุมพฤติกรรม</strong> (หลีกเลี่ยงการใช้จ่ายที่เพิ่มตามรายได้ ไม่หลงกับความสุขทันที ไม่ก่อหนี้เสีย และมีเงินสำรองฉุกเฉิน) เพื่อไม่ให้สามข้อแรกสะดุด<a href="#src-1" class="text-xs align-super">[1]</a><a href="#src-3" class="text-xs align-super">[3]</a><a href="#src-15" class="text-xs align-super">[15]</a></p>
+    <p>ตัวเลขอาจฟังดูง่าย แต่ผลลัพธ์กลับไม่ตรงกับสัญชาตญาณ คนอายุ 25 ปีที่ออมเดือนละ 5,000 บาท และได้ผลตอบแทนเฉลี่ย 7% ต่อปี จะมีเงินสะสมราว <strong>6.1 ล้านบาท</strong>เมื่อถึงวัยเกษียณ ขณะที่คนที่เริ่มออมช้ากว่า 10 ปีด้วยจำนวนเงินเท่ากันจะได้เงินก้อนน้อยกว่าอย่างมีนัยสำคัญ — เพราะ "เวลาที่อยู่ในตลาด" สำคัญกว่าจำนวนเงินที่ลงทุน<a href="#src-1" class="text-xs align-super">[1]</a> ตัวอย่างสุดขั้วคือวอร์เรน บัฟเฟตต์ ที่ทรัพย์สินสุทธิกว่า 96% เกิดขึ้นหลังอายุ 65 ปี และภารโรง Ronald Read ที่สะสมเงินหลายล้านดอลลาร์ได้ด้วยรายได้ธรรมดาแต่ออมอย่างสม่ำเสมอนานหลายสิบปี — พิสูจน์ว่าไม่ต้องรวยหรือฉลาดเป็นพิเศษก็สร้างความมั่งคั่งได้<a href="#src-21" class="text-xs align-super">[21]</a></p>
+    <p>แผนการรวยเร็ว การเก็งกำไรเสี่ยงสูง และเรื่องเล่าแบบ "ฉลาดหรือโชคดีถึงจะรวย" ล้วนเป็นความเชื่อที่ผิด ทุกแหล่งข้อมูลที่น่าเชื่อถือเห็นตรงกันว่าการสร้างความมั่งคั่งเป็นกระบวนการที่ช้า ค่อยเป็นค่อยไป และขับเคลื่อนด้วยพฤติกรรม ไม่ใช่ทางลัด<a href="#src-13" class="text-xs align-super">[13]</a><a href="#src-27" class="text-xs align-super">[27]</a></p>
+    <p>ในประเทศไทย หลักการเดียวกันนี้ใช้ได้ผลเช่นกัน โดยมีเครื่องมือทางภาษีที่ช่วยสนับสนุนการออมระยะยาว เช่น กองทุนรวมเพื่อการเลี้ยงชีพ (RMF) กองทุน Thai ESG กองทุนสำรองเลี้ยงชีพของนายจ้าง และดัชนี SET ซึ่งเทียบเคียงได้กับการลงทุนในกองทุนดัชนีของต่างประเทศ<a href="#src-9" class="text-xs align-super">[9]</a><a href="#src-10" class="text-xs align-super">[10]</a></p>
+    <p class="text-xs muted">เนื้อหานี้จัดทำเพื่อการศึกษาทั่วไปเท่านั้น ไม่ใช่คำแนะนำการลงทุนหรือภาษีเฉพาะบุคคล ผลตอบแทนในอดีตไม่ได้รับประกันผลตอบแทนในอนาคต</p>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="cog" class="w-5 h-5 accent"></i> กลไกและกรอบแนวคิด
+  </h2>
+  <div class="surface rounded-xl p-8 steps space-y-6">
+    <div class="step flex"><div><strong>กลไกดอกเบี้ยทบต้น</strong> — สูตรพื้นฐานคือ A = P(1+r/n)<sup>nt</sup> ดอกเบี้ยไม่ได้คิดจากเงินต้นอย่างเดียว แต่คิดจาก "ดอกเบี้ยที่สะสมไว้แล้ว" ด้วย ทำให้การเติบโตเร่งขึ้นเรื่อยๆ มนุษย์มักคิดแบบเส้นตรง (8+8+8=24) แต่การทบต้นทำงานแบบทวีคูณ (8×8×8=512) จึงมักถูกมองข้ามพลังที่แท้จริง<a href="#src-1" class="text-xs align-super">[1]</a><a href="#src-21" class="text-xs align-super">[21]</a></div></div>
+    <div class="step flex"><div><strong>กฎ 72</strong> — สูตรลัดประมาณจำนวนปีที่เงินจะเพิ่มเป็น 2 เท่า: 72 ÷ อัตราดอกเบี้ย (%) = จำนวนปี เช่น ผลตอบแทน 6% ต่อปี เงินจะเพิ่มเป็น 2 เท่าใน 12 ปี ส่วนผลตอบแทน 9% ใช้เวลาเพียง 8 ปี กฎนี้แม่นยำที่สุดในช่วงอัตรา 6-10% ต่อปี<a href="#src-2" class="text-xs align-super">[2]</a><a href="#src-26" class="text-xs align-super">[26]</a></div></div>
+    <div class="step flex"><div><strong>อัตราการออม — ปัจจัยเดียวที่คุณควบคุมได้</strong> — ผลตอบแทนการลงทุนคาดเดาไม่ได้ แต่ "อัตราการออม" อยู่ในมือคุณ 100% แนวคิด "จ่ายตัวเองก่อน" (Pay Yourself First) เปลี่ยนสมการจาก "รายได้ − รายจ่าย = เงินออม" เป็น "รายได้ − เงินออม = รายจ่าย" โดยตั้งระบบหักอัตโนมัติก่อนใช้จ่าย ส่วนกฎ 50/30/20 แบ่งรายได้เป็น 50% ค่าใช้จ่ายจำเป็น 30% สิ่งที่อยากได้ และ 20% ออม/ชำระหนี้ ซึ่งเป็นแนวทางที่ยืดหยุ่นได้ตามค่าครองชีพ<a href="#src-4" class="text-xs align-super">[4]</a><a href="#src-12" class="text-xs align-super">[12]</a></div></div>
+    <div class="step flex"><div><strong>กองทุนฉุกเฉิน</strong> — เงินสำรองสภาพคล่องสูงสำหรับเหตุการณ์ไม่คาดฝัน แนวทางดั้งเดิมแนะนำ 3-6 เดือนของค่าใช้จ่ายจำเป็น แต่แนวทางล่าสุดเน้นว่าจำนวนที่เหมาะสมขึ้นกับประวัติค่าใช้จ่ายฉุกเฉินของแต่ละครัวเรือน แม้เงินสำรองจำนวนน้อยที่ค่อยๆ สะสมก็ช่วยเพิ่มความมั่นคงทางใจได้มาก<a href="#src-7" class="text-xs align-super">[7]</a><a href="#src-18" class="text-xs align-super">[18]</a></div></div>
+    <div class="step flex"><div><strong>ลงทุนกองทุนดัชนี</strong> — กองทุนดัชนีกระจายเงินไปยังบริษัทหลายร้อยหลายพันแห่งโดยอัตโนมัติ ต้นทุนต่ำกว่ากองทุนที่บริหารเชิงรุก และในระยะยาวกองทุนดัชนีมักทำผลตอบแทนได้ดีกว่านักลงทุนที่พยายามเลือกหุ้นรายตัวส่วนใหญ่ ดัชนี S&P 500 ให้ผลตอบแทนเฉลี่ยราว 10% ต่อปีนับตั้งแต่ปี 1957 แม้จะผันผวนปีต่อปีและผลตอบแทนที่แท้จริง (หักเงินเฟ้อ) จะต่ำกว่าตัวเลขที่เห็น<a href="#src-5" class="text-xs align-super">[5]</a><a href="#src-29" class="text-xs align-super">[29]</a></div></div>
+    <div class="step flex"><div><strong>ขบวนการ FIRE (Financial Independence, Retire Early)</strong> — ออมในอัตราสูงกว่าปกติมาก (30-60%+ ของรายได้ เทียบกับ ~15% แบบดั้งเดิม) เพื่อสะสมพอร์ตให้ถึง <strong>25 เท่า</strong>ของค่าใช้จ่ายต่อปี แล้วถอนใช้ปีละ 4% ("กฎ 4%") ไปได้เรื่อยๆ นักเศรษฐศาสตร์บางคนแนะนำให้ระมัดระวังกว่านั้น (ถอน 3.25-3.5% หรือสะสม ~30 เท่า) โดยเฉพาะสำหรับผู้ที่จะเกษียณยาวนานกว่า 40 ปี มีหลายรูปแบบ เช่น LeanFIRE (ประหยัดสุดขีด) FatFIRE (คงไลฟ์สไตล์หรู) และ CoastFIRE (ออมหนักตอนต้นแล้วปล่อยให้ดอกเบี้ยทบต้นทำงานเอง)<a href="#src-3" class="text-xs align-super">[3]</a><a href="#src-6" class="text-xs align-super">[6]</a><a href="#src-28" class="text-xs align-super">[28]</a></div></div>
+    <div class="step flex"><div><strong>พฤติกรรมที่ต้องระวัง</strong> — Lifestyle inflation (ใช้จ่ายเพิ่มตามรายได้ที่เพิ่มขึ้น) และ "การเปรียบเทียบทางสังคม" ที่ไม่มีเพดาน คือตัวทำลายอัตราการออมที่พบบ่อยที่สุด ตามด้วยความอยากได้ทันที (present bias) หนี้เสียดอกเบี้ยสูง และความกลัวการลงทุน (loss aversion) ซึ่งทำให้คนขายสินทรัพย์ทิ้งตอนตลาดตกต่ำที่สุด วิธีรับมือที่ได้ผลคือการตั้งระบบออมอัตโนมัติ กำหนดกฎ 50/30/20 ให้ชัดเจน และมองความผันผวนของตลาดเป็น "ค่าธรรมเนียม" ที่ต้องจ่ายเพื่อผลตอบแทน ไม่ใช่ "บทลงโทษ"<a href="#src-15" class="text-xs align-super">[15]</a><a href="#src-21" class="text-xs align-super">[21]</a></div></div>
+    <div class="step flex"><div><strong>รายได้และการกระจายความเสี่ยง</strong> — การเพิ่มรายได้ (เลื่อนตำแหน่ง พัฒนาทักษะ) ช่วยเร่งอัตราการออมได้เร็วกว่าการประหยัดอย่างเดียว ส่วนรายได้เสริม (ฟรีแลนซ์ ค่าเช่า เงินปันผล) ทำหน้าที่หลักเป็นการกระจายความเสี่ยงจากการพึ่งพารายได้ทางเดียว คำแนะนำทั่วไปคือทำให้รายได้หลักมั่นคงก่อน แล้วค่อยเพิ่มรายได้เสริมทีละทาง<a href="#src-14" class="text-xs align-super">[14]</a></div></div>
+  </div>
+</section>
+
+<!-- Interactive compounding simulator -->
+<section id="simulator" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="calculator" class="w-5 h-5 accent"></i> เครื่องคำนวณดอกเบี้ยทบต้น
+  </h2>
+  <div class="surface rounded-xl p-6 md:p-8">
+    <p class="text-sm muted mb-6">ลองปรับตัวเลขด้านล่างเพื่อดูว่าการออมและลงทุนสม่ำเสมอจะเติบโตอย่างไรในระยะยาว กราฟจะแสดงผลทันที</p>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <div>
+        <label class="flex justify-between text-sm font-medium mb-1">
+          <span>เงินก้อนเริ่มต้น (บาท)</span>
+          <span id="pVal" class="accent font-semibold">0</span>
+        </label>
+        <input type="range" id="pInput" min="0" max="500000" step="10000" value="0" class="w-full">
+      </div>
+      <div>
+        <label class="flex justify-between text-sm font-medium mb-1">
+          <span>จำนวนเงินออมต่อเดือน (บาท)</span>
+          <span id="pmtVal" class="accent font-semibold">3,000</span>
+        </label>
+        <input type="range" id="pmtInput" min="500" max="20000" step="500" value="3000" class="w-full">
+      </div>
+      <div>
+        <label class="flex justify-between text-sm font-medium mb-1">
+          <span>อัตราผลตอบแทนต่อปี (%)</span>
+          <span id="rVal" class="accent font-semibold">7</span>
+        </label>
+        <input type="range" id="rInput" min="1" max="10" step="0.5" value="7" class="w-full">
+        <div class="flex gap-2 mt-2 flex-wrap">
+          <button class="preset-btn text-xs px-2 py-1 rounded-md border border-soft" data-rate="1">1% ออมธนาคาร</button>
+          <button class="preset-btn text-xs px-2 py-1 rounded-md border border-soft" data-rate="3">3%</button>
+          <button class="preset-btn text-xs px-2 py-1 rounded-md border border-soft" data-rate="5">5%</button>
+          <button class="preset-btn active text-xs px-2 py-1 rounded-md border border-soft" data-rate="7">7% กองทุนดัชนี</button>
+          <button class="preset-btn text-xs px-2 py-1 rounded-md border border-soft" data-rate="8">8%</button>
+        </div>
+      </div>
+      <div>
+        <label class="flex justify-between text-sm font-medium mb-1">
+          <span>จำนวนปี</span>
+          <span id="tVal" class="accent font-semibold">20</span>
+        </label>
+        <input type="range" id="tInput" min="5" max="40" step="1" value="20" class="w-full">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-6">
+      <div class="card scale-in text-center">
+        <div class="text-xs muted mb-1">เงินที่ออมสะสม</div>
+        <div class="text-lg md:text-xl font-bold" id="statContributed">0 บาท</div>
+      </div>
+      <div class="card scale-in text-center">
+        <div class="text-xs muted mb-1">มูลค่ารวมสุดท้าย</div>
+        <div class="text-lg md:text-xl font-bold accent" id="statTotal">0 บาท</div>
+      </div>
+      <div class="card scale-in text-center">
+        <div class="text-xs muted mb-1">กำไรจากการลงทุน</div>
+        <div class="text-lg md:text-xl font-bold" style="color:#10B981;" id="statGrowth">0 บาท</div>
+      </div>
+    </div>
+
+    <div style="position:relative; height:320px;">
+      <canvas id="growthChart"></canvas>
+    </div>
+
+    <div class="mt-6 pt-6 border-t border-soft">
+      <button id="toggleExample4" class="text-sm px-4 py-2 rounded-md border border-soft hover:bg-accent-soft transition flex items-center gap-2">
+        <i data-lucide="clock" class="w-4 h-4"></i>
+        ดูตัวอย่าง: "เริ่มเร็วชนะเวลา" — ออม 10 ปีแล้วหยุด เทียบกับ เริ่มช้าแต่ออมต่อเนื่อง 25 ปี
+      </button>
+      <div id="example4Panel" class="hidden mt-4">
+        <p class="text-sm muted mb-3">คนที่ 1 (สีม่วง) ออมเดือนละ 5,000 บาท เพียง 10 ปีแรก (อายุ 25-35) แล้วหยุดออมแต่ปล่อยเงินไว้ลงทุนต่อจนอายุ 60 ปี (รวมเงินต้น 600,000 บาท) ส่วนคนที่ 2 (สีเขียว) เริ่มออมตอนอายุ 35 และออมเดือนละ 5,000 บาทต่อเนื่อง 25 ปีจนถึงอายุ 60 (รวมเงินต้น 1,500,000 บาท — มากกว่าคนแรก 2.5 เท่า) ทั้งคู่ได้ผลตอบแทน 7% ต่อปีเท่ากัน<a href="#src-1" class="text-xs align-super">[1]</a></p>
+        <div style="position:relative; height:280px;">
+          <canvas id="example4Chart"></canvas>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-4 text-center">
+          <div class="card">
+            <div class="text-xs muted mb-1">คนที่ 1 — เริ่มเร็ว หยุดที่ 10 ปี</div>
+            <div class="text-lg font-bold" style="color:#6366F1;">~4,955,000 บาท</div>
+            <div class="text-xs muted">ออมรวม 600,000 บาท</div>
+          </div>
+          <div class="card">
+            <div class="text-xs muted mb-1">คนที่ 2 — เริ่มช้า ออมต่อเนื่อง 25 ปี</div>
+            <div class="text-lg font-bold" style="color:#10B981;">~4,050,000 บาท</div>
+            <div class="text-xs muted">ออมรวม 1,500,000 บาท</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-xs muted mt-6">ตัวเลขทั้งหมดเป็นการคำนวณตามสูตรดอกเบี้ยทบต้นมาตรฐาน (ทบต้นรายเดือน) เพื่อการศึกษาเท่านั้น <strong>ไม่ใช่การรับประกันผลตอบแทนในอนาคตและไม่ใช่คำแนะนำการลงทุนส่วนบุคคล</strong> ผลตอบแทนจริงของการลงทุนผันผวนและไม่แน่นอนเสมอ<a href="#src-1" class="text-xs align-super">[1]</a><a href="#src-5" class="text-xs align-super">[5]</a></p>
+  </div>
+</section>
+
+<!-- Examples -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> ตัวอย่างที่คำนวณจริง
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">ออมอย่างเดียว vs ลงทุน</div>
+      <p class="text-sm leading-relaxed">ออมเดือนละ 2,000 บาท เป็นเวลา 30 ปี: ถ้าฝากบัญชีออมทรัพย์ที่ 3% จะได้ราว <strong>1,165,000 บาท</strong> (ออมเอง 720,000 บาท) แต่ถ้าลงทุนกองทุนดัชนีที่ 7% จะได้ถึง <strong>2,440,000 บาท</strong> จากเงินออมเท่ากัน — เห็นชัดว่าการลงทุนทำให้เงินโตเร็วกว่าการออมเฉยๆ 2 เท่าขึ้นไปในระยะยาว<a href="#src-1" class="text-xs align-super">[1]</a><a href="#src-5" class="text-xs align-super">[5]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">ขยายจำนวนเงินออม</div>
+      <p class="text-sm leading-relaxed">ออมเดือนละ 5,000 บาท ที่ผลตอบแทน 7% นาน 30 ปี ได้ราว <strong>6,100,000 บาท</strong> ถ้าเพิ่มผลตอบแทนเป็น 8% ได้ <strong>7,452,000 บาท</strong> และถ้าเพิ่มเงินออมเป็นเดือนละ 10,000 บาทที่ 8% จะได้ถึง <strong>14,904,000 บาท</strong> — ยิ่งออมมากและได้ผลตอบแทนสูงขึ้นเล็กน้อย ผลลัพธ์ระยะยาวยิ่งต่างกันมาก<a href="#src-1" class="text-xs align-super">[1]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">เวลาชนะจำนวนเงิน (ตัวอย่างเด่น)</div>
+      <p class="text-sm leading-relaxed">คนที่ 1 ออมเดือนละ 5,000 บาท เพียง 10 ปี (อายุ 25-35) แล้วหยุด ปล่อยเงินลงทุนต่อจนอายุ 60 (7% ต่อปี) จบด้วย <strong>~4,955,000 บาท</strong> จากเงินต้นแค่ 600,000 บาท ส่วนคนที่ 2 เริ่มออมตอนอายุ 35 และออมต่อเนื่อง 25 ปีจนถึงอายุ 60 ด้วยเงินต้นรวม 1,500,000 บาท (มากกว่า 2.5 เท่า) กลับได้เพียง <strong>~4,050,000 บาท</strong> — พิสูจน์ว่า "เริ่มเร็ว" สำคัญกว่า "ออมเยอะ"<a href="#src-1" class="text-xs align-super">[1]</a><a href="#src-21" class="text-xs align-super">[21]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">ทบต้นจริง vs ถอนดอกเบี้ยออก</div>
+      <p class="text-sm leading-relaxed">เงินก้อน 100,000 บาท ลงทุนที่ผลตอบแทน 10% ต่อปี เป็นเวลา 10 ปี: ถ้า<strong>ปล่อยให้ดอกเบี้ยทบต้นต่อไปเรื่อยๆ</strong> จะได้ราว <strong>259,374 บาท</strong> แต่ถ้าถอนดอกเบี้ยออกมาใช้ปีละ 10,000 บาททุกปี (ดอกเบี้ยแบบธรรมดา) จะเหลือเพียง <strong>200,000 บาท</strong> เท่านั้น — ความแตกต่างมาจาก "ดอกเบี้ยที่งอกจากดอกเบี้ยเดิม" ล้วนๆ<a href="#src-1" class="text-xs align-super">[1]</a><a href="#src-33" class="text-xs align-super">[33]</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- Myths / mistakes -->
+<section id="mistakes" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="alert-triangle" class="w-5 h-5 accent"></i> ตำนานที่ต้องหักล้าง
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold mb-2" style="color:#ef4444;">"รวยเร็ว" ไม่มีจริง</div>
+      <p class="text-sm leading-relaxed">แชร์ลูกโซ่ (Ponzi) และธุรกิจขายตรงหลายชั้น (pyramid scheme) มักเสนอผลตอบแทนสูงผิดปกติ ต้องจ่ายเงินล่วงหน้า อ้าง "เคล็ดลับลับ" หรือ "รับประกัน 100%" — สัญญาณเหล่านี้คือธงแดงเสมอ ความมั่งคั่งจริงใช้เวลาเป็นปีหรือหลายสิบปี ไม่ใช่ทางลัด<a href="#src-13" class="text-xs align-super">[13]</a><a href="#src-27" class="text-xs align-super">[27]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold mb-2" style="color:#ef4444;">เก็งกำไรหุ้นรายตัว ≠ ทางรวย</div>
+      <p class="text-sm leading-relaxed">คนมักเห็นแต่ "อัจฉริยะ" ที่รวยจากการเดิมพันหุ้นตัวเดียว แต่มองข้ามคนอีกจำนวนมากที่ขาดทุนจากกลยุทธ์เดียวกัน สำหรับคนทั่วไป กองทุนดัชนีต้นทุนต่ำให้ผลลัพธ์ที่ดีกว่าและปลอดภัยกว่าการไล่หา "หุ้นตัวต่อไปที่จะพุ่ง"<a href="#src-5" class="text-xs align-super">[5]</a><a href="#src-13" class="text-xs align-super">[13]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold mb-2" style="color:#ef4444;">หนี้ไม่ได้แย่เสมอไป</div>
+      <p class="text-sm leading-relaxed">"หนี้ดี" คือหนี้ที่ใช้ซื้อสินทรัพย์ที่มูลค่าเพิ่มขึ้นหรือสร้างรายได้ในอนาคต เช่น สินเชื่อบ้านหรือเงินกู้เพื่อการศึกษา/ธุรกิจ ส่วน "หนี้เสีย" คือหนี้ดอกเบี้ยสูงเพื่อของที่มูลค่าลดลงเร็ว เช่น บัตรเครดิตหรือหนี้นอกระบบ — ควรหลีกเลี่ยงหนี้เสีย ไม่ใช่หนี้ทุกประเภท<a href="#src-8" class="text-xs align-super">[8]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold mb-2" style="color:#ef4444;">"รวย" ไม่เท่ากับ "มั่งคั่ง"</div>
+      <p class="text-sm leading-relaxed">"รวย" คือรายได้ปัจจุบัน คนที่ขับรถราคา 3 ล้านบาทอาจแค่ผ่อนไหวเพราะมีรายได้สูง แต่ "มั่งคั่ง" คือสิ่งที่มองไม่เห็น — คือรายได้ที่ "เลือกจะไม่ใช้" การใช้เงินเพื่อโชว์ว่ามีเงินมักเป็นวิธีที่เร็วที่สุดที่จะมีเงินเหลือน้อยลง<a href="#src-21" class="text-xs align-super">[21]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold mb-2" style="color:#ef4444;">Lifestyle Inflation และการเปรียบเทียบทางสังคม</div>
+      <p class="text-sm leading-relaxed">เมื่อรายได้เพิ่มขึ้น คนมักใช้จ่ายเพิ่มตามจนอัตราการออมไม่ขยับ เพราะ "hedonic adaptation" — ความเคยชินกับมาตรฐานชีวิตใหม่จนไม่รู้สึกพิเศษอีกต่อไป การเปรียบเทียบทางสังคมยิ่งอันตรายเพราะเพดานของมันไม่มีที่สิ้นสุด การนิยาม "พอแล้ว" ให้ตัวเองคือทางออก<a href="#src-15" class="text-xs align-super">[15]</a><a href="#src-25" class="text-xs align-super">[25]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold mb-2" style="color:#ef4444;">กลัวการลงทุนเกินไป</div>
+      <p class="text-sm leading-relaxed">ความเจ็บปวดจากการขาดทุนรุนแรงกว่าความสุขจากการได้กำไรในระดับเท่ากัน (loss aversion) ทำให้หลายคนขายสินทรัพย์ทิ้งตอนตลาดตกต่ำที่สุด หรือไม่กล้าลงทุนเลย ทั้งที่ความผันผวนคือ "ค่าธรรมเนียม" ปกติของการลงทุนระยะยาว ไม่ใช่สัญญาณว่าทำผิด<a href="#src-21" class="text-xs align-super">[21]</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- Thailand context -->
+<section id="thailand" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="map-pin" class="w-5 h-5 accent"></i> บริบทประเทศไทย
+  </h2>
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">RMF (กองทุนรวมเพื่อการเลี้ยงชีพ)</div>
+      <p class="text-sm leading-relaxed">ลดหย่อนภาษีได้สูงสุด 30% ของรายได้ที่ต้องเสียภาษี ไม่เกิน 500,000 บาทต่อปี ต้องลงทุนต่อเนื่องและถือครองอย่างน้อย 5 ปี และจนอายุครบ 55 ปี เหมาะกับการออมเพื่อเกษียณระยะยาว<a href="#src-9" class="text-xs align-super">[9]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">Thai ESG Fund</div>
+      <p class="text-sm leading-relaxed">กองทุนที่ลงทุนในบริษัทไทย/ตราสารหนี้ที่เข้าเกณฑ์ ESG มาแทน SSF สำหรับการซื้อใหม่ตั้งแต่ปี 2025 ลดหย่อนได้สูงสุด 300,000 บาท (30% ของรายได้) ถือครองเพียง 5 ปี — สั้นกว่า SSF เดิมมาก แต่เป็นสิทธิประโยชน์ชั่วคราวถึงปี 2026<a href="#src-9" class="text-xs align-super">[9]</a><a href="#src-23" class="text-xs align-super">[23]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">กองทุนสำรองเลี้ยงชีพ (PVD)</div>
+      <p class="text-sm leading-relaxed">กองทุนภาคสมัครใจที่นายจ้างตั้งขึ้น ลูกจ้างสมทบราว 2-15% ของเงินเดือน โดยนายจ้างสมทบเพิ่มให้เท่ากันหรือมากกว่า เป็นระบบ "ออมก่อนใช้" ที่หักจากเงินเดือนอัตโนมัติ — ตรงกับหลัก "จ่ายตัวเองก่อน" พอดี<a href="#src-10" class="text-xs align-super">[10]</a><a href="#src-35" class="text-xs align-super">[35]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">ดัชนี SET และ SET50/SET100</div>
+      <p class="text-sm leading-relaxed">ดัชนีตลาดหลักทรัพย์แห่งประเทศไทย เทียบเคียงได้กับ S&P 500 ของสหรัฐฯ ในเชิงกลไก มีกองทุนดัชนีและ ETF ที่อ้างอิงดัชนี SET50 (50 บริษัทใหญ่สุด) และ SET100 ให้เลือกลงทุน แม้จะยังไม่มีข้อมูลผลตอบแทนเฉลี่ยระยะยาวที่น่าเชื่อถือเทียบเท่า S&P 500<a href="#src-11" class="text-xs align-super">[11]</a><a href="#src-22" class="text-xs align-super">[22]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">วัฒนธรรมการออมแบบไทย</div>
+      <p class="text-sm leading-relaxed">คนไทยจำนวนมากให้ความสำคัญกับการจ่ายหนี้ก่อนออม สลากออมทรัพย์ธนาคารออมสิน/ธ.ก.ส. ยังเป็นที่นิยมในกลุ่มผู้สูงวัยเพราะออมได้พร้อมลุ้นรางวัล ขณะที่คนรุ่นใหม่นิยมเก็บทองคำควบคู่สินทรัพย์ดิจิทัล และยังมีค่านิยม "วัฒนธรรมโชว์" ผ่านของแสดงสถานะที่ผลักดันการใช้จ่ายเกินตัว<a href="#src-24" class="text-xs align-super">[24]</a><a href="#src-25" class="text-xs align-super">[25]</a></p>
+    </div>
+    <div class="card card-hover scale-in">
+      <div class="text-xs font-semibold accent mb-2">อินฟลูเอนเซอร์การเงินไทย</div>
+      <p class="text-sm leading-relaxed">ผู้เชี่ยวชาญไทยที่ได้รับความนิยม เช่น The Money Coach (จักรพงษ์ เมษพันธุ์) เน้นการจัดการหนี้และแนวคิดการเงิน, Longtunman ศูนย์รวมข่าวการลงทุน และ Wealth Me Up ที่เน้นแนวคิด "ใช้แรงหาเงิน แล้วให้เงินทำงานแทน"<a href="#src-17" class="text-xs align-super">[17]</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- Data -->
+<section id="data" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="bar-chart-3" class="w-5 h-5 accent"></i> ข้อมูล
+  </h2>
+  <div class="surface rounded-xl p-6 md:p-8 overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr><th>ตัวชี้วัด</th><th>ค่า</th><th>แหล่งข้อมูล</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>ผลตอบแทนเฉลี่ย S&P 500 ตั้งแต่ปี 1957</td><td>~10% ต่อปี (nominal)</td><td>Fidelity<a href="#src-5" class="text-xs align-super">[5]</a></td></tr>
+        <tr><td>ผลตอบแทนเฉลี่ย S&P 500 ช่วง 10 ปีล่าสุด</td><td>14.8% ต่อปี</td><td>Fidelity<a href="#src-5" class="text-xs align-super">[5]</a></td></tr>
+        <tr><td>อัตราการออมเพื่อเกษียณทั่วไป (ไม่ใช่ FIRE)</td><td>~15% ของรายได้</td><td>T. Rowe Price<a href="#src-6" class="text-xs align-super">[6]</a></td></tr>
+        <tr><td>อัตราการออมเป้าหมายของ FIRE</td><td>30-60%+ ของรายได้</td><td>T. Rowe Price<a href="#src-6" class="text-xs align-super">[6]</a></td></tr>
+        <tr><td>เป้าหมายพอร์ตของ FIRE (กฎ 4%)</td><td>25 เท่าของรายจ่ายต่อปี</td><td>Wikipedia FIRE<a href="#src-3" class="text-xs align-super">[3]</a></td></tr>
+        <tr><td>กองทุนฉุกเฉินตามแนวทางทั่วไป</td><td>3-6 เดือนของรายจ่าย</td><td>CFPB<a href="#src-7" class="text-xs align-super">[7]</a>, Vanguard<a href="#src-18" class="text-xs align-super">[18]</a></td></tr>
+        <tr><td>สัดส่วนงบ 50/30/20</td><td>50% จำเป็น / 30% อยากได้ / 20% ออม-หนี้</td><td>NerdWallet<a href="#src-4" class="text-xs align-super">[4]</a></td></tr>
+        <tr><td>ออม 5,000 บาท/เดือน ที่ 7% นาน 30 ปี</td><td>~6,100,000 บาท</td><td>คำนวณเอง (สูตร SEC)<a href="#src-1" class="text-xs align-super">[1]</a></td></tr>
+        <tr><td>เพดานลดหย่อนภาษี RMF ไทย</td><td>สูงสุด 500,000 บาท/ปี (30% ของรายได้)</td><td>SCB<a href="#src-9" class="text-xs align-super">[9]</a></td></tr>
+        <tr><td>เพดานลดหย่อนภาษี Thai ESG (2024-2026)</td><td>สูงสุด 300,000 บาท/ปี</td><td>SCB<a href="#src-9" class="text-xs align-super">[9]</a></td></tr>
+        <tr><td>เงินสมทบกองทุนสำรองเลี้ยงชีพ (ลูกจ้าง)</td><td>2-15% ของเงินเดือน</td><td>Principal Thailand<a href="#src-10" class="text-xs align-super">[10]</a></td></tr>
+        <tr><td>ดอกเบี้ยทบต้น vs ถอนดอกเบี้ย (100,000 บาท 10% 10 ปี)</td><td>259,374 บาท vs 200,000 บาท</td><td>คำนวณ NotebookLM<a href="#src-33" class="text-xs align-super">[33]</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Glossary -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> อภิธานศัพท์
+  </h2>
+  <div class="surface rounded-xl p-8">
+    <dl>
+      <div><dt>ดอกเบี้ยทบต้น (Compound interest)</dt><dd>ดอกเบี้ยที่คิดทั้งจากเงินต้นเดิมและดอกเบี้ยที่สะสมไว้ก่อนหน้า ทำให้การเติบโตเร่งขึ้นเรื่อยๆ แทนที่จะคงที่</dd></div>
+      <div><dt>กฎ 72 (Rule of 72)</dt><dd>สูตรลัดประมาณจำนวนปีที่เงินลงทุนจะเพิ่มเป็น 2 เท่า: หาร 72 ด้วยอัตราผลตอบแทนต่อปี (ตัวเลขเต็ม เช่น 7 สำหรับ 7%)</dd></div>
+      <div><dt>อัตราการออม (Savings rate)</dt><dd>สัดส่วนของรายได้ที่ถูกออมหรือนำไปลงทุนแทนการใช้จ่าย — ปัจจัยที่ควบคุมได้มากที่สุดในการสร้างความมั่งคั่ง</dd></div>
+      <div><dt>กองทุนดัชนี (Index fund)</dt><dd>กองทุนรวมที่ถือหุ้นหรือตราสารหนี้จำนวนมากเพื่อเลียนแบบผลตอบแทนของดัชนีตลาด เช่น S&P 500 หรือ SET Index ของไทย แทนการเลือกหุ้นรายตัว</dd></div>
+      <div><dt>การกระจายความเสี่ยง (Diversification)</dt><dd>การกระจายเงินไปในสินทรัพย์หลากหลายชนิด เพื่อไม่ให้ผลงานที่แย่ของบริษัทหรือสินทรัพย์ใดสินทรัพย์หนึ่งทำลายความมั่งคั่งโดยรวม</dd></div>
+      <div><dt>กองทุนฉุกเฉิน (Emergency fund)</dt><dd>เงินสำรองในบัญชีที่เข้าถึงง่าย สำหรับรองรับค่าใช้จ่ายหรือรายได้ที่ขาดหายไปโดยไม่คาดคิด เพื่อไม่ต้องก่อหนี้หรือขายสินทรัพย์ในจังหวะที่ไม่ดี</dd></div>
+      <div><dt>Lifestyle inflation</dt><dd>แนวโน้มที่การใช้จ่ายเพิ่มขึ้นตามรายได้ที่สูงขึ้น ทำให้อัตราการออมไม่ดีขึ้นแม้รายได้จะเพิ่ม</dd></div>
+      <div><dt>Hedonic adaptation</dt><dd>แนวโน้มทางจิตวิทยาที่คนเคยชินกับมาตรฐานชีวิตที่สูงขึ้นอย่างรวดเร็ว จนการใช้จ่ายใหม่ไม่รู้สึกพิเศษอีกต่อไปและกลายเป็น "ปกติใหม่"</dd></div>
+      <div><dt>FIRE (Financial Independence, Retire Early)</dt><dd>แนวทางการเงินที่เน้นออมในสัดส่วนสูงมากและนำไปลงทุน เพื่อบรรลุอิสรภาพทางการเงิน (และมักเกษียณ) เร็วกว่าอายุเกษียณปกติมาก</dd></div>
+      <div><dt>กฎ 4% (4% rule)</dt><dd>กฎประมาณการว่าการถอนเงินจากพอร์ตลงทุนปีละ ~4% (ปรับตามเงินเฟ้อ) มีโอกาสสูงที่เงินจะอยู่ได้ตลอดชีวิตหลังเกษียณ หมายถึงต้องมีพอร์ตราว 25 เท่าของค่าใช้จ่ายต่อปี</dd></div>
+      <div><dt>หนี้ดี vs หนี้เสีย (Good debt vs bad debt)</dt><dd>กรอบคิดที่แยกหนี้ที่ใช้ซื้อสินทรัพย์มูลค่าเพิ่มหรือสร้างรายได้ในอนาคต (เช่น สินเชื่อบ้าน เงินกู้เพื่อการศึกษา/ธุรกิจ) ออกจากหนี้ที่ใช้เพื่อสิ่งของที่มูลค่าลดลงเร็วด้วยดอกเบี้ยสูง (เช่น บัตรเครดิต หนี้นอกระบบ)</dd></div>
+      <div><dt>สินทรัพย์ vs หนี้สิน (Asset vs liability)</dt><dd>สินทรัพย์คือสิ่งที่นำเงินเข้ากระเป๋าคุณเมื่อเวลาผ่านไป ส่วนหนี้สินคือสิ่งที่ดึงเงินออกจากกระเป๋าคุณ — ใช้เป็นกรอบคิดง่ายๆ ในการตัดสินใจใช้จ่าย</dd></div>
+      <div><dt>จ่ายตัวเองก่อน (Pay yourself first)</dt><dd>นิสัยการเงินที่โอนเงินเข้าออม/ลงทุนโดยอัตโนมัติก่อนใช้จ่ายสิ่งที่ไม่จำเป็น แทนที่จะออมเฉพาะเงินที่เหลือ</dd></div>
+      <div><dt>RMF (กองทุนรวมเพื่อการเลี้ยงชีพ)</dt><dd>กองทุนรวมไทยที่ได้สิทธิลดหย่อนภาษีสำหรับการออมเพื่อเกษียณ แลกกับการถือครองระยะยาวจนอายุครบ 55 ปี</dd></div>
+      <div><dt>Thai ESG Fund</dt><dd>กองทุนรวมไทยที่ลงทุนในบริษัท/ตราสารที่เข้าเกณฑ์สิ่งแวดล้อม สังคม และธรรมาภิบาล มาแทน SSF สำหรับการซื้อใหม่ตั้งแต่ปี 2025</dd></div>
+      <div><dt>กองทุนสำรองเลี้ยงชีพ (Provident Fund)</dt><dd>กองทุนออมเพื่อเกษียณแบบสมัครใจที่นายจ้างจัดตั้งในไทย ซึ่งทั้งลูกจ้างและนายจ้างสมทบเงินร่วมกันเป็นสัดส่วนของเงินเดือน</dd></div>
+      <div><dt>ดัชนี SET (SET Index)</dt><dd>ดัชนีหลักของตลาดหลักทรัพย์แห่งประเทศไทย ใช้เป็นตัวชี้วัดผลงานของบริษัทจดทะเบียนไทยโดยรวม</dd></div>
+    </dl>
+  </div>
+</section>
+
+<!-- Sources -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16 fade-up">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> แหล่งข้อมูล
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm">
+    <ol class="list-decimal list-inside space-y-1.5">
+      <li id="src-1">What is compound interest? — U.S. SEC / Investor.gov — <a href="https://www.investor.gov/additional-resources/information/youth/teachers-classroom-resources/what-compound-interest" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-2">Rule of 72 — Wikipedia — <a href="https://en.wikipedia.org/wiki/Rule_of_72" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-3">FIRE movement — Wikipedia — <a href="https://en.wikipedia.org/wiki/FIRE_movement" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-4">50/30/20 Budget Calculator — NerdWallet — <a href="https://www.nerdwallet.com/finance/learn/nerdwallet-budget-calculator" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-5">What is the S&P 500 and stock market average return? — Fidelity — <a href="https://www.fidelity.com/learning-center/trading-investing/sp-500-average-return" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-6">Six steps to achieve FIRE — T. Rowe Price — <a href="https://www.troweprice.com/en/us/insights/six-steps-to-achieve-financial-independence-and-retire-early" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-7">An essential guide to building an emergency fund — CFPB — <a href="https://www.consumerfinance.gov/an-essential-guide-to-building-an-emergency-fund/" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-8">Financial Leverage: Good Debt vs Bad Debt — U.S. Bank — <a href="https://www.usbank.com/wealth-management/financial-perspectives/financial-planning/financial-leverage-what-is-good-debt-vs-bad-debt.html" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-9">New Tax Criteria: Thai ESG, SSF, and RMF — SCB — <a href="https://www.scb.co.th/en/personal-banking/stories/grow-your-wealth/update-new-tax-critieria-thai-esg" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-10">4 things employees need to know before investing in Provident Fund — Principal Thailand — <a href="https://www.principal.th/en/4thingsemployeesneedtoknowbeforeinvestinginProvidentFund" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-11">SET Index Overview — Stock Exchange of Thailand — <a href="https://www.set.or.th/en/market/index/set/overview" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-12">The Key to Becoming Rich: Always Pay Yourself First — Rich Dad — <a href="https://richdad.com/pay-yourself-first/" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-13">7 Biggest "Get Rich Quick" Myths Debunked — GOBankingRates — <a href="https://www.gobankingrates.com/money/financial-planning/money-experts-debunk-myths-about-getting-rich-quick/" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-14">How to Create Multiple Streams of Income — City National Bank — <a href="https://www.cnb.com/personal-banking/insights/create-multiple-streams-of-income.html" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-15">The Psychology of Wealth: Stop Lifestyle Inflation — Finance Monthly — <a href="https://www.finance-monthly.com/psychology-of-wealth-lifestyle-inflation/" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-16">14+ Finance Infographics to Simplify Financial Information — Venngage — <a href="https://venngage.com/blog/finance-infographics/" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-17">5 Influencers providing financial/investment knowledge — ACU Pay — <a href="https://acuthai.com/5-influencers-providing-financial-investment-knowledge/" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-18">Comprehensive Guide to Building an Emergency Fund — Vanguard — <a href="https://investor.vanguard.com/investor-resources-education/emergency-fund" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-19">How to follow the 50/30/20 rule — Wealthsimple — <a href="https://www.wealthsimple.com/en-ca/learn/50-30-20-rule" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-20">Index Funds — Investor.gov — <a href="https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-4" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-21">The Psychology of Money — Morgan Housel (PDF) — <a href="https://tiue.uz/wp-content/uploads/2024/02/The-Psychology-of-Money-Morgan-Housel.pdf" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-22">SET Text Book — Investment Product Series P1 — Stock Exchange of Thailand — <a href="https://media.set.or.th/set/Documents/2022/Apr/Text-book_P1_version3.pdf" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-23">SSF & RMF คู่หูกองทุนประหยัดภาษี — SET Investnow — <a href="https://www.setinvestnow.com/th/mutualfund/ssf-rmf-tax-saving-investments" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-24">Saving Behavior Survey: Decoding the Saving Habits of Thai Consumers — Krungsri — <a href="https://www.krungsri.com/en/research/research-intelligence/thai-saving-2025" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-25">The Culture of Showing Off: Debt and financial literacy in Thailand — Pattaya Mail — <a href="https://www.pattayamail.com/news/the-culture-of-showing-off-debt-and-financial-literacy-in-thailand-494637" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-26">Understanding Compound Interest — The Rule of 72 — BetterInvesting — <a href="https://www.betterinvesting.org/learn-about-investing/investor-education/personal-finance/rule-of-72" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-27">Understanding and Avoiding Get-Rich-Quick Schemes — SoFi — <a href="https://www.sofi.com/learn/content/get-rich-quick-schemes/" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-28">What Is the FIRE Movement? — Charles Schwab — <a href="https://www.schwab.com/learn/story/fire-movement" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-29">What is an index fund and how does it work? — Fidelity — <a href="https://www.fidelity.com/learning-center/smart-money/what-is-an-index-fund" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-30">What is the 50/30/20 Budget Rule? — Citizens — <a href="https://www.citizensbank.com/learning/50-30-20-budget.aspx" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-31">When Wealth Is the Result of Thought: 7 Mindsets — Thairath English — <a href="https://en.thairath.co.th/money/personal_finance/wealth_management/2941962" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-32">What is lifestyle inflation and how does it limit wealth? — The Week — <a href="https://theweek.com/finance/1020966/what-is-lifestyle-inflation-and-how-does-it-limit-wealth" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-33">ดอกเบี้ยทบต้น (Compound Interest) เทคนิคลงทุนที่สายออมห้ามพลาด — PeerPower — <a href="https://www.peerpower.co.th/en/blog/compound-interest-what-is" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-34">บริหารเงินอย่างไรให้มีเงินเก็บ? กฎ 50/30/20 — GQ Thailand — <a href="https://gqthailand.com/article/what-is-the-50-30-20-budgeting-rule" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-35">วางแผนกองทุนสำรองเลี้ยงชีพ — ตลาดหลักทรัพย์แห่งประเทศไทย — <a href="https://www.set.or.th/th/education-research/education/happymoney/provident-fund" target="_blank" rel="noopener">ลิงก์</a></li>
+    </ol>
+
+    <h3 class="text-base font-semibold mt-6 mb-3 flex items-center gap-2">
+      <i data-lucide="youtube" class="w-4 h-4 accent"></i> แหล่งข้อมูลวิดีโอ
+    </h3>
+    <ol class="list-decimal list-inside space-y-1.5" start="36">
+      <li id="src-36">3 steps to investing to create a "path to wealth" for salaried workers — YouTube — <a href="https://www.youtube.com/watch?v=asAwJIhVncs" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-37">6 วิธี "วางแผนการเงิน" แบบ Gen-Z — What's Up Wealth — YouTube — <a href="https://www.youtube.com/watch?v=y62Oe1GAaNI" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-38">Compound Interest Explained — NerdWallet — YouTube — <a href="https://www.youtube.com/watch?v=WgVPgNFgrAo" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-39">Financial Independence Retire Early (FIRE) 2026: The Math Behind Retiring — YouTube — <a href="https://www.youtube.com/watch?v=BXLHbD9YgAo" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-40">Index Funds and ETFs Explained (2026) — YouTube — <a href="https://www.youtube.com/watch?v=mIOEMLAc-bo" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-41">Index Investing for Beginners — YouTube — <a href="https://www.youtube.com/watch?v=TRAJxmK9P8o" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-42">It's Boring, But This 10 Step Blueprint Is The Easiest Path To $1M — YouTube — <a href="https://www.youtube.com/watch?v=62egdACb6WY" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-43">The FIRE Movement Has Changed... Here's How — YouTube — <a href="https://www.youtube.com/watch?v=CZv90FXWNm0" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-44">Why Money Feels Harder at Every Stage of Life (Behavioral Finance Explained) — YouTube — <a href="https://www.youtube.com/watch?v=0232_NGGFjw" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-45">วิดีโอประกอบการวิจัย — YouTube — <a href="https://www.youtube.com/watch?v=HcSNx7zq4iY" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-46">วิดีโอประกอบการวิจัย — YouTube — <a href="https://www.youtube.com/watch?v=JSKhXG9U_lM" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-47">วิดีโอประกอบการวิจัย — YouTube — <a href="https://www.youtube.com/watch?v=JYibhcBaJhA" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-48">วิดีโอประกอบการวิจัย — YouTube — <a href="https://www.youtube.com/watch?v=T-XwVPQ-GEE" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-49">วิดีโอประกอบการวิจัย — YouTube — <a href="https://www.youtube.com/watch?v=ZAIiiSga1Y8" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-50">วิดีโอประกอบการวิจัย — YouTube — <a href="https://www.youtube.com/watch?v=cnmYZSz6bJ4" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-51">วิดีโอประกอบการวิจัย — YouTube — <a href="https://www.youtube.com/watch?v=gU1Ylq5jpnU" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-52">วางแผนการเงินอย่างมีความสุข — Fintroduce x Nam Finance — YouTube — <a href="https://www.youtube.com/watch?v=ketKak0PoiQ" target="_blank" rel="noopener">ลิงก์</a></li>
+      <li id="src-53">เริ่มต้นลดหย่อนภาษี กองทุน RMF-SSF-TESG — Investo — YouTube — <a href="https://www.youtube.com/watch?v=IyxSZELaKng" target="_blank" rel="noopener">ลิงก์</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-soft mt-16 py-8">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>สร้างโดย <a href="../../">agent-newsroom</a> เมื่อวันที่ 2026-07-01</div>
+    <div class="flex items-center gap-4">
+      <button onclick="window.print()" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์
+      </button>
+      <a href="../../" class="hover:text-current transition flex items-center gap-1">
+        <i data-lucide="home" class="w-4 h-4"></i> กลับหน้าหลัก
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+lucide.createIcons();
+
+// ── Scroll progress bar ─────────────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── Entrance animations ─────────────────────────────────────────────────────
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (!reduceMotion) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.07 });
+  document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(el => io.observe(el));
+} else {
+  document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(el => el.classList.add('visible'));
+}
+
+// ── Animated counters (supports decimals + thousands separators) ───────────
+function animateCounter(el, target, duration, decimals, prefix, suffix) {
+  decimals = decimals || 0;
+  prefix = prefix || '';
+  suffix = suffix || '';
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    const val = ease * target;
+    el.textContent = prefix + val.toLocaleString('th-TH', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+// ── Insight reel ─────────────────────────────────────────────────────────
+const insights = [
+  { icon: 'divide', stat: 72, decimals: 0, statLabel: 'กฎ 72', headline: 'กฎ 72: สูตรลัดคำนวณเวลาเงินเพิ่มเป็น 2 เท่า', body: 'หาร 72 ด้วยอัตราผลตอบแทนต่อปี จะได้จำนวนปีที่เงินจะโตเป็น 2 เท่า เช่น 7% ต่อปี ใช้เวลาราว 10 ปี', color: '#6366F1' },
+  { icon: 'piggy-bank', stat: 20, suffix: '%', decimals: 0, statLabel: 'สัดส่วนออมในกฎ 50/30/20', headline: 'อัตราการออมคือปัจจัยที่คุณควบคุมได้', body: 'กฎ 50/30/20 แนะนำให้กันรายได้ 20% ไว้สำหรับออมและชำระหนี้ ก่อนใช้จ่ายส่วนที่เหลือ', color: '#10B981' },
+  { icon: 'trending-up', stat: 6.1, decimals: 1, suffix: ' ล้านบาท', statLabel: 'ออมเดือนละ 5,000 บาท 30 ปีที่ 7%', headline: 'ออมสม่ำเสมอ 30 ปี โตได้หลักล้าน', body: 'ออมเดือนละ 5,000 บาท ที่ผลตอบแทน 7% ต่อปี เป็นเวลา 30 ปี จะได้เงินราว 6.1 ล้านบาท', color: '#f59e0b' },
+  { icon: 'target', stat: 25, suffix: ' เท่า', decimals: 0, statLabel: 'เป้าหมายพอร์ต FIRE', headline: 'กฎ 25 เท่า: เป้าหมายของขบวนการ FIRE', body: 'สะสมพอร์ตให้ได้ 25 เท่าของรายจ่ายต่อปี แล้วถอนใช้ปีละ 4% ก็อยู่ได้อย่างยั่งยืน', color: '#6366F1' },
+  { icon: 'clock', stat: 10, suffix: ' ปี', decimals: 0, statLabel: 'ออมแค่ 10 ปีแต่ชนะ', headline: '"เริ่มเร็ว" ชนะ "ออมเยอะ"', body: 'ออมเพียง 10 ปีแรกแล้วหยุด ยังชนะคนที่เริ่มช้ากว่าและออมต่อเนื่อง 25 ปีด้วยเงินต้นมากกว่า 2.5 เท่า', color: '#10B981' },
+  { icon: 'trophy', stat: 96, suffix: '%', decimals: 0, statLabel: 'ทรัพย์สินบัฟเฟตต์หลังอายุ 65', headline: 'ความมั่งคั่งของบัฟเฟตต์ 96% มาจาก "เวลา"', body: 'ทรัพย์สินสุทธิกว่า 96% ของวอร์เรน บัฟเฟตต์ เกิดขึ้นหลังจากเขาอายุ 65 ปีไปแล้ว', color: '#f59e0b' },
+];
+
+let reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function buildSlide(ins) {
+  return `
+    <div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">
+      <div style="text-align:center;min-width:120px;flex-shrink:0;">
+        <div style="font-size:2.8rem;font-weight:800;color:${ins.color};line-height:1;" class="reel-stat" data-target="${ins.stat}" data-decimals="${ins.decimals}" data-suffix="${ins.suffix || ''}">0</div>
+        <div style="font-size:0.7rem;color:#71717a;margin-top:4px;">${ins.statLabel}</div>
+      </div>
+      <div style="flex:1;min-width:220px;">
+        <div style="font-size:1.15rem;font-weight:700;margin-bottom:6px;">${ins.headline}</div>
+        <div style="font-size:0.9rem;color:#71717a;line-height:1.6;">${ins.body}</div>
+      </div>
+    </div>`;
+}
+
+function showSlide(idx, animate) {
+  if (animate === undefined) animate = true;
+  if (reelAnimating) return;
+  reelAnimating = true;
+  reelIdx = (idx + insights.length) % insights.length;
+
+  const wrap = document.getElementById('reelSlides');
+  if (animate && !reduceMotion) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+  setTimeout(() => {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    wrap.style.opacity = '1';
+    wrap.style.transform = 'none';
+    reelAnimating = false;
+    const statEl = wrap.querySelector('.reel-stat');
+    if (statEl) {
+      animateCounter(statEl, Number(statEl.dataset.target), 1200, Number(statEl.dataset.decimals), '', statEl.dataset.suffix);
+    }
+  }, (animate && !reduceMotion) ? 350 : 0);
+
+  document.querySelectorAll('.reel-dot').forEach((d, i) => {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => {
+    bar.style.transition = 'width 4s linear';
+    bar.style.width = '100%';
+  });
+}
+
+function startReel() { reelTimer = setInterval(() => showSlide(reelIdx + 1), 4000); }
+function stopReel() { clearInterval(reelTimer); }
+
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;';
+  d.style.background = i === 0 ? 'var(--accent)' : '#d4d4d8';
+  d.onclick = () => { stopReel(); showSlide(i); startReel(); };
+  dotsWrap.appendChild(d);
+});
+
+document.getElementById('reel').setAttribute('tabindex', '0');
+document.getElementById('reel').addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1); startReel(); }
+  if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1); startReel(); }
+});
+document.getElementById('reel').addEventListener('mouseenter', stopReel);
+document.getElementById('reel').addEventListener('mouseleave', startReel);
+
+showSlide(0, false);
+startReel();
+
+// ── Compounding simulator ───────────────────────────────────────────────────
+function fmtTHB(n) {
+  return Math.round(n).toLocaleString('th-TH') + ' บาท';
+}
+
+function computeSeries(P, PMT, rPct, years) {
+  const r = rPct / 100;
+  const monthlyRate = r / 12;
+  const labels = [];
+  const contributedSeries = [];
+  const totalSeries = [];
+  for (let y = 0; y <= years; y++) {
+    const n = y * 12;
+    const fvPrincipal = P * Math.pow(1 + monthlyRate, n);
+    let fvContrib;
+    if (monthlyRate === 0) {
+      fvContrib = PMT * n;
+    } else {
+      fvContrib = PMT * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate);
+    }
+    labels.push('ปี ' + y);
+    contributedSeries.push(Math.round(P + PMT * n));
+    totalSeries.push(Math.round(fvPrincipal + fvContrib));
+  }
+  return { labels, contributedSeries, totalSeries };
+}
+
+const pInput = document.getElementById('pInput');
+const pmtInput = document.getElementById('pmtInput');
+const rInput = document.getElementById('rInput');
+const tInput = document.getElementById('tInput');
+const pVal = document.getElementById('pVal');
+const pmtVal = document.getElementById('pmtVal');
+const rVal = document.getElementById('rVal');
+const tVal = document.getElementById('tVal');
+
+let growthChart = null;
+
+function renderChart() {
+  const P = Number(pInput.value);
+  const PMT = Number(pmtInput.value);
+  const r = Number(rInput.value);
+  const t = Number(tInput.value);
+
+  pVal.textContent = P.toLocaleString('th-TH');
+  pmtVal.textContent = PMT.toLocaleString('th-TH');
+  rVal.textContent = r;
+  tVal.textContent = t;
+
+  const { labels, contributedSeries, totalSeries } = computeSeries(P, PMT, r, t);
+  const finalTotal = totalSeries[totalSeries.length - 1];
+  const finalContributed = contributedSeries[contributedSeries.length - 1];
+  const growth = finalTotal - finalContributed;
+
+  document.getElementById('statContributed').textContent = fmtTHB(finalContributed);
+  document.getElementById('statTotal').textContent = fmtTHB(finalTotal);
+  document.getElementById('statGrowth').textContent = fmtTHB(growth);
+
+  const ctx = document.getElementById('growthChart').getContext('2d');
+  if (growthChart) growthChart.destroy();
+  growthChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'เงินที่ออมสะสม',
+          data: contributedSeries,
+          borderColor: '#a1a1aa',
+          backgroundColor: 'rgba(161,161,170,0.08)',
+          fill: true,
+          tension: 0.25,
+          pointRadius: 0,
+        },
+        {
+          label: 'มูลค่ารวม (รวมผลตอบแทน)',
+          data: totalSeries,
+          borderColor: '#6366F1',
+          backgroundColor: 'rgba(99,102,241,0.15)',
+          fill: true,
+          tension: 0.25,
+          pointRadius: 0,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 700, easing: 'easeOutQuart' },
+      interaction: { mode: 'index', intersect: false },
+      scales: {
+        y: { ticks: { callback: (v) => (v / 1e6).toFixed(1) + 'M' } },
+        x: { ticks: { maxTicksLimit: 10 } }
+      },
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => ctx.dataset.label + ': ' + fmtTHB(ctx.parsed.y)
+          }
+        }
+      }
+    }
+  });
+}
+
+[pInput, pmtInput, tInput].forEach(inp => inp.addEventListener('input', renderChart));
+rInput.addEventListener('input', () => {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  renderChart();
+});
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    rInput.value = btn.dataset.rate;
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderChart();
+  });
+});
+
+renderChart();
+
+// ── Example 4 toggle: "time beats amount" comparison ────────────────────────
+let example4Chart = null;
+let example4Rendered = false;
+
+function renderExample4() {
+  // Person A: 5,000 THB/month for 10 years (age 25-35), then no more contributions,
+  // money stays invested at 7% until age 60 (25 more years, no new contributions).
+  // Person B: starts at age 35, contributes 5,000 THB/month for 25 years (age 35-60) at 7%.
+  const r = 0.07;
+  const monthlyRate = r / 12;
+  const pmt = 5000;
+  const labels = [];
+  const personA = [];
+  const personB = [];
+
+  for (let age = 25; age <= 60; age++) {
+    labels.push('อายุ ' + age);
+
+    // Person A
+    let aBalance;
+    if (age <= 35) {
+      const n = (age - 25) * 12;
+      aBalance = pmt * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate);
+    } else {
+      const balanceAt35 = pmt * ((Math.pow(1 + monthlyRate, 120) - 1) / monthlyRate);
+      const nSince35 = (age - 35) * 12;
+      aBalance = balanceAt35 * Math.pow(1 + monthlyRate, nSince35);
+    }
+    personA.push(Math.round(aBalance));
+
+    // Person B
+    let bBalance = 0;
+    if (age > 35) {
+      const n = (age - 35) * 12;
+      bBalance = pmt * ((Math.pow(1 + monthlyRate, n) - 1) / monthlyRate);
+    }
+    personB.push(Math.round(bBalance));
+  }
+
+  const ctx = document.getElementById('example4Chart').getContext('2d');
+  if (example4Chart) example4Chart.destroy();
+  example4Chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'คนที่ 1 — เริ่มเร็ว หยุดที่ 10 ปี', data: personA, borderColor: '#6366F1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, tension: 0.2, pointRadius: 0 },
+        { label: 'คนที่ 2 — เริ่มช้า ออมต่อเนื่อง 25 ปี', data: personB, borderColor: '#10B981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.2, pointRadius: 0 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      scales: {
+        y: { ticks: { callback: (v) => (v / 1e6).toFixed(1) + 'M' } },
+        x: { ticks: { maxTicksLimit: 8 } }
+      },
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + fmtTHB(ctx.parsed.y) } }
+      }
+    }
+  });
+}
+
+document.getElementById('toggleExample4').addEventListener('click', () => {
+  const panel = document.getElementById('example4Panel');
+  panel.classList.toggle('hidden');
+  if (!panel.classList.contains('hidden') && !example4Rendered) {
+    renderExample4();
+    example4Rendered = true;
+  }
+});
+</script>
+
+</body>
+</html>
