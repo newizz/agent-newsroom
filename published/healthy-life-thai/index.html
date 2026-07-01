@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>การมีชีวิตที่มีสุขภาพดี สำหรับคนไทย — agent-newsroom</title>
+<link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-autoloader@0.16"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root { --accent: #6366F1; --accent-soft: #6366F11A; }
+  html { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { background: #fafafa; color: #18181b; }
+
+  @media (prefers-color-scheme: dark) {
+    body { background: #0a0a0b; color: #e4e4e7; }
+    .surface { background: #131316 !important; border-color: #27272a !important; }
+    .muted { color: #a1a1aa !important; }
+    .border-soft { border-color: #27272a !important; }
+    .card { background: #131316 !important; border-color: #27272a !important; }
+    dd { color: #a1a1aa !important; }
+    header { background: rgba(10,10,11,0.96) !important; }
+    .toc-link:hover { background: #27272a !important; }
+  }
+
+  .surface { background: #ffffff; border: 1px solid #e4e4e7; }
+  .muted { color: #71717a; }
+  .border-soft { border-color: #e4e4e7; }
+  .accent { color: var(--accent); }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .card { padding: 1.5rem; border: 1px solid #e4e4e7; border-radius: 0.75rem; background: #fff; }
+  .card-hover { transition: transform .2s ease, box-shadow .2s ease; }
+  .card-hover:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(99,102,241,.13); }
+
+  .prose-content p { margin-bottom: 1em; line-height: 1.8; }
+  .prose-content p:last-child { margin-bottom: 0; }
+  .prose-content strong { color: var(--accent); }
+  .prose-content ul, .prose-content ol { margin: 1em 0; padding-left: 1.5em; }
+  .prose-content li { margin-bottom: 0.4em; line-height: 1.7; }
+
+  dl { display: grid; gap: 1.2em; }
+  dt { font-weight: 600; font-size: 0.95rem; }
+  dd { margin-left: 0; color: #71717a; line-height: 1.6; font-size: 0.9rem; margin-top: 0.15em; }
+
+  sup a { font-size: 0.72em; vertical-align: super; color: var(--accent); text-decoration: none; }
+  sup a:hover { text-decoration: underline; }
+
+  .pillar-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: var(--accent-soft); display: flex;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .toc-link { transition: background .15s; border-radius: 6px; padding: 6px 12px; font-size: 0.875rem; color: inherit; }
+  .toc-link:hover { background: #f4f4f5; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-up   { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
+    .fade-left { opacity: 0; transform: translateX(-24px); transition: opacity .55s ease, transform .55s ease; }
+    .scale-in  { opacity: 0; transform: scale(0.93);       transition: opacity .45s ease, transform .45s ease; }
+    .visible   { opacity: 1 !important; transform: none !important; }
+  }
+
+  @media print {
+    nav, #progress, footer button { display: none; }
+    .surface { border: 1px solid #ccc; box-shadow: none; }
+  }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- Scroll progress bar -->
+<div id="progress" style="position:fixed;top:0;left:0;height:3px;width:0%;background:#6366F1;z-index:9999;transition:width .1s linear;"></div>
+
+<!-- Header -->
+<header class="border-b border-soft sticky top-0 z-50" style="background:rgba(250,250,250,0.96);backdrop-filter:blur(8px);">
+  <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="../../" class="flex items-center gap-2 text-sm muted hover:text-current transition" style="text-decoration:none;">
+      <i data-lucide="arrow-left" class="w-4 h-4"></i>
+      กลับหน้าหลัก
+    </a>
+    <div class="text-xs muted">healthy-life-thai · 2026-07-01</div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="max-w-5xl mx-auto px-6 pt-16 pb-8">
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <span style="background:var(--accent-soft);color:var(--accent);padding:4px 12px;border-radius:6px;font-size:0.75rem;font-weight:600;">คู่มือสุขภาพองค์รวมสำหรับคนไทย</span>
+    <span class="muted text-xs">·</span>
+    <span class="muted text-xs">deep mode</span>
+    <span class="muted text-xs">·</span>
+    <span class="muted text-xs">concept-explorer</span>
+  </div>
+  <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 leading-tight">
+    การมีชีวิตที่มีสุขภาพดี<br/>
+    <span style="color:var(--accent);">สำหรับคนไทย</span>
+  </h1>
+  <p class="text-lg md:text-xl muted max-w-3xl leading-relaxed">
+    สุขภาพที่ดีสำหรับคนไทยยุคปัจจุบันต้องอาศัย 6 เสาหลักที่สมดุล — โภชนาการ การออกกำลังกาย สุขภาพจิต การนอนหลับ สมุนไพรไทย และการตรวจสุขภาพเชิงป้องกัน — เพื่อรับมือกับวิกฤต NCDs ที่คร่าชีวิตคนไทยปีละ 354,000 คน
+  </p>
+  <div class="mt-5 text-xs muted flex items-start gap-2 max-w-2xl">
+    <i data-lucide="info" class="w-4 h-4 mt-0.5 flex-shrink-0"></i>
+    <span>เนื้อหานี้ให้ข้อมูลด้านสุขภาพเท่านั้น ไม่ใช่คำแนะนำทางการแพทย์ หากมีความกังวลด้านสุขภาพ กรุณาปรึกษาแพทย์หรือบุคลากรทางการแพทย์ที่มีใบอนุญาต</span>
+  </div>
+</section>
+
+<!-- TOC -->
+<nav class="max-w-5xl mx-auto px-6 mb-8">
+  <div class="surface rounded-xl p-3 flex flex-wrap gap-1 items-center">
+    <span class="text-xs muted mr-1 px-2">สารบัญ:</span>
+    <a href="#findings" class="toc-link" style="text-decoration:none;">ผลการค้นพบสำคัญ</a>
+    <a href="#mindmap" class="toc-link" style="text-decoration:none;">แผนที่ความคิด</a>
+    <a href="#overview" class="toc-link" style="text-decoration:none;">ภาพรวม</a>
+    <a href="#how" class="toc-link" style="text-decoration:none;">6 เสาหลัก</a>
+    <a href="#examples" class="toc-link" style="text-decoration:none;">ตัวอย่าง</a>
+    <a href="#glossary" class="toc-link" style="text-decoration:none;">อภิธานศัพท์</a>
+    <a href="#sources" class="toc-link" style="text-decoration:none;">แหล่งข้อมูล</a>
+  </div>
+</nav>
+
+<!-- ── DEEP MODE: Mind Map (Tier 2 fallback) ── -->
+<section id="mindmap" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="brain" class="w-5 h-5 accent"></i> แผนที่ความคิด
+  </h2>
+  <div class="surface rounded-xl p-4 fade-up" style="height:520px;">
+    <div class="markmap" style="width:100%;height:100%;">
+      <script type="text/template">
+# การมีชีวิตที่มีสุขภาพดี สำหรับคนไทย
+
+## TL;DR
+- ต้องอาศัย 6 เสาหลักที่สมดุลกัน
+- NCDs คร่าชีวิตคนไทย 354,000 คน/ปี
+- ป้องกันได้ด้วยการปรับเปลี่ยนวิถีชีวิต
+
+## ผลการค้นพบสำคัญ
+- ความดันสูง 29.5% หรือ 17.5 ล้านคน
+- เบาหวาน 10.6% หรือ 6.1 ล้านคน
+- น้ำหนักเกิน 45% ของคนไทย
+- วัยทำงาน 40% มีความเครียดสูง
+- คนเอเชียนอนเฉลี่ย 6 ชม. 50 นาที
+
+## อาหารเพื่อสุขภาพ
+### ธงโภชนาการ
+- ข้าว-แป้ง ฐานมากที่สุด
+- ผัก-ผลไม้ มากเป็นอันดับสอง
+- ลดน้ำตาล เกลือ ไขมัน
+### สูตร 2:1:1 ต่อมื้อ
+- ข้าว 2 ส่วน ผัก 1 ส่วน โปรตีน 1 ส่วน
+### เมนูแนะนำ
+- ต้มยำน้ำใส (<100 กิโลแคลอรี)
+- ผัดผักน้ำมันน้อย ข้าวกล้อง
+
+## NCDs และปัจจัยเสี่ยง
+- อาหารไม่ถูกต้อง 56.93%
+- ออกกำลังกายไม่เพียงพอ 42.70%
+- น้ำหนักเกิน 50.03%
+- ดื่มแอลกอฮอล์ 29.73%
+- สูบบุหรี่ 16.61%
+
+## การออกกำลังกาย
+- WHO แนะนำ 150-300 นาที/สัปดาห์
+- ออกก่อน 09.00 หรือหลัง 17.00 น.
+- มวยไทย ว่ายน้ำ โยคะ HIIT
+
+## สมุนไพรไทย
+### หลักฐานแข็งแกร่ง
+- ขมิ้นชัน (Curcumin)
+### หลักฐานปานกลาง
+- ข่า ตะไคร้ กะเพรา
+
+## สุขภาพจิต
+- 40% ของวัยทำงานมีความเครียดสูง
+- สมาธิ/เจริญสติ ลด Cortisol
+- สายด่วน 1323 ฟรีตลอด 24 ชม.
+
+## การนอนหลับ
+- เป้าหมาย 7-9 ชั่วโมง/คืน
+- ปิดจอ 60 นาทีก่อนนอน
+- งดกาแฟหลัง 14.00 น.
+
+## ระบบสาธารณสุข
+- บัตรทอง สปสช. ครอบคลุม ~100%
+- ตรวจสุขภาพฟรี 14 รายการ
+- โทร สปสช. 1330 / เป๋าตัง
+
+## แหล่งข้อมูลสำคัญ
+- WHO Thailand NCDs
+- กระทรวงสาธารณสุขไทย
+- Samsung Global Sleep Study 2025
+- สสส. สุขภาพจิตแรงงานไทย 2024
+      </script>
+    </div>
+  </div>
+  <div class="text-xs muted mt-2">แผนที่ความคิดสร้างจากการสังเคราะห์งานวิจัย (NotebookLM ไม่มีแผนที่ความคิดสำหรับรอบนี้)</div>
+</section>
+
+<!-- ── DEEP MODE: Synthesis callout ── -->
+<aside class="max-w-5xl mx-auto px-6 mb-12">
+  <div class="rounded-xl p-5 border-l-4 fade-up" style="border-left-color:var(--accent);background:var(--accent-soft);">
+    <div class="text-xs font-semibold accent mb-2" style="letter-spacing:0.05em;">🔬 การวิจัยเชิงลึก — รวบรวม 12 แหล่งข้อมูลวิดีโอผ่าน NotebookLM</div>
+    <p class="text-sm leading-relaxed" style="margin:0;">
+      การวิจัยเชิงลึกรอบนี้ได้รวบรวมวิดีโอ YouTube จำนวน <strong>12 รายการ</strong> จากช่องผู้เชี่ยวชาญด้านสุขภาพไทย ครอบคลุมหัวข้อ: อาหาร 12 ชนิดทานเป็นยา, การจัดการความเครียดโดย Mahidol Channel, วิทยาศาสตร์การนอนหลับ, ธงโภชนาการ, สิทธิตรวจสุขภาพฟรี 14 รายการ และการแพทย์แผนไทย
+      อย่างไรก็ตาม การสังเคราะห์ผ่าน NotebookLM ไม่สำเร็จเนื่องจากข้อผิดพลาด SSL (<em>certificate verify failed</em>)
+      ข้อมูลหลักในหน้านี้จึงมาจากงานวิจัยของ Ravi ที่รวบรวมจาก <strong>24 แหล่งที่ผ่านการตรวจสอบ</strong> ได้แก่ WHO Thailand, กระทรวงสาธารณสุขไทย, สสส. และวารสารวิชาการนานาชาติ
+    </p>
+  </div>
+</aside>
+
+<!-- ── Insight Reel ── -->
+<section id="findings" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-4 flex items-center gap-2 fade-up">
+    <i data-lucide="zap" class="w-5 h-5 accent"></i> ผลการค้นพบสำคัญ
+  </h2>
+  <div class="surface rounded-2xl overflow-hidden fade-up" id="reel" tabindex="0" style="outline:none;">
+    <div id="reelSlides" style="position:relative;min-height:190px;"></div>
+    <div id="reelProgress" style="height:3px;background:var(--accent);width:0%;transition:none;"></div>
+    <div id="reelDots" class="flex justify-center gap-2 py-3"></div>
+  </div>
+</section>
+
+<!-- ── Overview ── -->
+<section id="overview" class="max-w-5xl mx-auto px-6 mb-12">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-open" class="w-5 h-5 accent"></i> ภาพรวม
+  </h2>
+  <div class="surface rounded-xl p-8 prose-content fade-up">
+    <p>สุขภาพตามนิยามขององค์การอนามัยโลก (WHO) ไม่ได้หมายถึงแค่การไม่เจ็บป่วย แต่คือ <strong>"สภาวะของความสมบูรณ์แข็งแรงทั้งทางกาย ทางจิต และทางสังคม"</strong> ในบริบทไทย สสส. ขยายนิยามนี้ออกไปครอบคลุมมิติจิตวิญญาณ (สุขภาวะ) ทำให้สุขภาพไทยเป็นเรื่ององค์รวม 4 มิติ: กาย จิต สังคม และจิตวิญญาณ</p>
+    <p>ประเทศไทยกำลังเผชิญกับความท้าทายสองด้านพร้อมกัน คือ (1) <strong>วิกฤตโรคไม่ติดต่อเรื้อรัง (NCDs)</strong> ที่คร่าชีวิตคนไทยถึง 354,000 คนต่อปี หรือ 71% ของการเสียชีวิตทั้งหมด<sup><a href="#11">[11]</a></sup> และ (2) ความต้องการอนุรักษ์และต่อยอด <strong>ภูมิปัญญาสุขภาพแบบไทยดั้งเดิม</strong> ทั้งอาหาร สมุนไพร และการแพทย์แผนไทยที่มีประวัติยาวนานกว่า 700 ปี</p>
+    <p>ปัจจัยเชิงบริบทที่ส่งผลเฉพาะต่อสุขภาพคนไทย: <strong>สภาพอากาศร้อนชื้น</strong> (เฉลี่ย 30–36°C ตลอดปี) กำหนดรูปแบบการออกกำลังกายและเวลาที่เหมาะสม — ควรออกกำลังกายก่อน 09.00 น. หรือหลัง 17.00 น. เพื่อหลีกเลี่ยงความร้อนสูงสุด<sup><a href="#9">[9]</a></sup> <strong>วัฒนธรรมอาหารที่หลากหลาย</strong> ตามภูมิภาค (เหนือ อีสาน กลาง ใต้) มีศักยภาพด้านสุขภาพสูง แต่กำลังเผชิญกับการขยายตัวของอาหารแปรรูปและฟาสต์ฟู้ด และ <strong>ระบบสาธารณสุขถ้วนหน้า</strong> ที่ครอบคลุมประชากรเกือบ 100% ผ่าน 3 สิทธิหลัก (บัตรทอง, ประกันสังคม, สวัสดิการข้าราชการ) ซึ่งเป็นจุดแข็งที่คนไทยหลายคนยังใช้ประโยชน์ได้ไม่เต็มที่<sup><a href="#8">[8]</a></sup></p>
+    <p>จากการสำรวจพฤติกรรมสุขภาพประชากรไทยปี 2564 พบปัจจัยเสี่ยงที่น่าเป็นห่วง: <strong>56.93%</strong> รับประทานอาหารไม่ถูกต้อง, <strong>50.03%</strong> มีน้ำหนักเกินหรืออ้วน, <strong>42.70%</strong> ออกกำลังกายไม่เพียงพอ, <strong>29.73%</strong> ดื่มแอลกอฮอล์, และ <strong>16.61%</strong> สูบบุหรี่<sup><a href="#2">[2]</a></sup> — ปัจจัยเสี่ยงเหล่านี้ล้วนปรับเปลี่ยนได้ด้วยวิถีชีวิต</p>
+  </div>
+
+  <!-- Data viz: NCD Risk Factors -->
+  <div class="surface rounded-xl p-6 mt-5 fade-up">
+    <h3 class="font-semibold text-base mb-1">ปัจจัยเสี่ยงพฤติกรรมของคนไทย (2564)</h3>
+    <p class="text-xs muted mb-4">สัดส่วนประชากรที่มีปัจจัยเสี่ยงแต่ละด้าน — ข้อมูลจากการสำรวจพฤติกรรมสุขภาพประชากรไทย<sup><a href="#2">[2]</a></sup></p>
+    <canvas id="riskChart" height="160"></canvas>
+  </div>
+</section>
+
+<!-- ── 6 Pillars ── -->
+<section id="how" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-2 flex items-center gap-2 fade-up">
+    <i data-lucide="layers" class="w-5 h-5 accent"></i> 6 เสาหลักสุขภาพดีสำหรับคนไทย
+  </h2>
+  <p class="muted text-sm mb-6 fade-up">แต่ละเสาหลักมีความสำคัญเท่าเทียมกัน ความสมดุลระหว่างทั้งหกด้านคือหัวใจของสุขภาพองค์รวม</p>
+  <div class="grid md:grid-cols-2 gap-5" id="pillarsGrid"></div>
+</section>
+
+<!-- ── Examples ── -->
+<section id="examples" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="lightbulb" class="w-5 h-5 accent"></i> ตัวอย่างในชีวิตจริง
+  </h2>
+  <div class="grid md:grid-cols-2 gap-5" id="examplesGrid"></div>
+</section>
+
+<!-- ── Glossary ── -->
+<section id="glossary" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="book-marked" class="w-5 h-5 accent"></i> อภิธานศัพท์
+  </h2>
+  <div class="surface rounded-xl p-8 fade-up">
+    <dl>
+      <div>
+        <dt>โรคไม่ติดต่อเรื้อรัง (NCDs — Non-Communicable Diseases)</dt>
+        <dd>โรคที่ไม่ได้ติดต่อจากคนสู่คน ได้แก่ โรคหัวใจและหลอดเลือด มะเร็ง เบาหวาน โรคทางเดินหายใจเรื้อรัง เป็นสาเหตุการเสียชีวิต 71% ของคนไทย<sup><a href="#11">[11]</a></sup></dd>
+      </div>
+      <div>
+        <dt>ธงโภชนาการ (Nutrition Flag)</dt>
+        <dd>แผนภาพแนะนำสัดส่วนอาหาร 5 หมู่จากสำนักโภชนาการ กรมอนามัย กระทรวงสาธารณสุข แสดงสัดส่วนที่เหมาะสมสำหรับผู้ใหญ่ไทย<sup><a href="#10">[10]</a></sup></dd>
+      </div>
+      <div>
+        <dt>ดัชนีมวลกาย (BMI — Body Mass Index)</dt>
+        <dd>ค่าที่วัดสัดส่วนน้ำหนักต่อส่วนสูง (น้ำหนักกก. / ส่วนสูงเมตร²) ค่าปกติสำหรับคนเอเชีย: 18.5–22.9</dd>
+      </div>
+      <div>
+        <dt>บัตรทอง (UC — Universal Coverage Gold Card)</dt>
+        <dd>บัตรสวัสดิการสุขภาพของ สปสช. สำหรับประชาชนทั่วไปที่ไม่ได้อยู่ในระบบประกันสังคมหรือสวัสดิการข้าราชการ<sup><a href="#8">[8]</a></sup></dd>
+      </div>
+      <div>
+        <dt>การแพทย์แผนไทย (TTM — Traditional Thai Medicine)</dt>
+        <dd>ระบบการแพทย์ดั้งเดิมของไทยที่มีประวัติยาวนานกว่า 700 ปี ครอบคลุมสมุนไพร นวด หัตถเวช และโภชนาการแบบไทย<sup><a href="#4">[4]</a></sup></dd>
+      </div>
+      <div>
+        <dt>Curcumin / คอร์คิวมิน</dt>
+        <dd>สารสำคัญในขมิ้นชัน (Curcuma longa) มีฤทธิ์ต้านการอักเสบและต้านอนุมูลอิสระ มีหลักฐานทางคลินิกสนับสนุนมากที่สุดในบรรดาสมุนไพรไทย<sup><a href="#5">[5]</a></sup></dd>
+      </div>
+      <div>
+        <dt>Circadian Rhythm / จังหวะชีวภาพ</dt>
+        <dd>ระบบควบคุมวงจรการตื่น-นอนตามธรรมชาติของร่างกาย (24 ชั่วโมง) การรักษาเวลาตื่น-นอนที่สม่ำเสมอช่วยเพิ่มคุณภาพการนอนและสุขภาพโดยรวม</dd>
+      </div>
+      <div>
+        <dt>Sarcopenia / ภาวะมวลกล้ามเนื้อลดลงตามอายุ</dt>
+        <dd>ภาวะที่กล้ามเนื้อลดลงตามอายุ เสี่ยงในผู้สูงอายุ ป้องกันได้ด้วยการรับประทานโปรตีนเพียงพอและออกกำลังกายสม่ำเสมอ</dd>
+      </div>
+      <div>
+        <dt>Aerobic Exercise / การออกกำลังกายแบบแอโรบิก</dt>
+        <dd>การออกกำลังกายที่ใช้ออกซิเจน เพิ่มความทนทานของหัวใจและปอด เช่น วิ่ง ว่ายน้ำ ปั่นจักรยาน WHO แนะนำ 150–300 นาที/สัปดาห์<sup><a href="#12">[12]</a></sup></dd>
+      </div>
+      <div>
+        <dt>สุขภาวะ (Holistic Well-being)</dt>
+        <dd>สุขภาพองค์รวมที่ครอบคลุมทั้ง 4 มิติ: กาย จิต สังคม และจิตวิญญาณ ตามแนวคิดของ สสส. (สำนักงานกองทุนสนับสนุนการสร้างเสริมสุขภาพ)</dd>
+      </div>
+      <div>
+        <dt>ประกันสังคม (SSO — Social Security Office)</dt>
+        <dd>ระบบประกันสุขภาพสำหรับลูกจ้างเอกชน ให้สิทธิตรวจสุขภาพเชิงป้องกัน 14 รายการร่วมกับบัตรทอง ตั้งแต่ 1 เมษายน 2567<sup><a href="#8">[8]</a></sup></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<!-- ── Sources ── -->
+<section id="sources" class="max-w-5xl mx-auto px-6 mb-16">
+  <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 fade-up">
+    <i data-lucide="link" class="w-5 h-5 accent"></i> แหล่งข้อมูล
+  </h2>
+  <div class="surface rounded-xl p-8 text-sm fade-up">
+    <ol class="space-y-2 leading-relaxed" style="padding-left:1.5em;">
+      <li id="1"><a href="https://www.nationthailand.com/health-wellness/40057925" target="_blank" rel="noopener">Rising Non-Communicable Diseases: Thailand's major health crisis</a> — The Nation Thailand (2024)</li>
+      <li id="2"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12100955/" target="_blank" rel="noopener">Prevalence of NCD risk factors and economic status — 2021 health behaviour survey, Thailand</a> — Tantiwattanakul P et al., Global Health Action / PMC (2025)</li>
+      <li id="3"><a href="https://www.webmd.com/diet/ss/slideshow-thai-food-health" target="_blank" rel="noopener">Best and Worst Thai Dishes for Your Health</a> — WebMD (2024)</li>
+      <li id="4"><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11872421/" target="_blank" rel="noopener">Culinary and medicinal wonders of the wild: An ethnobotanical review of native herbs and spices in Thailand</a> — Habtemariam S et al., Heliyon / PMC (2025)</li>
+      <li id="5"><a href="https://www.nccih.nih.gov/health/turmeric" target="_blank" rel="noopener">Turmeric: Usefulness and Safety</a> — NCCIH / NIH (2024)</li>
+      <li id="6"><a href="https://www.thaihealth.or.th/%E0%B8%AA%E0%B8%B2%E0%B8%A2%E0%B8%94%E0%B9%88%E0%B8%A7%E0%B8%99%E0%B8%AA%E0%B8%B8%E0%B8%82%E0%B8%A0%E0%B8%B2%E0%B8%9E%E0%B8%88%E0%B8%B4%E0%B8%95%E0%B9%80%E0%B8%9C%E0%B8%A2%E0%B8%84%E0%B8%A7%E0%B8%B2/" target="_blank" rel="noopener">สายด่วนสุขภาพจิตเผยความเครียด-กังวล-ทำงานไม่มีความสุข ปัญหาใหญ่อันดับ 1 ของแรงงานไทย</a> — สสส. (2024)</li>
+      <li id="7"><a href="https://brandinside.asia/samsung-world-sleep-2025-trends/" target="_blank" rel="noopener">คนอาเซียน-โอเชียเนียนอนน้อยกว่ามาตรฐาน เฉลี่ยคืนละ 6 ชั่วโมง 50 นาที</a> — Brandinside / Samsung Global Sleep Health Study (2025)</li>
+      <li id="8"><a href="https://www.bangkokbiznews.com/health/well-being/1120343" target="_blank" rel="noopener">อย่ารอช้า!! ประกันสังคม - บัตรทอง ตรวจสุขภาพฟรี 14 รายการ เริ่ม 1 เม.ย.นี้</a> — Bangkok Biz News / สปสช. (2567/2024)</li>
+      <li id="9"><a href="https://www.who.int/southeastasia/activities/thailand-s-physical-activity-drive-is-improving-physical-health" target="_blank" rel="noopener">Thailand's physical activity drive is improving physical health</a> — WHO South-East Asia (2023)</li>
+      <li id="10"><a href="https://nutrition2.anamai.moph.go.th/th/cms-of-10" target="_blank" rel="noopener">ธงโภชนาการ (Nutrition Flag)</a> — สำนักโภชนาการ กรมอนามัย กระทรวงสาธารณสุข (2563/2020)</li>
+      <li id="11"><a href="https://www.who.int/thailand/our-work/NCDs" target="_blank" rel="noopener">Health in all public policies for the prevention and control of NCDs</a> — WHO Thailand (2024)</li>
+      <li id="12"><a href="https://www.who.int/publications/i/item/9789240015128" target="_blank" rel="noopener">WHO Guidelines on Physical Activity and Sedentary Behaviour</a> — World Health Organization (2020)</li>
+      <li id="13"><a href="https://www.ncbi.nlm.nih.gov/books/NBK92752/" target="_blank" rel="noopener">Turmeric, the Golden Spice — Herbal Medicine</a> — NCBI Bookshelf / NIH (2020)</li>
+      <li id="14"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12023551/" target="_blank" rel="noopener">Anti-inflammatory and antibacterial effects of a Thai traditional medicine formula from Wat Pho</a> — Kladpetch W et al., Frontiers / PMC (2025)</li>
+      <li id="15"><a href="https://www.hfocus.org/content/2024/09/31560" target="_blank" rel="noopener">ผลสำรวจพนักงานไทย 40% เครียดสูง เสี่ยงซึมเศร้า 17.2% อาจทำร้ายตัวเอง 10.6%</a> — Hfocus.org (2567/2024)</li>
+      <li id="16"><a href="https://www.undp.org/sites/g/files/zskgke326/files/migration/th/UNDP_TH_WHO_THAILAND_NCD-IC-REPORT_v06_231121.pdf" target="_blank" rel="noopener">Thailand Prevention and Control of Noncommunicable Diseases (NCD-IC Report)</a> — UNDP / WHO Thailand (2023)</li>
+      <li id="17"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC11562084/" target="_blank" rel="noopener">Trends in hypertension prevalence, awareness, treatment, and control in the Thai population, 2004–2020</a> — Tanamas SK et al., PMC (2024)</li>
+      <li id="18"><a href="https://www.nature.com/articles/s41598-025-17619-5" target="_blank" rel="noopener">Diabetes trends and determinants among Thai adults from 2004 to 2020</a> — Jinatongthai P et al., Scientific Reports / Nature (2025)</li>
+      <li id="19"><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10887578/" target="_blank" rel="noopener">A Culinary and Medicinal Gem: Exploring the Phytochemical and Functional Properties of Thai Basil</a> — Plengsuriyakarn T et al., PMC / Nutrients (2024)</li>
+      <li id="20"><a href="https://globalwellnessinstitute.org/global-wellness-institute-blog/2025/04/02/sleep-initiative-trends-for-2025/" target="_blank" rel="noopener">Sleep Initiative Trends for 2025</a> — Global Wellness Institute (2025)</li>
+      <li id="21"><a href="https://www.researchgate.net/publication/376993503_The_Role_of_Thai_Local_Herbs_and_Ingredients_in_Promoting_Post-Pandemic_Wellness_and_Medical_Tourism_for_Sustainable_Development_Goal_3_A_Critical_Review_of_the_Literature" target="_blank" rel="noopener">The Role of Thai Local Herbs and Ingredients in Promoting Post-Pandemic Wellness and Medical Tourism</a> — ResearchGate (2023)</li>
+      <li id="22"><a href="https://thaidj.org/index.php/JHS/article/view/11576/10016" target="_blank" rel="noopener">Thailand Physical Activity Strategy 2018–2030: Challenges and Recommendations</a> — Thai Journal of Health Sciences (2022)</li>
+      <li id="23"><a href="https://www.hfocus.org/content/2024/07/31045" target="_blank" rel="noopener">คนวัยทำงาน 76% มีภาวะเครียดจากบรรยากาศงานและภาระงานหนัก</a> — สสส. / Hfocus.org (2567/2024)</li>
+      <li id="24"><a href="https://he02.tci-thaijo.org/index.php/jph/article/view/265247" target="_blank" rel="noopener">Prevalence of Noncommunicable Diseases and Social Determinants of Health in Thailand</a> — Thai Journal of Public Health / Mahidol University (2023)</li>
+    </ol>
+
+    <h3 class="font-semibold mt-8 mb-3 flex items-center gap-2">
+      <i data-lucide="youtube" class="w-4 h-4 accent"></i> แหล่งข้อมูลวิดีโอ (YouTube — รวบรวมผ่าน NotebookLM)
+    </h3>
+    <ol class="space-y-2 leading-relaxed" style="padding-left:1.5em;">
+      <li><a href="https://www.youtube.com/watch?v=2Y-D2Tv950Q" target="_blank" rel="noopener">12 อาหารทานเป็นยา เพื่อรักษาสุขภาพ</a> — YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=U7d1-_SWJv4" target="_blank" rel="noopener">Re-Mind EP.2 — การจัดการความเครียดด้วยตนเอง</a> — Mahidol Channel, YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=4tqghj6bRpQ" target="_blank" rel="noopener">วิดีโอด้านสุขภาพ</a> — YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=HcXtB9wM_GI" target="_blank" rel="noopener">วิดีโอด้านสุขภาพ</a> — YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=cnt0tAOvS1U" target="_blank" rel="noopener">วิดีโอด้านสุขภาพ</a> — YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=2JmcNnwnJ0k" target="_blank" rel="noopener">การแพทย์แผนไทย ก้าวไกลระดับโลก | Healthy Living วิถีสุขภาพดี</a> — คนสู้โรค, YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=snohsMewUoU" target="_blank" rel="noopener">จัดการความเครียดด้วยตัวเองอย่างง่ายๆ</a> — YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=DH7iRTvaMaY" target="_blank" rel="noopener">ธงโภชนาการและข้อปฏิบัติการกินอาหารเพื่อสุขภาพที่ดีของคนไทย EP.2</a> — YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=s77lCSozsxo" target="_blank" rel="noopener">นอนไม่หลับ ฝัน ละเมอ 'Why We Sleep' วิทยาศาสตร์การนอน</a> — Readery EP.65, YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=8czmro3Ywj4" target="_blank" rel="noopener">วงจรการหลับ วิทยาศาสตร์การนอนหลับของมนุษย์</a> — อ.ดร.นพ.ไตรรักษ์ พิสิษฐ์กุล, YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=5_r4ji0jtWk" target="_blank" rel="noopener">สิทธิการตรวจสุขภาพฟรี 14 รายการ 2569 จากสำนักงานประกันสังคม</a> — YouTube</li>
+      <li><a href="https://www.youtube.com/watch?v=lG6laKNuanc" target="_blank" rel="noopener">โรค NCDs คืออะไร? ทำไมทุกคนถึงต้องระวัง</a> — YouTube</li>
+    </ol>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="border-t border-soft mt-16 py-10">
+  <div class="max-w-5xl mx-auto px-6 flex flex-wrap items-center justify-between gap-4 text-sm muted">
+    <div>สร้างโดย <a href="../../" style="color:var(--accent);">agent-newsroom</a> เมื่อวันที่ 2026-07-01</div>
+    <div class="flex items-center gap-4">
+      <button onclick="window.print()" class="hover:text-current transition flex items-center gap-1 bg-transparent border-none cursor-pointer text-sm muted">
+        <i data-lucide="printer" class="w-4 h-4"></i> พิมพ์
+      </button>
+      <a href="../../" class="hover:text-current transition flex items-center gap-1" style="text-decoration:none;color:inherit;">
+        <i data-lucide="home" class="w-4 h-4"></i> กลับหน้าหลัก
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════ SCRIPTS ═══ -->
+<script>
+// ── Lucide icons ──
+lucide.createIcons();
+
+// ── Scroll progress bar ──
+window.addEventListener('scroll', () => {
+  const pct = window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+});
+
+// ── animateCounter ──
+function animateCounter(el, target, duration, suffix) {
+  duration = duration || 1200;
+  suffix = suffix || '';
+  const start = performance.now();
+  const update = (now) => {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(ease * target) + suffix;
+    if (t < 1) requestAnimationFrame(update);
+  };
+  requestAnimationFrame(update);
+}
+
+// ── Entrance animation (IntersectionObserver) ──
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+  });
+}, { threshold: 0.07 });
+
+// Counter observer (for data-target elements outside reel)
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(e.target, Number(e.target.dataset.target), 1200, e.target.dataset.suffix || '');
+      counterObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+// ── Insight Reel ──
+const insights = [
+  {
+    icon: 'alert-triangle',
+    stat: '354K',
+    target: 354,
+    suffix: 'K',
+    statLabel: 'คน/ปี เสียชีวิตจาก NCDs',
+    headline: 'วิกฤต NCDs คร่าชีวิตคนไทยปีละ 354,000 คน',
+    body: 'คิดเป็น 71% ของการเสียชีวิตทั้งหมด โรคหัวใจ มะเร็ง เบาหวาน ความดัน ล้วนป้องกันได้ด้วยการปรับเปลี่ยนพฤติกรรมในชีวิตประจำวัน',
+    color: '#EF4444'
+  },
+  {
+    icon: 'heart',
+    stat: '29%',
+    target: 29,
+    suffix: '%',
+    statLabel: 'ของคนไทยมีความดันโลหิตสูง',
+    headline: 'เกือบ 1 ใน 3 ของคนไทยมีความดันโลหิตสูง',
+    body: 'และ 48% ไม่รู้ตัวว่าตัวเองป่วย ความดันโลหิตสูงเป็น "ภัยเงียบ" ที่ไม่มีอาการชัดเจนจนถึงขั้นวิกฤต การตรวจสุขภาพจึงสำคัญมาก',
+    color: '#6366F1'
+  },
+  {
+    icon: 'brain',
+    stat: '40%',
+    target: 40,
+    suffix: '%',
+    statLabel: 'ของวัยทำงานมีความเครียดสูง',
+    headline: 'ความเครียดในที่ทำงานเป็นวิกฤตสาธารณสุขของไทย',
+    body: '17.2% เสี่ยงซึมเศร้า และ 10.6% เสี่ยงทำร้ายตัวเอง ปัญหาความเครียดและวิตกกังวลคือเหตุผลอันดับ 1 ที่คนโทรสายด่วน 1323',
+    color: '#F59E0B'
+  },
+  {
+    icon: 'moon',
+    stat: '70%',
+    target: 70,
+    suffix: '%',
+    statLabel: 'ของคนเมืองใช้มือถือก่อนนอน',
+    headline: 'ยุคดิจิทัลทำให้คนไทยนอนไม่พอ',
+    body: 'คนเอเชียนอนเฉลี่ยเพียง 6 ชั่วโมง 50 นาที ต่ำกว่าเป้าหมาย 7–9 ชั่วโมงของ WHO แสง Blue Light จากหน้าจอยับยั้งการหลั่ง Melatonin',
+    color: '#8B5CF6'
+  },
+  {
+    icon: 'activity',
+    stat: '150',
+    target: 150,
+    suffix: ' นาที',
+    statLabel: 'ต่อสัปดาห์ — เป้าหมาย WHO',
+    headline: 'ออกกำลังกาย 150 นาที/สัปดาห์ ป้องกันโรคได้จริง',
+    body: 'ออกก่อน 09.00 น. หรือหลัง 17.00 น. เพื่อหลีกเลี่ยงความร้อน 30–36°C ของไทย มวยไทย ว่ายน้ำ โยคะ และ HIIT ล้วนเหมาะสมกับสภาพภูมิอากาศไทย',
+    color: '#10B981'
+  },
+  {
+    icon: 'shield-check',
+    stat: '14',
+    target: 14,
+    suffix: ' รายการ',
+    statLabel: 'ตรวจสุขภาพฟรี บัตรทอง/ประกันสังคม',
+    headline: '14 รายการตรวจสุขภาพฟรี สำหรับคนไทยทุกคน',
+    body: 'ตรวจเบาหวาน ความดัน ไขมัน มะเร็งปากมดลูก มะเร็งลำไส้ และอื่นๆ โดยไม่เสียค่าใช้จ่าย ตั้งแต่ 1 เมษายน 2567 ผ่านแอป "เป๋าตัง" หรือโทร 1330',
+    color: '#0EA5E9'
+  }
+];
+
+let reelIdx = 0, reelTimer = null, reelAnimating = false;
+
+function buildSlide(ins) {
+  return `<div style="display:flex;align-items:center;gap:2rem;padding:2rem 2.5rem;flex-wrap:wrap;">
+    <div style="text-align:center;min-width:120px;flex-shrink:0;">
+      <div style="font-size:2.8rem;font-weight:800;color:${ins.color};line-height:1;" class="reel-stat" data-target="${ins.target}" data-suffix="${ins.suffix}">0${ins.suffix}</div>
+      <div style="font-size:0.7rem;color:#71717a;margin-top:6px;line-height:1.4;">${ins.statLabel}</div>
+    </div>
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;line-height:1.4;">${ins.headline}</div>
+      <div style="font-size:0.875rem;color:#71717a;line-height:1.65;">${ins.body}</div>
+    </div>
+  </div>`;
+}
+
+function showSlide(idx, animate) {
+  if (animate === undefined) animate = true;
+  if (reelAnimating && animate) return;
+  reelAnimating = true;
+  reelIdx = ((idx % insights.length) + insights.length) % insights.length;
+
+  const wrap = document.getElementById('reelSlides');
+
+  if (animate) {
+    wrap.style.opacity = '0';
+    wrap.style.transform = 'translateY(8px)';
+    wrap.style.transition = 'opacity .35s ease, transform .35s ease';
+  }
+
+  const delay = animate ? 350 : 0;
+  setTimeout(function() {
+    wrap.innerHTML = buildSlide(insights[reelIdx]);
+    if (animate) {
+      wrap.style.opacity = '1';
+      wrap.style.transform = 'none';
+    }
+    reelAnimating = false;
+
+    // Animate counter
+    const statEl = wrap.querySelector('.reel-stat');
+    if (statEl) {
+      animateCounter(statEl, Number(statEl.dataset.target), 1200, statEl.dataset.suffix || '');
+    }
+  }, delay);
+
+  // Dots
+  document.querySelectorAll('.reel-dot').forEach(function(d, i) {
+    d.style.background = i === reelIdx ? 'var(--accent)' : '#d4d4d8';
+  });
+
+  // Progress bar reset + re-run
+  const bar = document.getElementById('reelProgress');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      bar.style.transition = 'width 4s linear';
+      bar.style.width = '100%';
+    });
+  });
+}
+
+function startReel() { reelTimer = setInterval(function() { showSlide(reelIdx + 1); }, 4000); }
+function stopReel() { clearInterval(reelTimer); }
+
+// Build dots
+const dotsWrap = document.getElementById('reelDots');
+insights.forEach(function(_, i) {
+  const d = document.createElement('button');
+  d.className = 'reel-dot';
+  d.style.cssText = 'width:8px;height:8px;border-radius:999px;border:none;cursor:pointer;transition:background .2s;background:#d4d4d8;padding:0;';
+  d.onclick = function() { stopReel(); showSlide(i); startReel(); };
+  dotsWrap.appendChild(d);
+});
+
+// Keyboard nav
+const reelEl = document.getElementById('reel');
+reelEl.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight') { stopReel(); showSlide(reelIdx + 1); startReel(); }
+  if (e.key === 'ArrowLeft')  { stopReel(); showSlide(reelIdx - 1); startReel(); }
+});
+
+// Pause on hover
+reelEl.addEventListener('mouseenter', stopReel);
+reelEl.addEventListener('mouseleave', startReel);
+
+// Init
+showSlide(0, false);
+startReel();
+
+// ── 6 Pillars ──
+const pillars = [
+  {
+    icon: 'utensils',
+    color: '#10B981',
+    num: '1',
+    title: 'โภชนาการสมดุล',
+    desc: 'ใช้ธงโภชนาการของกรมอนามัยเป็นแนวทาง ยึดสูตร <strong>2:1:1</strong> ต่อมื้อ (ข้าว 2 ส่วน + ผัก 1 + โปรตีน 1) เลือกข้าวกล้องแทนข้าวขาว ลดน้ำตาล เกลือ และกะทิ อาหารไทยดั้งเดิมเช่น ต้มยำน้ำใส และผัดผักน้ำมันน้อย คือตัวเลือกที่ดีเยี่ยม<sup><a href="#3">[3]</a></sup>',
+    tip: '56.93% ของคนไทยรับประทานอาหารไม่ถูกต้อง — เริ่มจากการลดน้ำตาลในเครื่องดื่มทีละแก้ว'
+  },
+  {
+    icon: 'activity',
+    color: '#6366F1',
+    num: '2',
+    title: 'การออกกำลังกายสม่ำเสมอ',
+    desc: 'WHO แนะนำ <strong>150–300 นาที/สัปดาห์</strong> สำหรับผู้ใหญ่ พร้อมเสริมฝึกกล้ามเนื้ออย่างน้อย 2 วัน/สัปดาห์<sup><a href="#12">[12]</a></sup> สำหรับสภาพอากาศไทย ควรออกก่อน 09.00 น. หรือหลัง 17.00 น. กีฬาที่เหมาะสม: มวยไทย ว่ายน้ำ โยคะ HIIT และเดินในสวนสาธารณะ<sup><a href="#9">[9]</a></sup>',
+    tip: 'ดื่มน้ำก่อน ระหว่าง และหลังออกกำลังกายเสมอ เพิ่มอิเล็กโทรไลต์เมื่อออกกำลังกายนาน >45 นาที'
+  },
+  {
+    icon: 'smile',
+    color: '#F59E0B',
+    num: '3',
+    title: 'สุขภาพจิตและการจัดการความเครียด',
+    desc: 'คนวัยทำงาน <strong>40%</strong> มีความเครียดสูง<sup><a href="#15">[15]</a></sup> และ 76% เครียดจากบรรยากาศงาน<sup><a href="#23">[23]</a></sup> แนวทาง: ฝึกสมาธิ/เจริญสติ (มีหลักฐานว่าลด Cortisol ได้จริง) นวดแผนไทย กิจกรรมทางสังคม และกำหนดขอบเขตงาน (work-life boundary) อย่างชัดเจน',
+    tip: 'สายด่วนสุขภาพจิต 1323 — ฟรีตลอด 24 ชั่วโมง 365 วัน ไม่ต้องรอจนวิกฤต'
+  },
+  {
+    icon: 'moon',
+    color: '#8B5CF6',
+    num: '4',
+    title: 'การนอนหลับที่มีคุณภาพ',
+    desc: 'ผู้ใหญ่ควรนอน <strong>7–9 ชั่วโมง/คืน</strong> ตามมาตรฐาน WHO แต่คนเอเชียนอนเฉลี่ยเพียง 6 ชั่วโมง 50 นาที<sup><a href="#7">[7]</a></sup> ปิดจอภาพทุกชนิด 60 นาทีก่อนนอน รักษาเวลานอนให้สม่ำเสมอแม้วันหยุด ปรับห้องนอนให้เย็น (20–22°C) มืด และเงียบ<sup><a href="#20">[20]</a></sup>',
+    tip: 'งดกาแฟและชาหลัง 14.00 น. เพราะ Caffeine มีฤทธิ์ยาวนาน 5–6 ชั่วโมง'
+  },
+  {
+    icon: 'leaf',
+    color: '#059669',
+    num: '5',
+    title: 'สมุนไพรและการแพทย์แผนไทย',
+    desc: '<strong>ขมิ้นชัน (Curcumin)</strong> มีหลักฐานทางคลินิกแข็งแกร่งที่สุด: ต้านการอักเสบ ต้านอนุมูลอิสระ ปลอดภัยสูงในปริมาณอาหาร<sup><a href="#5">[5]</a></sup> ข่า ตะไคร้ กะเพรา มีหลักฐาน preclinical ที่น่าสนใจแต่ยังต้องการการวิจัยเพิ่มเติม<sup><a href="#4">[4]</a></sup> การนวดแผนไทยมีหลักฐานบางส่วนว่าลดความเครียดและปวดกล้ามเนื้อ',
+    tip: 'ใช้สมุนไพรเป็นส่วนเสริม ไม่ใช่ทดแทนยาแผนปัจจุบัน ปรึกษาแพทย์ก่อนเสมอ'
+  },
+  {
+    icon: 'shield-check',
+    color: '#0EA5E9',
+    num: '6',
+    title: 'การตรวจสุขภาพเชิงป้องกัน',
+    desc: 'ผู้มีสิทธิ <strong>บัตรทอง (สปสช.)</strong> และ <strong>ประกันสังคม</strong> ตรวจสุขภาพฟรี 14 รายการ ตั้งแต่ 1 เมษายน 2567<sup><a href="#8">[8]</a></sup> ได้แก่ เบาหวาน ความดัน ไขมัน ไต ตับอักเสบ มะเร็งปากมดลูก มะเร็งลำไส้ใหญ่ การได้ยิน การมองเห็น และเอกซเรย์ทรวงอก จองนัดผ่านแอป "เป๋าตัง" หรือโทร 1330',
+    tip: 'ความดันโลหิตสูง 48% ไม่รู้ตัว และเบาหวาน 27% ไม่รู้ตัว — การตรวจคือการป้องกันที่ดีที่สุด'
+  }
+];
+
+const pillarsGrid = document.getElementById('pillarsGrid');
+pillars.forEach(function(p, i) {
+  const div = document.createElement('div');
+  div.className = 'card card-hover scale-in';
+  div.style.transitionDelay = Math.min(i * 80, 400) + 'ms';
+  div.innerHTML = `
+    <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem;">
+      <div class="pillar-icon">
+        <i data-lucide="${p.icon}" style="width:20px;height:20px;color:${p.color};"></i>
+      </div>
+      <div>
+        <div style="font-size:0.65rem;font-weight:600;color:#71717a;letter-spacing:0.08em;margin-bottom:2px;">เสาหลักที่ ${p.num}</div>
+        <h3 style="font-size:1rem;font-weight:700;margin:0;">${p.title}</h3>
+      </div>
+    </div>
+    <p style="font-size:0.875rem;line-height:1.7;color:#52525b;margin-bottom:1rem;">${p.desc}</p>
+    <div style="background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-size:0.8rem;line-height:1.5;">
+      <span style="color:var(--accent);font-weight:600;">💡 เคล็ดลับ:</span> ${p.tip}
+    </div>`;
+  pillarsGrid.appendChild(div);
+});
+
+// Re-init lucide for dynamically added icons
+lucide.createIcons();
+
+// ── Examples ──
+const examples = [
+  {
+    icon: 'briefcase',
+    title: 'คนเมืองวัยทำงาน (อายุ 30–45 ปี)',
+    color: '#6366F1',
+    schedule: [
+      { time: '06.00 น.', detail: 'ตื่นตรงเวลาทุกวัน (รักษา Circadian Rhythm)' },
+      { time: '06.30 น.', detail: 'ออกกำลังกาย 30–45 นาที (วิ่ง/ว่ายน้ำ/โยคะ) ก่อนแดดจัด' },
+      { time: '07.30 น.', detail: 'อาหารเช้า: ข้าวต้มปลา + ผักต้ม หรือข้าวกล้องกับไข่ต้ม + ผลไม้ + น้ำเปล่า' },
+      { time: '12.00 น.', detail: 'เลือกข้าวราดแกงที่มีผักมาก ลดเมนูทอด งดน้ำหวาน เดินหลังอาหาร 10–15 นาที' },
+      { time: '17.30 น.', detail: 'ออกกำลังกายเพิ่มเติม หรือผ่อนคลายด้วยโยคะ/ยืดเหยียด' },
+      { time: '21.00 น.', detail: 'วางโทรศัพท์ 60 นาทีก่อนนอน อาบน้ำอุ่น ปิดไฟ เข้านอนก่อน 23.00 น.' }
+    ]
+  },
+  {
+    icon: 'users',
+    title: 'ผู้สูงอายุ (อายุ 60 ปีขึ้นไป)',
+    color: '#10B981',
+    schedule: [
+      { time: 'การออกกำลังกาย', detail: 'รำมวยจีน เดิน หรือว่ายน้ำ อย่างน้อย 150 นาที/สัปดาห์ หลีกเลี่ยงกิจกรรมกระแทกสูง' },
+      { time: 'โภชนาการ', detail: 'เน้นโปรตีนสูง (ปลา ไข่ ถั่ว) เพื่อป้องกัน Sarcopenia (กล้ามเนื้อลีบตามอายุ)' },
+      { time: 'สุขภาพจิต', detail: 'ฝึกสมาธิหรือเจริญสติ ทำกิจกรรมทางสังคม เข้าร่วมชมรมผู้สูงอายุในชุมชน' },
+      { time: 'การตรวจสุขภาพ', detail: 'ตรวจสุขภาพประจำปีครบทุกรายการตามสิทธิ ตรวจตา ตรวจการได้ยิน และ FIT Test มะเร็งลำไส้ใหญ่' },
+      { time: 'การนอนหลับ', detail: 'รักษาเวลานอนสม่ำเสมอ งดนอนกลางวันนานเกิน 30 นาที ระวังยาที่รบกวนการนอน' },
+      { time: 'สมุนไพร', detail: 'ปรึกษาแพทย์ก่อนใช้สมุนไพรเสริม โดยเฉพาะหากมียาแผนปัจจุบันที่รับประทานอยู่' }
+    ]
+  }
+];
+
+const examplesGrid = document.getElementById('examplesGrid');
+examples.forEach(function(ex, i) {
+  const div = document.createElement('div');
+  div.className = 'card card-hover fade-up';
+  div.style.transitionDelay = (i * 120) + 'ms';
+  div.innerHTML = `
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.25rem;">
+      <div style="width:40px;height:40px;border-radius:10px;background:${ex.color}18;display:flex;align-items:center;justify-content:center;">
+        <i data-lucide="${ex.icon}" style="width:20px;height:20px;color:${ex.color};"></i>
+      </div>
+      <h3 style="font-size:1rem;font-weight:700;margin:0;line-height:1.3;">${ex.title}</h3>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:0.75rem;">
+      ${ex.schedule.map(function(s) {
+        return `<div style="display:flex;gap:0.75rem;align-items:flex-start;">
+          <span style="min-width:80px;font-size:0.7rem;font-weight:600;color:${ex.color};padding-top:2px;line-height:1.4;">${s.time}</span>
+          <span style="font-size:0.85rem;line-height:1.6;color:#52525b;">${s.detail}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  examplesGrid.appendChild(div);
+});
+
+lucide.createIcons();
+
+// ── Observe all animated elements ──
+document.querySelectorAll('.fade-up, .fade-left, .scale-in').forEach(function(el) { io.observe(el); });
+document.querySelectorAll('[data-target]').forEach(function(el) { counterObserver.observe(el); });
+
+// ── Chart.js: NCD Risk Factors ──
+const ctx = document.getElementById('riskChart');
+if (ctx) {
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: [
+        'อาหารไม่ถูกต้อง',
+        'น้ำหนักเกิน/อ้วน',
+        'ออกกำลังกายไม่พอ',
+        'ดื่มแอลกอฮอล์',
+        'สูบบุหรี่'
+      ],
+      datasets: [{
+        label: 'สัดส่วนประชากร (%)',
+        data: [56.93, 50.03, 42.70, 29.73, 16.61],
+        backgroundColor: [
+          '#EF444480',
+          '#F59E0B80',
+          '#6366F180',
+          '#8B5CF680',
+          '#6B728080'
+        ],
+        borderColor: [
+          '#EF4444',
+          '#F59E0B',
+          '#6366F1',
+          '#8B5CF6',
+          '#6B7280'
+        ],
+        borderWidth: 1.5,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      animation: { duration: 900, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) { return ' ' + ctx.raw + '%'; }
+          }
+        }
+      },
+      scales: {
+        x: {
+          beginAtZero: true,
+          max: 70,
+          ticks: { callback: function(v) { return v + '%'; }, font: { size: 11 } },
+          grid: { color: '#e4e4e740' }
+        },
+        y: {
+          ticks: { font: { size: 12 } },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
